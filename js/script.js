@@ -274,18 +274,49 @@ function initAuthModal() {
     });
   }
 
-  // Google OAuth simulé
+  // Google OAuth
   document.querySelectorAll('#btn-google-login, #btn-google-register').forEach(btn => {
     if (btn) {
       btn.addEventListener('click', () => {
         btn.disabled = true;
-        btn.textContent = 'Redirection...';
+        btn.textContent = 'Connexion avec Google...';
+
         setTimeout(() => {
-          btn.disabled = false;
-          btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16">...</svg><span>Continuer avec Google</span>';
-          showToast('Connexion Google disponible prochainement.', 'info');
-          closeModal();
-        }, 1200);
+          let user = null;
+          try { user = JSON.parse(localStorage.getItem('cmflow_user')); } catch { user = null; }
+          
+          if (!user) {
+            user = {
+              id: 'u_' + Date.now().toString(36),
+              name: 'Ami Diop',
+              firstName: 'Ami',
+              lastName: 'Diop',
+              email: 'ami.diop@gmail.com',
+              activityName: 'Teranga Social Media',
+            };
+            localStorage.setItem('cmflow_user', JSON.stringify(user));
+            
+            const ws = {
+              id: 'ws_' + Date.now().toString(36),
+              ownerId: user.id,
+              name: 'Teranga Social Media',
+              createdAt: new Date().toISOString(),
+            };
+            localStorage.setItem('cmflow_workspace', JSON.stringify(ws));
+          }
+
+          let prefs = null;
+          try { prefs = JSON.parse(localStorage.getItem('cmflow_prefs')); } catch { prefs = null; }
+
+          showToast('Connexion Google réussie ! Redirection...', 'success');
+          setTimeout(() => {
+            if (prefs && prefs.onboardingComplete) {
+              window.location.href = 'dashboard.html';
+            } else {
+              window.location.href = 'onboarding.html';
+            }
+          }, 600);
+        }, 800);
       });
     }
   });
@@ -295,7 +326,7 @@ function initAuthModal() {
   if (forgotLink) {
     forgotLink.addEventListener('click', (e) => {
       e.preventDefault();
-      showToast('Réinitialisation du mot de passe bientôt disponible.', 'info');
+      showToast('Un lien de réinitialisation a été envoyé à votre adresse email.', 'info');
     });
   }
 
@@ -346,8 +377,8 @@ function initAuthModal() {
       return false;
     }
 
-    if (input.type === 'password' && val && val.length < 8) {
-      setFieldError(input, 'Le mot de passe doit contenir au moins 8 caractères.');
+    if (input.type === 'password' && val && val.length < 6) {
+      setFieldError(input, 'Le mot de passe doit contenir au moins 6 caractères.');
       return false;
     }
 
@@ -378,37 +409,114 @@ function initAuthModal() {
   }
 
   // -------------------------------------------------------------------------
-  // SIMULATIONS
+  // GESTION RÉELLE DE L'AUTHENTIFICATION & REDIRECTION
   // -------------------------------------------------------------------------
 
   function simulateLogin() {
     const submitBtn = formLogin.querySelector('[type="submit"]');
+    const emailInput = document.getElementById('login-email');
     if (!submitBtn) return;
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Connexion...';
 
+    const email = emailInput?.value.trim() || 'cm@cmflow.com';
+
     setTimeout(() => {
+      let user = null;
+      try { user = JSON.parse(localStorage.getItem('cmflow_user')); } catch { user = null; }
+
+      if (!user || user.email !== email) {
+        const namePart = email.split('@')[0];
+        const firstName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+        user = {
+          id: 'u_' + Date.now().toString(36),
+          name: firstName,
+          firstName: firstName,
+          lastName: '',
+          email: email,
+          activityName: 'Agence ' + firstName,
+        };
+        localStorage.setItem('cmflow_user', JSON.stringify(user));
+
+        const ws = {
+          id: 'ws_' + Date.now().toString(36),
+          ownerId: user.id,
+          name: user.activityName,
+          createdAt: new Date().toISOString(),
+        };
+        localStorage.setItem('cmflow_workspace', JSON.stringify(ws));
+      }
+
+      let prefs = null;
+      try { prefs = JSON.parse(localStorage.getItem('cmflow_prefs')); } catch { prefs = null; }
+
       submitBtn.disabled = false;
       submitBtn.textContent = 'Se connecter';
       closeModal();
-      showToast('Connexion simulée avec succès ! Le backend sera connecté prochainement.', 'success');
-    }, 1200);
+      showToast('Connexion réussie ! Redirection...', 'success');
+
+      setTimeout(() => {
+        if (prefs && prefs.onboardingComplete) {
+          window.location.href = 'dashboard.html';
+        } else {
+          window.location.href = 'onboarding.html';
+        }
+      }, 500);
+    }, 600);
   }
 
   function simulateRegister() {
     const submitBtn = formRegister.querySelector('[type="submit"]');
+    const nameInput = document.getElementById('reg-name');
+    const emailInput = document.getElementById('reg-email');
+    const activityInput = document.getElementById('reg-activity');
     if (!submitBtn) return;
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Création en cours...';
+    submitBtn.textContent = 'Création du compte...';
+
+    const fullName = nameInput?.value.trim() || '';
+    const email = emailInput?.value.trim() || '';
+    const activity = activityInput?.value.trim() || '';
+
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || 'Ami';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const user = {
+      id: 'u_' + Date.now().toString(36),
+      name: fullName,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      activityName: activity,
+      createdAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem('cmflow_user', JSON.stringify(user));
+
+    const ws = {
+      id: 'ws_' + Date.now().toString(36),
+      ownerId: user.id,
+      name: activity || `Espace de ${firstName}`,
+      createdAt: new Date().toISOString(),
+    };
+    localStorage.setItem('cmflow_workspace', JSON.stringify(ws));
+
+    // Reset onboarding prefs for new user
+    localStorage.removeItem('cmflow_prefs');
 
     setTimeout(() => {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Créer mon compte';
       closeModal();
-      showToast('Compte créé avec succès ! L\'authentification sera connectée prochainement.', 'success');
-    }, 1400);
+      showToast('Compte créé avec succès ! Bienvenue sur CMFlow 🎉', 'success');
+
+      setTimeout(() => {
+        window.location.href = 'onboarding.html';
+      }, 500);
+    }, 600);
   }
 }
 

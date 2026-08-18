@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de bord — CMFlow</title>
+  <meta name="description" content="Tableau de bord principal CMFlow pour Community Managers. Suivez vos clients, publications et performances.">
+
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Cpath d='M9 16a7 7 0 0 1 7-7h2a5 5 0 0 1 5 5v2a5 5 0 0 1-5 5h-2a7 7 0 0 1-7-5z' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='13' cy='16' r='2' fill='white'/%3E%3Ccircle cx='19' cy='16' r='2' fill='%2393c5fd'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- =======================================================================
+         SIDEBAR NAVIGATION
+         ======================================================================= -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <!-- Sidebar Brand -->
+      <a href="dashboard.html" class="sidebar-brand" style="text-decoration: none;">
+        <div class="sidebar-logo-icon">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 18C10 13.5817 13.5817 10 18 10H20C23.3137 10 26 12.6863 26 16C26 19.3137 23.3137 22 20 22H16" stroke="white" stroke-width="2.6" stroke-linecap="round" />
+            <path d="M26 18C26 22.4183 22.4183 26 18 26H16C12.6863 26 10 23.3137 10 20C10 16.6863 12.6863 14 16 14H20" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0.5 4" />
+            <circle cx="14" cy="18" r="2.2" fill="white" />
+            <circle cx="22" cy="18" r="2.2" fill="#93C5FD" />
+          </svg>
+        </div>
+        <span class="sidebar-brand-name">CM<span>Flow</span></span>
+      </a>
+
+      <!-- Sidebar Navigation -->
+      <nav class="sidebar-nav" aria-label="Menu principal">
+        <span class="sidebar-nav-section-label">Général</span>
+        
+        <a href="dashboard.html" class="sidebar-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9" rx="1"/>
+            <rect x="14" y="3" width="7" height="5" rx="1"/>
+            <rect x="14" y="12" width="7" height="9" rx="1"/>
+            <rect x="3" y="16" width="7" height="5" rx="1"/>
+          </svg>
+          <span>Tableau de bord</span>
+        </a>
+
+        <a href="clients.html" class="sidebar-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Clients</span>
+        </a>
+
+        <a href="#" class="sidebar-nav-item" data-coming-soon>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span>Planning & Posts</span>
+          <span class="sidebar-badge-coming">Bientôt</span>
+        </a>
+
+        <a href="#" class="sidebar-nav-item" data-coming-soon>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>Analytics & Rapports</span>
+          <span class="sidebar-badge-coming">Bientôt</span>
+        </a>
+
+        <span class="sidebar-nav-section-label">Collaboration</span>
+
+        <a href="#" class="sidebar-nav-item" data-coming-soon>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <span>Portail Validation</span>
+          <span class="sidebar-badge-coming">Bientôt</span>
+        </a>
+
+        <a href="#" class="sidebar-nav-item" data-coming-soon>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>Paramètres</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar Footer (User Menu) -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user-avatar" data-user-initials>CM</div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name" data-user-name>Utilisateur</span>
+          <span class="sidebar-user-role" data-workspace-name>Mon espace</span>
+        </div>
+        <button type="button" class="sidebar-user-menu-btn" id="user-menu-btn" aria-label="Menu options utilisateur">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div class="user-dropdown" id="user-dropdown">
+          <button type="button" class="dropdown-item" onclick="showAppToast('Page profil bientôt disponible.', 'info')">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+            <span>Mon profil</span>
+          </button>
+          <button type="button" class="dropdown-item" onclick="showAppToast('Abonnement actuel : Formule Essai Gratuit.', 'info')">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
+            <span>Mon abonnement</span>
+          </button>
+          <div class="dropdown-divider"></div>
+          <button type="button" class="dropdown-item danger" id="logout-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+            <span>Se déconnecter</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Overlay Mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- =======================================================================
+         MAIN CONTENT AREA
+         ======================================================================= -->
+    <main class="app-main">
+      <!-- Header -->
+      <header class="app-header">
+        <button type="button" class="app-hamburger" id="app-hamburger" aria-label="Menu mobile">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="header-greeting">
+          <h1>Bonjour <span id="greeting-name">Ami</span> 👋</h1>
+          <p>Voici ce qui se passe sur vos comptes aujourd'hui</p>
+        </div>
+
+        <div class="header-actions">
+          <button type="button" class="header-notif-btn" aria-label="Notifications" onclick="showAppToast('Aucune nouvelle notification.', 'info')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="notif-dot"></span>
+          </button>
+
+          <button type="button" class="btn-primary-app" data-open-add-client>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+            </svg>
+            <span>Ajouter un client</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <div class="app-page">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">Tableau de bord</h2>
+            <p class="page-subtitle">Vue synthétique de votre activité de Community Management</p>
+          </div>
+        </div>
+
+        <!-- KPIs Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">Clients actifs</span>
+            <div class="stat-value" id="stat-clients">0</div>
+            <span class="stat-description">Gérés dans votre espace</span>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-label">Comptes connectés</span>
+            <div class="stat-value" id="stat-accounts">0</div>
+            <span class="stat-description">Instagram, Facebook, etc.</span>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-label">Posts ce mois</span>
+            <div class="stat-value" id="stat-posts">0</div>
+            <span class="stat-description">Programmés et publiés</span>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-label">Taux d'engagement</span>
+            <div class="stat-value"><span id="stat-engagement">0</span>%</div>
+            <span class="stat-description">Moyenne globale des comptes</span>
+          </div>
+        </div>
+
+        <!-- Empty State (affiché si 0 clients) -->
+        <div class="empty-state-card" id="dashboard-empty">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h3 class="empty-state-title">Aucun client pour le moment</h3>
+          <p class="empty-state-text">
+            Commencez par ajouter votre premier client pour organiser ses réseaux sociaux, planifier des publications et générer des rapports de performance.
+          </p>
+          <button type="button" class="btn-primary-app" data-open-add-client>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+            </svg>
+            <span>Ajouter mon premier client</span>
+          </button>
+        </div>
+
+        <!-- Section Clients Récents (affiché si >= 1 client) -->
+        <div id="dashboard-clients" style="display: none;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0;">Clients récents</h3>
+            <a href="clients.html" style="font-size: 0.85rem; font-weight: 600; color: var(--color-primary); text-decoration: none;">Voir tous les clients →</a>
+          </div>
+          <div class="clients-grid" id="recent-clients-grid"></div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- =======================================================================
+       MODAL : AJOUTER UN CLIENT
+       ======================================================================= -->
+  <div class="modal-backdrop" id="add-client-modal" role="dialog" aria-modal="true" aria-labelledby="add-client-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="add-client-title">Nouveau client</h3>
+        <button type="button" class="modal-close" id="modal-close-btn" aria-label="Fermer la boîte de dialogue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form class="modal-body" id="form-add-client">
+        <div class="form-field">
+          <label for="client-name">Nom du client ou entreprise *</label>
+          <input type="text" id="client-name" placeholder="Ex: Teranga Gourmet, Hôtel Almadies..." required>
+        </div>
+
+        <div class="form-field">
+          <label for="client-industry">Secteur d'activité</label>
+          <select id="client-industry">
+            <option value="Restauration & Hôtellerie">Restauration & Hôtellerie</option>
+            <option value="E-commerce & Retail">E-commerce & Retail</option>
+            <option value="Mode & Beauté">Mode & Beauté</option>
+            <option value="Immobilier & BTP">Immobilier & BTP</option>
+            <option value="Santé & Bien-être">Santé & Bien-être</option>
+            <option value="Tech, SaaS & Services">Tech, SaaS & Services</option>
+            <option value="Éducation & Formation">Éducation & Formation</option>
+            <option value="Autre" selected>Autre secteur</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="client-description">Notes & Objectifs <span class="opt-label">(optionnel)</span></label>
+          <textarea id="client-description" placeholder="Objectifs de publications, ton de la marque, contacts clés..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary-app">
+            <span>Créer le client</span>
+          </button>
+          <button type="button" class="btn-secondary-app" onclick="document.getElementById('add-client-modal').classList.remove('active'); document.body.style.overflow='';">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts applicatifs -->
+  <script src="js/app.js"></script>
+</body>
+</html>
