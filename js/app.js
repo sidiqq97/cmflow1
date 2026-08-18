@@ -178,7 +178,7 @@ function authGuard() {
   const prefs = CMFlowStore.getPrefs();
   const currentPage = window.location.pathname.split('/').pop();
 
-  if (!prefs?.onboardingComplete && ['dashboard.html', 'clients.html', 'planning.html', 'analytics.html'].includes(currentPage)) {
+  if (!prefs?.onboardingComplete && ['dashboard.html', 'clients.html', 'planning.html', 'analytics.html', 'settings.html'].includes(currentPage)) {
     window.location.href = 'onboarding.html';
     return false;
   }
@@ -1328,7 +1328,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const page = window.location.pathname.split('/').pop() || 'index.html';
 
   // Pages protégées
-  const protectedPages = ['dashboard.html', 'clients.html', 'onboarding.html', 'planning.html', 'analytics.html'];
+  const protectedPages = ['dashboard.html', 'clients.html', 'onboarding.html', 'planning.html', 'analytics.html', 'settings.html'];
   if (protectedPages.includes(page)) {
     if (!authGuard()) return;
   }

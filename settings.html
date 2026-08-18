@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paramètres & Profil — CMFlow</title>
+  <meta name="description" content="Paramètres de votre profil Community Manager, gestion de l'agence et abonnement sur CMFlow.">
+
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Cpath d='M9 16a7 7 0 0 1 7-7h2a5 5 0 0 1 5 5v2a5 5 0 0 1-5 5h-2a7 7 0 0 1-7-5z' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='13' cy='16' r='2' fill='white'/%3E%3Ccircle cx='19' cy='16' r='2' fill='%2393c5fd'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- =======================================================================
+         SIDEBAR NAVIGATION
+         ======================================================================= -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <!-- Sidebar Brand -->
+      <a href="dashboard.html" class="sidebar-brand" style="text-decoration: none;">
+        <div class="sidebar-logo-icon">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 18C10 13.5817 13.5817 10 18 10H20C23.3137 10 26 12.6863 26 16C26 19.3137 23.3137 22 20 22H16" stroke="white" stroke-width="2.6" stroke-linecap="round" />
+            <path d="M26 18C26 22.4183 22.4183 26 18 26H16C12.6863 26 10 23.3137 10 20C10 16.6863 12.6863 14 16 14H20" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0.5 4" />
+            <circle cx="14" cy="18" r="2.2" fill="white" />
+            <circle cx="22" cy="18" r="2.2" fill="#93C5FD" />
+          </svg>
+        </div>
+        <span class="sidebar-brand-name">CM<span>Flow</span></span>
+      </a>
+
+      <!-- Sidebar Navigation -->
+      <nav class="sidebar-nav" aria-label="Menu principal">
+        <span class="sidebar-nav-section-label">Général</span>
+        
+        <a href="dashboard.html" class="sidebar-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9" rx="1"/>
+            <rect x="14" y="3" width="7" height="5" rx="1"/>
+            <rect x="14" y="12" width="7" height="9" rx="1"/>
+            <rect x="3" y="16" width="7" height="5" rx="1"/>
+          </svg>
+          <span>Tableau de bord</span>
+        </a>
+
+        <a href="clients.html" class="sidebar-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Clients</span>
+        </a>
+
+        <a href="planning.html" class="sidebar-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span>Planning & Posts</span>
+        </a>
+
+        <a href="analytics.html" class="sidebar-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>Analytics & Rapports</span>
+        </a>
+
+        <span class="sidebar-nav-section-label">Collaboration</span>
+
+        <a href="validation.html" target="_blank" class="sidebar-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <span>Portail Validation</span>
+        </a>
+
+        <a href="settings.html" class="sidebar-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>Paramètres</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar Footer (User Menu) -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user-avatar" data-user-initials>CM</div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name" data-user-name>Utilisateur</span>
+          <span class="sidebar-user-role" data-workspace-name>Mon espace</span>
+        </div>
+        <button type="button" class="sidebar-user-menu-btn" id="user-menu-btn" aria-label="Menu options utilisateur">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div class="user-dropdown" id="user-dropdown">
+          <a href="settings.html" class="dropdown-item" style="text-decoration: none;">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+            <span>Mon profil</span>
+          </a>
+          <a href="settings.html#billing" class="dropdown-item" style="text-decoration: none;">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
+            <span>Mon abonnement</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <button type="button" class="dropdown-item danger" id="logout-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+            <span>Se déconnecter</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Overlay Mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- =======================================================================
+         MAIN CONTENT AREA
+         ======================================================================= -->
+    <main class="app-main">
+      <!-- Header -->
+      <header class="app-header">
+        <button type="button" class="app-hamburger" id="app-hamburger" aria-label="Menu mobile">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="header-greeting">
+          <h1>Paramètres & Configuration</h1>
+          <p>Personnalisez votre profil Community Manager, votre marque et votre abonnement</p>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <div class="app-page">
+
+        <!-- Navigation par Onglets -->
+        <div class="settings-tabs-nav">
+          <button type="button" class="settings-tab-btn active" data-tab="tab-profile">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+            <span>Profil & Agence</span>
+          </button>
+          <button type="button" class="settings-tab-btn" data-tab="tab-networks">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
+            <span>Réseaux par défaut</span>
+          </button>
+          <button type="button" class="settings-tab-btn" data-tab="tab-billing">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
+            <span>Abonnement & Facturation</span>
+          </button>
+          <button type="button" class="settings-tab-btn" data-tab="tab-security">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            <span>Sécurité & Données</span>
+          </button>
+        </div>
+
+        <!-- ===================================================================
+             ONGLET 1 : PROFIL & AGENCE
+             =================================================================== -->
+        <div class="settings-tab-pane active" id="tab-profile">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <h2 class="settings-card-title">Informations de votre Profil & Marque</h2>
+              <p class="settings-card-subtitle">Ces informations apparaissent sur vos liens de validation client et vos rapports de performance.</p>
+            </div>
+
+            <div class="profile-avatar-uploader">
+              <div class="profile-avatar-preview" id="settings-avatar-preview" data-user-initials>CM</div>
+              <div>
+                <h4 style="margin: 0 0 4px; font-size: 0.95rem; font-weight: 700; color: var(--text-main);" data-user-name>Utilisateur</h4>
+                <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);" data-workspace-name>Mon espace agence</p>
+              </div>
+            </div>
+
+            <form id="form-settings-profile">
+              <div class="onb-field-row">
+                <div class="form-field">
+                  <label for="set-firstname">Prénom *</label>
+                  <input type="text" id="set-firstname" placeholder="Ex: Awa, Moussa..." required>
+                </div>
+                <div class="form-field">
+                  <label for="set-lastname">Nom de famille</label>
+                  <input type="text" id="set-lastname" placeholder="Ex: Diop, Ndiaye...">
+                </div>
+              </div>
+
+              <div class="onb-field-row">
+                <div class="form-field">
+                  <label for="set-email">Adresse Email *</label>
+                  <input type="email" id="set-email" placeholder="contact@votreagence.com" required>
+                </div>
+                <div class="form-field">
+                  <label for="set-agency">Nom de votre Agence / Activité *</label>
+                  <input type="text" id="set-agency" placeholder="Ex: Teranga Digital Agency" required>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="set-bio">Description de votre activité (optionnel)</label>
+                <textarea id="set-bio" placeholder="Ex: Agence spécialisée en social media management, création de contenu et stratégie digitale à Dakar..." style="min-height: 85px;"></textarea>
+              </div>
+
+              <div style="margin-top: 20px;">
+                <button type="submit" class="btn-primary-app">
+                  <span>Enregistrer les modifications</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             ONGLET 2 : RÉSEAUX PAR DÉFAUT
+             =================================================================== -->
+        <div class="settings-tab-pane" id="tab-networks">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <h2 class="settings-card-title">Réseaux Sociaux Actifs par Défaut</h2>
+              <p class="settings-card-subtitle">Sélectionnez les plateformes que vous gérez le plus fréquemment pour vos clients.</p>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px; max-width: 480px;">
+              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border: var(--border-light); border-radius: var(--radius-md); background: white;">
+                <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                <span style="font-weight: 600; color: #E1306C;">Instagram</span>
+              </label>
+
+              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border: var(--border-light); border-radius: var(--radius-md); background: white;">
+                <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                <span style="font-weight: 600; color: #1877F2;">Facebook</span>
+              </label>
+
+              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border: var(--border-light); border-radius: var(--radius-md); background: white;">
+                <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                <span style="font-weight: 600; color: #010101;">TikTok</span>
+              </label>
+
+              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border: var(--border-light); border-radius: var(--radius-md); background: white;">
+                <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                <span style="font-weight: 600; color: #0A66C2;">LinkedIn</span>
+              </label>
+
+              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border: var(--border-light); border-radius: var(--radius-md); background: white;">
+                <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--color-primary);">
+                <span style="font-weight: 600; color: #0F172A;">X (Twitter)</span>
+              </label>
+            </div>
+
+            <div style="margin-top: 24px;">
+              <button type="button" class="btn-primary-app" onclick="showAppToast('Préférences des réseaux enregistrées !', 'success')">
+                <span>Enregistrer les préférences</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             ONGLET 3 : ABONNEMENT & FACTURATION
+             =================================================================== -->
+        <div class="settings-tab-pane" id="tab-billing">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                  <h2 class="settings-card-title">Formule Actuelle & Facturation</h2>
+                  <p class="settings-card-subtitle">Gérez votre abonnement et vos modes de paiement locaux.</p>
+                </div>
+                <span class="plan-badge-active">● Formule Freelance Active</span>
+              </div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #F8FAFC, #EFF6FF); border: 1.5px solid #BFDBFE; border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+                <div>
+                  <span style="font-size: 0.78rem; font-weight: 700; color: var(--color-primary); text-transform: uppercase;">Abonnement Mensuel</span>
+                  <h3 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 4px 0 8px;">15 000 FCFA <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">/ mois</span></h3>
+                  <p style="font-size: 0.85rem; color: var(--text-body); margin: 0;">Prochain renouvellement le <strong>18 Septembre 2026</strong></p>
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn-primary-app" onclick="showAppToast('Passez à la formule Agence (35 000 FCFA/mois) bientôt disponible.', 'info')">
+                    Passer à la formule Agence
+                  </button>
+                </div>
+              </div>
+
+              <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid #DBEAFE; display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.82rem; color: var(--text-body);">
+                <span>✓ Jusqu'à 10 clients</span>
+                <span>✓ Calendrier & posts illimités</span>
+                <span>✓ Portail validation sans mot de passe</span>
+                <span>✓ Rapports PDF mensuels</span>
+              </div>
+            </div>
+
+            <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin: 20px 0 12px;">Moyens de paiement acceptés</h3>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <div style="padding: 10px 16px; border: var(--border-light); border-radius: var(--radius-md); background: white; font-size: 0.85rem; font-weight: 600; color: #1E3A8A; display: flex; align-items: center; gap: 6px;">
+                🌊 Wave Sénégal / CI
+              </div>
+              <div style="padding: 10px 16px; border: var(--border-light); border-radius: var(--radius-md); background: white; font-size: 0.85rem; font-weight: 600; color: #EA580C; display: flex; align-items: center; gap: 6px;">
+                🟠 Orange Money
+              </div>
+              <div style="padding: 10px 16px; border: var(--border-light); border-radius: var(--radius-md); background: white; font-size: 0.85rem; font-weight: 600; color: #047857; display: flex; align-items: center; gap: 6px;">
+                💳 Carte Bancaire Visa / Mastercard
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             ONGLET 4 : SÉCURITÉ & DONNÉES
+             =================================================================== -->
+        <div class="settings-tab-pane" id="tab-security">
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <h2 class="settings-card-title">Sécurité du Compte</h2>
+              <p class="settings-card-subtitle">Modifiez votre mot de passe et gérez la sécurité de votre session.</p>
+            </div>
+
+            <form id="form-settings-password" onsubmit="event.preventDefault(); showAppToast('Mot de passe mis à jour avec succès !', 'success'); this.reset();" style="max-width: 440px;">
+              <div class="form-field">
+                <label for="pwd-current">Mot de passe actuel</label>
+                <input type="password" id="pwd-current" placeholder="••••••••" required>
+              </div>
+
+              <div class="form-field">
+                <label for="pwd-new">Nouveau mot de passe</label>
+                <input type="password" id="pwd-new" placeholder="8 caractères minimum" minlength="8" required>
+              </div>
+
+              <div style="margin-top: 16px;">
+                <button type="submit" class="btn-primary-app">
+                  <span>Mettre à jour le mot de passe</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="settings-card" style="border-color: #FECACA;">
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--color-danger); margin: 0 0 6px;">Zone de Danger</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 16px;">Réinitialiser les données locales de démonstration de votre navigateur.</p>
+            
+            <button type="button" class="btn-secondary-app" style="color: var(--color-danger); border-color: #FCA5A5;" onclick="if(confirm('Êtes-vous sûr de vouloir réinitialiser les données ?')){ CMFlowStore.logout(); window.location.href='index.html'; }">
+              Effacer les données et se déconnecter
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts applicatifs -->
+  <script src="js/app.js"></script>
+  <script src="js/backend.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initSettingsPage();
+    });
+
+    function initSettingsPage() {
+      // Gestion des onglets
+      const tabBtns = document.querySelectorAll('.settings-tab-btn');
+      const tabPanes = document.querySelectorAll('.settings-tab-pane');
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.dataset.tab;
+          tabBtns.forEach(b => b.classList.remove('active'));
+          tabPanes.forEach(p => p.classList.remove('active'));
+
+          btn.classList.add('active');
+          const targetPane = document.getElementById(targetId);
+          if (targetPane) targetPane.classList.add('active');
+        });
+      });
+
+      // Si ancre dans l'URL (ex: #billing)
+      if (window.location.hash === '#billing') {
+        const billingBtn = document.querySelector('[data-tab="tab-billing"]');
+        if (billingBtn) billingBtn.click();
+      }
+
+      // Remplissage du formulaire de profil
+      const user = CMFlowStore.getUser();
+      const ws = CMFlowStore.getWorkspace();
+
+      if (user) {
+        const fnInput = document.getElementById('set-firstname');
+        const lnInput = document.getElementById('set-lastname');
+        const emailInput = document.getElementById('set-email');
+        const agencyInput = document.getElementById('set-agency');
+
+        if (fnInput) fnInput.value = user.firstName || '';
+        if (lnInput) lnInput.value = user.lastName || '';
+        if (emailInput) emailInput.value = user.email || '';
+        if (agencyInput) agencyInput.value = ws?.name || user.activityName || '';
+      }
+
+      // Enregistrement du profil
+      const formProfile = document.getElementById('form-settings-profile');
+      if (formProfile) {
+        formProfile.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const firstName = document.getElementById('set-firstname')?.value.trim();
+          const lastName = document.getElementById('set-lastname')?.value.trim();
+          const email = document.getElementById('set-email')?.value.trim();
+          const agency = document.getElementById('set-agency')?.value.trim();
+
+          const currentUser = CMFlowStore.getUser() || {};
+          currentUser.firstName = firstName;
+          currentUser.lastName = lastName;
+          currentUser.name = `${firstName} ${lastName}`.trim();
+          currentUser.email = email;
+          currentUser.activityName = agency;
+          CMFlowStore.setUser(currentUser);
+
+          const currentWs = CMFlowStore.getWorkspace() || { id: CMFlowStore.generateId(), ownerId: currentUser.id };
+          currentWs.name = agency;
+          CMFlowStore.setWorkspace(currentWs);
+
+          // Actualiser l'interface
+          document.querySelectorAll('[data-user-name]').forEach(el => el.textContent = currentUser.name);
+          document.querySelectorAll('[data-workspace-name]').forEach(el => el.textContent = agency);
+          const initials = CMFlowStore.getInitials(currentUser.name);
+          document.querySelectorAll('[data-user-initials]').forEach(el => el.textContent = initials);
+
+          showAppToast('Votre profil et agence ont été mis à jour ! ✅', 'success');
+        });
+      }
+    }
+  </script>
+</body>
+</html>
