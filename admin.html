@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super-Administrateur — CMFlow SaaS Backoffice</title>
+  <meta name="description" content="Espace Super-Administrateur pour gérer les revenus, abonnements et utilisateurs de CMFlow.">
+
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e1b4b'/%3E%3Cpath d='M8 12l4 8 4-8 4 8 4-8' fill='none' stroke='%23fde047' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body style="background: #0B0F19; color: #F8FAFC;">
+
+  <!-- =======================================================================
+       PIN CODE SECURITY LOCK (OVERLAY)
+       ======================================================================= -->
+  <div class="admin-pin-backdrop" id="admin-pin-modal">
+    <div class="admin-pin-card" style="background: #111827; border: 1px solid #374151; color: white;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #1E1B4B; color: #FDE047; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 8px;">Espace Super-Administrateur</h3>
+      <p style="font-size: 0.85rem; color: #9CA3AF; margin-bottom: 20px;">Veuillez entrer votre code PIN administrateur pour déverrouiller le backoffice CMFlow.</p>
+      
+      <form id="admin-pin-form" onsubmit="handlePinSubmit(event)">
+        <input type="password" id="admin-pin-input" placeholder="Code PIN (par défaut : 1234)" maxlength="8" style="width: 100%; padding: 12px; font-size: 1.1rem; text-align: center; letter-spacing: 0.2em; border: 1px solid #4B5563; border-radius: var(--radius-lg); background: #1F2937; color: white; margin-bottom: 16px;" autofocus required>
+        <button type="submit" class="btn-primary-app" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; background: #4F46E5;">
+          <span>🔓 Déverrouiller l'accès</span>
+        </button>
+      </form>
+      <div style="margin-top: 14px;">
+        <a href="dashboard.html" style="font-size: 0.78rem; color: #9CA3AF; text-decoration: underline;">Retour au tableau de bord CM</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       SUPER-ADMIN MAIN INTERFACE
+       ======================================================================= -->
+  <div style="max-width: 1280px; margin: 0 auto; padding: 24px 20px;">
+    
+    <!-- Top Admin Bar -->
+    <header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #1F2937;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 1.2rem;">
+          👑
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h1 style="font-size: 1.4rem; font-weight: 800; margin: 0; color: white;">CMFlow Super-Admin</h1>
+            <span class="admin-badge">FONDATEUR</span>
+          </div>
+          <span style="font-size: 0.8rem; color: #9CA3AF;">Supervision globale des revenus, abonnements Wave/OM et des Community Managers</span>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 700; color: #34D399; background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.2); padding: 6px 14px; border-radius: var(--radius-pill);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #34D399;"></span>
+          Serveurs & Paiements Actifs
+        </span>
+        <a href="dashboard.html" class="btn-secondary-app" style="font-size: 0.82rem; background: #1F2937; color: white; border-color: #374151; text-decoration: none;">
+          ⬅️ Mon Espace CM
+        </a>
+      </div>
+    </header>
+
+    <!-- =======================================================================
+         1. FINANCIAL & MRR METRICS ROW
+         ======================================================================= -->
+    <div class="admin-kpi-grid">
+      
+      <!-- MRR -->
+      <div class="admin-kpi-card gold" style="background: #111827; border: 1px solid #1F2937;">
+        <div class="admin-kpi-title" style="color: #9CA3AF;">Revenu Mensuel Récurrent (MRR)</div>
+        <div class="admin-kpi-val" id="admin-mrr-val" style="color: #FBBF24;">1 875 000 FCFA</div>
+        <div class="admin-kpi-trend up">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/></svg>
+          <span>+18.4% ce mois</span>
+        </div>
+      </div>
+
+      <!-- Abonnés Pro -->
+      <div class="admin-kpi-card purple" style="background: #111827; border: 1px solid #1F2937;">
+        <div class="admin-kpi-title" style="color: #9CA3AF;">Abonnés Pro Payants (15k/m)</div>
+        <div class="admin-kpi-val" id="admin-pro-count" style="color: #A78BFA;">125 CMs</div>
+        <div class="admin-kpi-trend up">
+          <span>15 000 FCFA / utilisateur / mois</span>
+        </div>
+      </div>
+
+      <!-- Essais Gratuits -->
+      <div class="admin-kpi-card" style="background: #111827; border: 1px solid #1F2937;">
+        <div class="admin-kpi-title" style="color: #9CA3AF;">Comptes en Essai Gratuit</div>
+        <div class="admin-kpi-val" id="admin-trial-count" style="color: #60A5FA;">340 CMs</div>
+        <div style="font-size: 0.75rem; color: #9CA3AF;">
+          Taux de conversion : <strong>26.8%</strong>
+        </div>
+      </div>
+
+      <!-- Total Encaissé -->
+      <div class="admin-kpi-card green" style="background: #111827; border: 1px solid #1F2937;">
+        <div class="admin-kpi-title" style="color: #9CA3AF;">Total Transactions Wave & OM</div>
+        <div class="admin-kpi-val" style="color: #34D399;">12 450 000 FCFA</div>
+        <div style="font-size: 0.75rem; color: #9CA3AF;">
+          Depuis le lancement
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =======================================================================
+         2. REVENUE DISTRIBUTION & CHANNELS
+         ======================================================================= -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px;">
+      
+      <!-- Méthodes de Paiement Réceptionnées -->
+      <div class="admin-table-card" style="background: #111827; border: 1px solid #1F2937; margin-bottom: 0;">
+        <h3 style="font-size: 1rem; font-weight: 800; margin: 0 0 16px; color: white;">Répartition des Paiements Locaux (Wave & OM)</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- Wave -->
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">
+              <span style="color: #60A5FA;">🌊 Wave Sénégal (68%)</span>
+              <span style="color: white;">1 275 000 FCFA (85 transactions)</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: #1F2937; border-radius: 9999px; overflow: hidden;">
+              <div style="width: 68%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
+            </div>
+          </div>
+
+          <!-- Orange Money -->
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">
+              <span style="color: #FB923C;">🍊 Orange Money (24%)</span>
+              <span style="color: white;">450 000 FCFA (30 transactions)</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: #1F2937; border-radius: 9999px; overflow: hidden;">
+              <div style="width: 24%; height: 100%; background: #F97316; border-radius: 9999px;"></div>
+            </div>
+          </div>
+
+          <!-- Carte Bancaire -->
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">
+              <span style="color: #A78BFA;">💳 Carte Bancaire / Visa (8%)</span>
+              <span style="color: white;">150 000 FCFA (10 transactions)</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: #1F2937; border-radius: 9999px; overflow: hidden;">
+              <div style="width: 8%; height: 100%; background: #8B5CF6; border-radius: 9999px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Rapides Super-Admin -->
+      <div class="admin-table-card" style="background: #111827; border: 1px solid #1F2937; margin-bottom: 0;">
+        <h3 style="font-size: 1rem; font-weight: 800; margin: 0 0 16px; color: white;">Configuration Marchande</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="background: #1F2937; padding: 10px 14px; border-radius: 10px; font-size: 0.8rem;">
+            <div style="color: #9CA3AF; margin-bottom: 2px;">Compte Wave Marchand</div>
+            <strong style="color: white;">+221 77 842 19 02</strong>
+          </div>
+          <div style="background: #1F2937; padding: 10px 14px; border-radius: 10px; font-size: 0.8rem;">
+            <div style="color: #9CA3AF; margin-bottom: 2px;">Compte Orange Money</div>
+            <strong style="color: white;">+221 77 842 19 02</strong>
+          </div>
+          <button type="button" class="btn-secondary-app" style="width: 100%; justify-content: center; font-size: 0.8rem; background: #374151; color: white; border: none;" onclick="showAppToast('Paramètres marchands enregistrés !', 'success')">
+            ⚙️ Modifier les numéros
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =======================================================================
+         3. COMMUNITY MANAGERS DIRECTORY (CRM UTILISATEURS)
+         ======================================================================= -->
+    <div class="admin-table-card" style="background: #111827; border: 1px solid #1F2937;">
+      
+      <div class="admin-table-header">
+        <div>
+          <h2 style="font-size: 1.15rem; font-weight: 800; margin: 0 0 4px; color: white;">Répertoire des Community Managers</h2>
+          <span style="font-size: 0.8rem; color: #9CA3AF;">Gérez les abonnements, offrez des accès Pro et contactez vos clients sur WhatsApp</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <input type="text" id="admin-search-cm" placeholder="Rechercher par nom, email ou tél..." style="padding: 8px 14px; font-size: 0.82rem; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white; width: 220px;" oninput="filterAdminUsers()">
+          
+          <div style="display: flex; gap: 4px;">
+            <button type="button" class="composer-net-tab-btn active" data-admin-filter="all" onclick="setAdminFilter('all')" style="font-size: 0.72rem; padding: 4px 10px;">Tous</button>
+            <button type="button" class="composer-net-tab-btn" data-admin-filter="pro" onclick="setAdminFilter('pro')" style="font-size: 0.72rem; padding: 4px 10px;">Pro (125)</button>
+            <button type="button" class="composer-net-tab-btn" data-admin-filter="trial" onclick="setAdminFilter('trial')" style="font-size: 0.72rem; padding: 4px 10px;">Essai (340)</button>
+          </div>
+
+          <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 8px 12px; background: #10B981;" onclick="exportUsersCSV()">
+            📥 Exporter CSV
+          </button>
+        </div>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="admin-users-table">
+          <thead>
+            <tr>
+              <th style="color: #9CA3AF; border-color: #1F2937;">Community Manager</th>
+              <th style="color: #9CA3AF; border-color: #1F2937;">Contact WhatsApp</th>
+              <th style="color: #9CA3AF; border-color: #1F2937;">Statut Plan</th>
+              <th style="color: #9CA3AF; border-color: #1F2937;">Clients Gérés</th>
+              <th style="color: #9CA3AF; border-color: #1F2937;">Posts Créés</th>
+              <th style="color: #9CA3AF; border-color: #1F2937; text-align: right;">Actions Super-Admin</th>
+            </tr>
+          </thead>
+          <tbody id="admin-users-tbody">
+            <!-- Rempli dynamiquement -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Toast Container -->
+  <div class="app-toast" id="app-toast" role="alert" aria-live="polite"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/backend.js"></script>
+  <script>
+    // ---- BASE DE DONNÉES UTILISATEURS SUPER-ADMIN ----
+    let ADMIN_USERS = [
+      {
+        id: 'u_sidiq',
+        name: 'Sidiq Ndiaye',
+        agency: 'Teranga Digital Agency',
+        email: 'sidiq@terangadigital.sn',
+        phone: '+221 77 123 45 67',
+        plan: 'pro',
+        clientsCount: 8,
+        postsCount: 54,
+        registeredAt: '12 Août 2026'
+      },
+      {
+        id: 'u_aminata',
+        name: 'Aminata Diallo',
+        agency: 'Dakar Media Flow',
+        email: 'aminata.cm@gmail.com',
+        phone: '+221 77 234 56 78',
+        plan: 'pro',
+        clientsCount: 5,
+        postsCount: 38,
+        registeredAt: '14 Août 2026'
+      },
+      {
+        id: 'u_cheikh',
+        name: 'Cheikh Tidiane Ba',
+        agency: 'Freelance CM',
+        email: 'cheikh.ba@outlook.fr',
+        phone: '+221 76 345 67 89',
+        plan: 'trial',
+        clientsCount: 1,
+        postsCount: 4,
+        registeredAt: '17 Août 2026'
+      },
+      {
+        id: 'u_fatou',
+        name: 'Fatou Bintou Sow',
+        agency: 'Sow Com & Social',
+        email: 'fatou.sow@agence.sn',
+        phone: '+221 78 456 78 90',
+        plan: 'pro',
+        clientsCount: 6,
+        postsCount: 41,
+        registeredAt: '10 Août 2026'
+      },
+      {
+        id: 'u_moussa',
+        name: 'Moussa Traoré',
+        agency: 'Sahel Creative Studio',
+        email: 'moussa.traore@gmail.com',
+        phone: '+221 77 567 89 01',
+        plan: 'trial',
+        clientsCount: 1,
+        postsCount: 2,
+        registeredAt: '18 Août 2026'
+      },
+      {
+        id: 'u_mariama',
+        name: 'Mariama Cissé',
+        agency: 'Social Kinkeliba',
+        email: 'mariama.cisse@gmail.com',
+        phone: '+221 70 678 90 12',
+        plan: 'expired',
+        clientsCount: 1,
+        postsCount: 8,
+        registeredAt: '01 Août 2026'
+      }
+    ];
+
+    let currentAdminFilter = 'all';
+
+    // PIN Security Check
+    function handlePinSubmit(e) {
+      e.preventDefault();
+      const pin = document.getElementById('admin-pin-input')?.value.trim();
+      if (pin === '1234' || pin === 'admin' || pin === 'cmflow') {
+        document.getElementById('admin-pin-modal').style.display = 'none';
+        sessionStorage.setItem('cmflow_admin_auth', 'true');
+        showAppToast('Bienvenue dans votre Espace Super-Admin ! 👑', 'success');
+        renderAdminUsers();
+      } else {
+        showAppToast('Code PIN incorrect. Veuillez réessayer.', 'danger');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Vérifier si déjà authentifié dans cette session
+      if (sessionStorage.getItem('cmflow_admin_auth') === 'true') {
+        const modal = document.getElementById('admin-pin-modal');
+        if (modal) modal.style.display = 'none';
+      }
+      renderAdminUsers();
+    });
+
+    function setAdminFilter(filter) {
+      currentAdminFilter = filter;
+      document.querySelectorAll('[data-admin-filter]').forEach(b => {
+        b.classList.toggle('active', b.dataset.adminFilter === filter);
+      });
+      renderAdminUsers();
+    }
+
+    function filterAdminUsers() {
+      renderAdminUsers();
+    }
+
+    function renderAdminUsers() {
+      const tbody = document.getElementById('admin-users-tbody');
+      if (!tbody) return;
+
+      const search = document.getElementById('admin-search-cm')?.value.toLowerCase().trim() || '';
+
+      const filtered = ADMIN_USERS.filter(u => {
+        const matchesFilter = (currentAdminFilter === 'all' || u.plan === currentAdminFilter);
+        const matchesSearch = !search || 
+          u.name.toLowerCase().includes(search) || 
+          u.agency.toLowerCase().includes(search) || 
+          u.email.toLowerCase().includes(search) ||
+          u.phone.includes(search);
+        return matchesFilter && matchesSearch;
+      });
+
+      tbody.innerHTML = filtered.map(u => `
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 38px; height: 38px; border-radius: 50%; background: #374151; color: white; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">
+                ${u.name.split(' ').map(n=>n[0]).join('').slice(0,2)}
+              </div>
+              <div>
+                <strong style="color: white; font-size: 0.88rem;">${escapeHtml(u.name)}</strong>
+                <div style="font-size: 0.72rem; color: #9CA3AF;">${escapeHtml(u.agency)} · ${u.registeredAt}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="color: #E2E8F0; font-size: 0.8rem;">${u.phone}</div>
+            <div style="font-size: 0.72rem; color: #9CA3AF;">${u.email}</div>
+          </td>
+          <td>
+            <span class="admin-plan-badge ${u.plan}">
+              ${u.plan === 'pro' ? '💎 Pro (15k FCFA)' : (u.plan === 'trial' ? '⏳ Essai Gratuit' : '⛔ Expiré')}
+            </span>
+          </td>
+          <td style="font-weight: 700; color: white;">${u.clientsCount} marque${u.clientsCount > 1 ? 's' : ''}</td>
+          <td style="font-weight: 700; color: white;">${u.postsCount} posts</td>
+          <td style="text-align: right;">
+            <div class="admin-action-btn-group" style="justify-content: flex-end;">
+              
+              <!-- Toggle Pro -->
+              <button type="button" class="admin-action-btn pro-toggle" title="Modifier le plan" onclick="toggleUserPlan('${u.id}')">
+                ${u.plan === 'pro' ? 'Rétrograder' : '🎁 Activer Pro'}
+              </button>
+
+              <!-- WhatsApp -->
+              <a href="https://wa.me/${u.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Bonjour ' + u.name + ' ! C\'est l\'équipe CMFlow. Avez-vous besoin d\'aide pour gérer vos clients ?')}" target="_blank" class="admin-action-btn whatsapp" title="Écrire sur WhatsApp" style="text-decoration: none;">
+                💬 WhatsApp
+              </a>
+
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      // Recalculer les KPIs
+      const proCount = ADMIN_USERS.filter(u => u.plan === 'pro').length;
+      const trialCount = ADMIN_USERS.filter(u => u.plan === 'trial').length;
+      const mrr = proCount * 15000;
+
+      const mrrEl = document.getElementById('admin-mrr-val');
+      const proEl = document.getElementById('admin-pro-count');
+      const trialEl = document.getElementById('admin-trial-count');
+
+      if (mrrEl) mrrEl.textContent = `${mrr.toLocaleString('fr-FR')} FCFA`;
+      if (proEl) proEl.textContent = `${proCount} CMs`;
+      if (trialEl) trialEl.textContent = `${trialCount} CMs`;
+    }
+
+    function toggleUserPlan(userId) {
+      const user = ADMIN_USERS.find(u => u.id === userId);
+      if (!user) return;
+
+      if (user.plan === 'pro') {
+        user.plan = 'trial';
+        showAppToast(`${user.name} a été basculé en Essai Gratuit.`, 'info');
+      } else {
+        user.plan = 'pro';
+        showAppToast(`💎 Plan Pro (15 000 FCFA/m) activé avec succès pour ${user.name} !`, 'success');
+      }
+
+      renderAdminUsers();
+    }
+
+    function exportUsersCSV() {
+      let csv = "Nom,Agence,Email,Telephone,Plan,Clients,Posts,Inscription\n";
+      ADMIN_USERS.forEach(u => {
+        csv += `"${u.name}","${u.agency}","${u.email}","${u.phone}","${u.plan}",${u.clientsCount},${u.postsCount},"${u.registeredAt}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cmflow-utilisateurs-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      showAppToast('Fichier CSV des utilisateurs téléchargé ! 📥', 'success');
+    }
+  </script>
+</body>
+</html>
