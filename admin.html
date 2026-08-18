@@ -791,14 +791,27 @@
       showAppToast('Comptes marchands Wave et OM mis à jour ! 📱', 'success');
     }
 
+    // DÉCONNEXION & VERROUILLAGE AUTOMATIQUE SYSTÉMATIQUE
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.removeItem('cmflow_admin_auth');
+    });
+
+    window.addEventListener('pagehide', () => {
+      sessionStorage.removeItem('cmflow_admin_auth');
+    });
+
+    // Verrouillage automatique si l'administrateur change d'onglet ou quitte la fenêtre
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        logoutAdmin();
+      }
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
       loadMerchants();
 
-      // Vérifier si déjà authentifié dans cette session
-      if (sessionStorage.getItem('cmflow_admin_auth') === 'true') {
-        const modal = document.getElementById('admin-pin-modal');
-        if (modal) modal.style.display = 'none';
-      }
+      // Toujours exiger le code PIN à l'arrivée (Sécurité Maximale)
+      logoutAdmin();
       renderAdminUsers();
     });
 
