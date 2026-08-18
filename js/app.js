@@ -42,6 +42,95 @@ const CMFlowStore = {
     this.setClients(clients);
   },
 
+  // ---- Posts (Planning & Publications) ----
+  getPosts() {
+    try {
+      let posts = JSON.parse(localStorage.getItem('cmflow_posts'));
+      if (!posts || posts.length === 0) {
+        // Posts d'exemples initiaux pour une démonstration immédiate
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = today.getDate();
+
+        const formatDate = (dayOffset) => {
+          const date = new Date(today);
+          date.setDate(d + dayOffset);
+          const dy = date.getFullYear();
+          const dm = String(date.getMonth() + 1).padStart(2, '0');
+          const dd = String(date.getDate()).padStart(2, '0');
+          return `${dy}-${dm}-${dd}`;
+        };
+
+        const clients = this.getClients();
+        const client1 = clients[0] ? clients[0].name : 'Teranga Gourmet';
+        const clientId1 = clients[0] ? clients[0].id : 'sample1';
+
+        posts = [
+          {
+            id: 'p1',
+            clientId: clientId1,
+            clientName: client1,
+            platforms: ['instagram', 'facebook'],
+            scheduledDate: formatDate(1),
+            scheduledTime: '14:30',
+            caption: 'Nouveau menu de saison disponible dès ce week-end ! 🍽️✨ Venez déguster nos saveurs locales revisitées. Réservations par DM ou WhatsApp.\n\n#DakarFood #Teranga #Gastronomie #SenegalFood',
+            imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&auto=format&fit=crop&q=80',
+            status: 'scheduled', // draft, pending, scheduled, published
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: 'p2',
+            clientId: clientId1,
+            clientName: client1,
+            platforms: ['instagram', 'tiktok'],
+            scheduledDate: formatDate(3),
+            scheduledTime: '18:00',
+            caption: 'Les coulisses de la préparation de nos plats signatures avec le Chef ! 👨‍🍳🔥 Restez connectés pour le drop de la semaine.\n\n#BehindTheScenes #ChefLife #DakarVibes',
+            imageUrl: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=600&auto=format&fit=crop&q=80',
+            status: 'pending',
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: 'p3',
+            clientId: clientId1,
+            clientName: client1,
+            platforms: ['linkedin'],
+            scheduledDate: formatDate(-2),
+            scheduledTime: '09:00',
+            caption: 'Fier d\'annoncer notre nouveau partenariat pour valoriser les produits du terroir sénégalais. 🇸🇳💼 Ensemble, développons l\'économie locale.\n\n#BusinessSenegal #Partenariat #Leadership',
+            imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop&q=80',
+            status: 'published',
+            createdAt: new Date().toISOString(),
+          }
+        ];
+        this.setPosts(posts);
+      }
+      return posts;
+    } catch {
+      return [];
+    }
+  },
+  setPosts(posts) {
+    localStorage.setItem('cmflow_posts', JSON.stringify(posts));
+  },
+  addPost(post) {
+    const posts = this.getPosts();
+    posts.push(post);
+    this.setPosts(posts);
+  },
+  updatePost(id, updatedData) {
+    const posts = this.getPosts().map(p => p.id === id ? { ...p, ...updatedData } : p);
+    this.setPosts(posts);
+  },
+  deletePost(id) {
+    const posts = this.getPosts().filter(p => p.id !== id);
+    this.setPosts(posts);
+  },
+  getPostById(id) {
+    return this.getPosts().find(p => p.id === id) || null;
+  },
+
   // ---- UserPreferences ----
   getPrefs() {
     try { return JSON.parse(localStorage.getItem('cmflow_prefs')); } catch { return null; }
@@ -55,6 +144,7 @@ const CMFlowStore = {
     localStorage.removeItem('cmflow_user');
     localStorage.removeItem('cmflow_workspace');
     localStorage.removeItem('cmflow_clients');
+    localStorage.removeItem('cmflow_posts');
     localStorage.removeItem('cmflow_prefs');
   },
 
@@ -88,12 +178,7 @@ function authGuard() {
   const prefs = CMFlowStore.getPrefs();
   const currentPage = window.location.pathname.split('/').pop();
 
-  if (!prefs?.onboardingComplete && currentPage === 'dashboard.html') {
-    window.location.href = 'onboarding.html';
-    return false;
-  }
-
-  if (!prefs?.onboardingComplete && currentPage === 'clients.html') {
+  if (!prefs?.onboardingComplete && ['dashboard.html', 'clients.html', 'planning.html'].includes(currentPage)) {
     window.location.href = 'onboarding.html';
     return false;
   }
@@ -537,6 +622,7 @@ function initOnboarding() {
 function renderDashboard() {
   const user = CMFlowStore.getUser();
   const clients = CMFlowStore.getClients();
+  const posts = CMFlowStore.getPosts();
 
   // Greeting
   const greetingName = document.getElementById('greeting-name');
@@ -546,9 +632,9 @@ function renderDashboard() {
 
   // KPIs
   updateStat('stat-clients', clients.length);
-  updateStat('stat-accounts', 0);
-  updateStat('stat-posts', 0);
-  updateStat('stat-engagement', 0);
+  updateStat('stat-accounts', clients.length * 2);
+  updateStat('stat-posts', posts.length);
+  updateStat('stat-engagement', posts.length > 0 ? '4.8' : '0');
 
   // Afficher empty state ou la liste des clients
   const emptyState = document.getElementById('dashboard-empty');
@@ -648,11 +734,11 @@ function buildClientCard(client) {
         <span class="social-tag">Facebook</span>
       </div>
       <div class="client-status-badge">
-        <span class="status-dot-inactive"></span>
-        <span>Aucun compte connecté</span>
+        <span class="status-dot-inactive" style="background: #10B981;"></span>
+        <span style="color: #059669; font-weight: 500;">Comptes prêts</span>
       </div>
       <div class="client-card-actions">
-        <button type="button" class="btn-card-action primary" onclick="showComingSoon()">Gérer le client</button>
+        <button type="button" class="btn-card-action primary" onclick="window.location.href='planning.html'">Planifier des posts</button>
         <button type="button" class="btn-card-action" onclick="confirmDeleteClient('${client.id}')">
           <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
         </button>
@@ -680,21 +766,573 @@ function confirmDeleteClient(id) {
 }
 
 /* ==========================================================================
+   PLANNING & CALENDRIER ÉDITORIAL — LOGIQUE
+   ========================================================================== */
+let planningState = {
+  currentDate: new Date(),
+  filterClient: 'all',
+  filterPlatform: 'all',
+  filterStatus: 'all',
+  selectedPlatforms: ['instagram'],
+  selectedImageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&auto=format&fit=crop&q=80',
+  editingPostId: null,
+};
+
+const MONTH_NAMES_FR = [
+  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+];
+
+function initPlanning() {
+  const prevBtn = document.getElementById('prev-month-btn');
+  const nextBtn = document.getElementById('next-month-btn');
+  const todayBtn = document.getElementById('today-btn');
+  const filterClient = document.getElementById('filter-client');
+  const filterPlatform = document.getElementById('filter-platform');
+  const filterStatus = document.getElementById('filter-status');
+  const openPostModalBtns = document.querySelectorAll('[data-open-create-post]');
+
+  // Remplir le filtre client
+  if (filterClient) {
+    const clients = CMFlowStore.getClients();
+    filterClient.innerHTML = '<option value="all">Tous les clients</option>';
+    clients.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.name;
+      filterClient.appendChild(opt);
+    });
+
+    filterClient.addEventListener('change', (e) => {
+      planningState.filterClient = e.target.value;
+      renderPlanningCalendar();
+    });
+  }
+
+  if (filterPlatform) {
+    filterPlatform.addEventListener('change', (e) => {
+      planningState.filterPlatform = e.target.value;
+      renderPlanningCalendar();
+    });
+  }
+
+  if (filterStatus) {
+    filterStatus.addEventListener('change', (e) => {
+      planningState.filterStatus = e.target.value;
+      renderPlanningCalendar();
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      planningState.currentDate.setMonth(planningState.currentDate.getMonth() - 1);
+      renderPlanningCalendar();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      planningState.currentDate.setMonth(planningState.currentDate.getMonth() + 1);
+      renderPlanningCalendar();
+    });
+  }
+
+  if (todayBtn) {
+    todayBtn.addEventListener('click', () => {
+      planningState.currentDate = new Date();
+      renderPlanningCalendar();
+    });
+  }
+
+  openPostModalBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      openPostModalForDate(todayStr);
+    });
+  });
+
+  initPostModal();
+  renderPlanningCalendar();
+}
+
+function renderPlanningCalendar() {
+  const grid = document.getElementById('planning-calendar-grid');
+  const monthTitle = document.getElementById('calendar-month-title');
+  if (!grid) return;
+
+  const currentYear = planningState.currentDate.getFullYear();
+  const currentMonth = planningState.currentDate.getMonth();
+
+  if (monthTitle) {
+    monthTitle.textContent = `${MONTH_NAMES_FR[currentMonth]} ${currentYear}`;
+  }
+
+  grid.innerHTML = '';
+
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+
+  // Lundi = 0, Dimanche = 6
+  let startingDayOfWeek = firstDayOfMonth.getDay() - 1;
+  if (startingDayOfWeek === -1) startingDayOfWeek = 6;
+
+  const totalDays = lastDayOfMonth.getDate();
+  const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+  const allPosts = CMFlowStore.getPosts();
+
+  // Filtrage des posts
+  const filteredPosts = allPosts.filter(post => {
+    if (planningState.filterClient !== 'all' && post.clientId !== planningState.filterClient) return false;
+    if (planningState.filterPlatform !== 'all' && !post.platforms?.includes(planningState.filterPlatform)) return false;
+    if (planningState.filterStatus !== 'all' && post.status !== planningState.filterStatus) return false;
+    return true;
+  });
+
+  // Jours du mois précédent
+  for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+    const dayNum = prevMonthLastDay - i;
+    const prevMonthDate = new Date(currentYear, currentMonth - 1, dayNum);
+    const dateStr = `${prevMonthDate.getFullYear()}-${String(prevMonthDate.getMonth() + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+    grid.appendChild(createDayCell(dayNum, dateStr, true, filteredPosts));
+  }
+
+  // Jours du mois en cours
+  for (let d = 1; d <= totalDays; d++) {
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const isToday = dateStr === todayStr;
+    grid.appendChild(createDayCell(d, dateStr, false, filteredPosts, isToday));
+  }
+
+  // Jours du mois suivant
+  const totalRendered = startingDayOfWeek + totalDays;
+  const remainingCells = (totalRendered > 35 ? 42 : 35) - totalRendered;
+
+  for (let nextD = 1; nextD <= remainingCells; nextD++) {
+    const nextMonthDate = new Date(currentYear, currentMonth + 1, nextD);
+    const dateStr = `${nextMonthDate.getFullYear()}-${String(nextMonthDate.getMonth() + 1).padStart(2, '0')}-${String(nextD).padStart(2, '0')}`;
+    grid.appendChild(createDayCell(nextD, dateStr, true, filteredPosts));
+  }
+}
+
+function createDayCell(dayNumber, dateStr, isOtherMonth, posts, isToday = false) {
+  const cell = document.createElement('div');
+  cell.className = `calendar-day-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'is-today' : ''}`;
+  cell.dataset.date = dateStr;
+
+  const top = document.createElement('div');
+  top.className = 'day-cell-top';
+
+  const num = document.createElement('span');
+  num.className = 'day-number';
+  num.textContent = dayNumber;
+  top.appendChild(num);
+
+  const addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.className = 'day-cell-add-btn';
+  addBtn.title = 'Créer une publication ce jour';
+  addBtn.innerHTML = '<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>';
+  addBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openPostModalForDate(dateStr);
+  });
+  top.appendChild(addBtn);
+
+  cell.appendChild(top);
+
+  const postsList = document.createElement('div');
+  postsList.className = 'day-posts-list';
+
+  const dayPosts = posts.filter(p => p.scheduledDate === dateStr);
+  dayPosts.forEach(post => {
+    postsList.appendChild(buildPostPill(post));
+  });
+
+  cell.appendChild(postsList);
+
+  cell.addEventListener('click', () => {
+    openPostModalForDate(dateStr);
+  });
+
+  return cell;
+}
+
+function buildPostPill(post) {
+  const pill = document.createElement('div');
+  const mainPlatform = post.platforms?.[0] || 'instagram';
+  pill.className = `post-pill network-${mainPlatform}`;
+  pill.title = `${post.clientName || 'Client'} (${post.scheduledTime || '12:00'}) — ${post.caption || ''}`;
+
+  const time = document.createElement('span');
+  time.className = 'post-pill-time';
+  time.textContent = post.scheduledTime || '12:00';
+  pill.appendChild(time);
+
+  const title = document.createElement('span');
+  title.className = 'post-pill-title';
+  title.textContent = post.caption ? post.caption.slice(0, 32) : (post.clientName || 'Publication');
+  pill.appendChild(title);
+
+  const dot = document.createElement('span');
+  dot.className = `post-pill-status-dot dot-${post.status || 'draft'}`;
+  pill.appendChild(dot);
+
+  pill.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openPostModalForEdit(post.id);
+  });
+
+  return pill;
+}
+
+/* ==========================================================================
+   MODAL DE PUBLICATION & LIVE FEED PREVIEW
+   ========================================================================== */
+function initPostModal() {
+  const modalBackdrop = document.getElementById('post-modal-backdrop');
+  const modalClose = document.getElementById('post-modal-close-btn');
+  const modalCancel = document.getElementById('post-modal-cancel-btn');
+  const form = document.getElementById('form-create-post');
+  const deleteBtn = document.getElementById('post-delete-btn');
+
+  const clientSelect = document.getElementById('post-client');
+  const dateInput = document.getElementById('post-date');
+  const timeInput = document.getElementById('post-time');
+  const captionInput = document.getElementById('post-caption');
+  const statusSelect = document.getElementById('post-status');
+  const charCount = document.getElementById('caption-char-count');
+
+  // Preview elements
+  const mockupAvatar = document.getElementById('mockup-avatar');
+  const mockupUsername = document.getElementById('mockup-username');
+  const mockupImage = document.getElementById('mockup-image');
+  const mockupCaption = document.getElementById('mockup-caption-text');
+  const mockupTime = document.getElementById('mockup-time');
+
+  if (!modalBackdrop) return;
+
+  const close = () => {
+    modalBackdrop.classList.remove('active');
+    document.body.style.overflow = '';
+    planningState.editingPostId = null;
+    if (form) form.reset();
+  };
+
+  if (modalClose) modalClose.addEventListener('click', close);
+  if (modalCancel) modalCancel.addEventListener('click', close);
+  modalBackdrop.addEventListener('click', (e) => {
+    if (e.target === modalBackdrop) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalBackdrop.classList.contains('active')) close();
+  });
+
+  // Mise à jour de la prévisualisation en direct
+  function updateLivePreview() {
+    // Client & Avatar
+    const selectedClientId = clientSelect?.value;
+    const clients = CMFlowStore.getClients();
+    const client = clients.find(c => c.id === selectedClientId) || { name: 'Votre Client' };
+    const handleName = client.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+    if (mockupAvatar) mockupAvatar.textContent = CMFlowStore.getInitials(client.name);
+    if (mockupUsername) mockupUsername.textContent = handleName;
+
+    // Caption & Hashtags highlight
+    const rawCaption = captionInput?.value || '';
+    if (charCount) charCount.textContent = `${rawCaption.length} / 2 200`;
+
+    if (mockupCaption) {
+      if (!rawCaption.trim()) {
+        mockupCaption.innerHTML = `<span class="caption-user">${escapeHtml(handleName)}</span> Votre texte et vos hashtags apparaîtront ici en direct...`;
+      } else {
+        // Mettre en gras les hashtags
+        const formatted = escapeHtml(rawCaption).replace(/#([a-zA-Z0-9_À-ÿ]+)/g, '<span class="hashtag-hl">#$1</span>');
+        mockupCaption.innerHTML = `<span class="caption-user">${escapeHtml(handleName)}</span> ${formatted.replace(/\n/g, '<br>')}`;
+      }
+    }
+
+    // Image
+    if (mockupImage) {
+      mockupImage.src = planningState.selectedImageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&auto=format&fit=crop&q=80';
+    }
+
+    // Date & Time
+    if (mockupTime) {
+      const d = dateInput?.value || 'Aujourd\'hui';
+      const t = timeInput?.value || '12:00';
+      mockupTime.textContent = `Programmé pour le ${d} à ${t}`;
+    }
+  }
+
+  // Écouteurs de frappe et changements
+  if (captionInput) captionInput.addEventListener('input', updateLivePreview);
+  if (clientSelect) clientSelect.addEventListener('change', updateLivePreview);
+  if (dateInput) dateInput.addEventListener('change', updateLivePreview);
+  if (timeInput) timeInput.addEventListener('change', updateLivePreview);
+
+  // Hashtag chips clic
+  document.querySelectorAll('.hashtag-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const tag = chip.dataset.tag || chip.textContent.trim();
+      if (captionInput) {
+        captionInput.value = (captionInput.value.trim() + ' ' + tag).trim() + ' ';
+        captionInput.focus();
+        updateLivePreview();
+      }
+    });
+  });
+
+  // Toggles Réseaux sociaux
+  document.querySelectorAll('.network-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('active');
+      const network = btn.dataset.network;
+      if (btn.classList.contains('active')) {
+        if (!planningState.selectedPlatforms.includes(network)) planningState.selectedPlatforms.push(network);
+      } else {
+        planningState.selectedPlatforms = planningState.selectedPlatforms.filter(n => n !== network);
+        if (planningState.selectedPlatforms.length === 0) {
+          // Garder au moins 1 réseau
+          btn.classList.add('active');
+          planningState.selectedPlatforms.push(network);
+        }
+      }
+    });
+  });
+
+  // Presets d'images
+  document.querySelectorAll('.image-preset-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.image-preset-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      planningState.selectedImageUrl = item.dataset.img;
+      updateLivePreview();
+    });
+  });
+
+  // Upload image personnalisé
+  const customFileInput = document.getElementById('post-image-file');
+  if (customFileInput) {
+    customFileInput.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          planningState.selectedImageUrl = event.target.result;
+          document.querySelectorAll('.image-preset-item').forEach(i => i.classList.remove('active'));
+          updateLivePreview();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Soumission Formulaire Post
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const clientId = clientSelect?.value;
+      const clients = CMFlowStore.getClients();
+      const client = clients.find(c => c.id === clientId);
+
+      const scheduledDate = dateInput?.value || new Date().toISOString().split('T')[0];
+      const scheduledTime = timeInput?.value || '12:00';
+      const caption = captionInput?.value.trim() || '';
+      const status = statusSelect?.value || 'scheduled';
+
+      if (!caption) {
+        showAppToast('Veuillez saisir un texte pour votre publication.', 'error');
+        if (captionInput) captionInput.focus();
+        return;
+      }
+
+      const submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Enregistrement...';
+      }
+
+      setTimeout(() => {
+        if (planningState.editingPostId) {
+          // Mise à jour
+          CMFlowStore.updatePost(planningState.editingPostId, {
+            clientId: clientId || 'sample',
+            clientName: client?.name || 'Client',
+            platforms: planningState.selectedPlatforms,
+            scheduledDate,
+            scheduledTime,
+            caption,
+            imageUrl: planningState.selectedImageUrl,
+            status,
+          });
+          showAppToast('Publication mise à jour ! 🚀', 'success');
+        } else {
+          // Création
+          const newPost = {
+            id: CMFlowStore.generateId(),
+            clientId: clientId || (clients[0]?.id || 'c1'),
+            clientName: client?.name || (clients[0]?.name || 'Mon Client'),
+            platforms: [...planningState.selectedPlatforms],
+            scheduledDate,
+            scheduledTime,
+            caption,
+            imageUrl: planningState.selectedImageUrl,
+            status,
+            createdAt: new Date().toISOString(),
+          };
+          CMFlowStore.addPost(newPost);
+          showAppToast('Publication planifiée avec succès ! 📅✨', 'success');
+        }
+
+        close();
+        renderPlanningCalendar();
+        if (typeof renderDashboard === 'function') renderDashboard();
+
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Enregistrer la publication';
+        }
+      }, 500);
+    });
+  }
+
+  // Suppression d'un post
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', () => {
+      if (!planningState.editingPostId) return;
+      if (!confirm('Voulez-vous supprimer cette publication ?')) return;
+      CMFlowStore.deletePost(planningState.editingPostId);
+      showAppToast('Publication supprimée.', 'success');
+      close();
+      renderPlanningCalendar();
+      if (typeof renderDashboard === 'function') renderDashboard();
+    });
+  }
+}
+
+function openPostModalForDate(dateStr) {
+  const modalBackdrop = document.getElementById('post-modal-backdrop');
+  const form = document.getElementById('form-create-post');
+  const titleEl = document.getElementById('post-modal-title');
+  const deleteBtn = document.getElementById('post-delete-btn');
+  const clientSelect = document.getElementById('post-client');
+  const dateInput = document.getElementById('post-date');
+  const timeInput = document.getElementById('post-time');
+  const captionInput = document.getElementById('post-caption');
+  const statusSelect = document.getElementById('post-status');
+
+  if (!modalBackdrop) return;
+
+  planningState.editingPostId = null;
+
+  // Peupler la liste des clients
+  if (clientSelect) {
+    const clients = CMFlowStore.getClients();
+    clientSelect.innerHTML = '';
+    if (clients.length === 0) {
+      clientSelect.innerHTML = '<option value="sample">Client Démo (ex: Teranga)</option>';
+    } else {
+      clients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name;
+        clientSelect.appendChild(opt);
+      });
+    }
+  }
+
+  if (titleEl) titleEl.textContent = 'Nouvelle publication';
+  if (deleteBtn) deleteBtn.style.display = 'none';
+
+  if (dateInput) dateInput.value = dateStr;
+  if (timeInput) timeInput.value = '14:00';
+  if (captionInput) captionInput.value = '';
+  if (statusSelect) statusSelect.value = 'scheduled';
+
+  modalBackdrop.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  // Trigger input for preview update
+  if (captionInput) captionInput.dispatchEvent(new Event('input'));
+}
+
+function openPostModalForEdit(postId) {
+  const post = CMFlowStore.getPostById(postId);
+  if (!post) return;
+
+  const modalBackdrop = document.getElementById('post-modal-backdrop');
+  const titleEl = document.getElementById('post-modal-title');
+  const deleteBtn = document.getElementById('post-delete-btn');
+  const clientSelect = document.getElementById('post-client');
+  const dateInput = document.getElementById('post-date');
+  const timeInput = document.getElementById('post-time');
+  const captionInput = document.getElementById('post-caption');
+  const statusSelect = document.getElementById('post-status');
+
+  if (!modalBackdrop) return;
+
+  planningState.editingPostId = postId;
+
+  if (clientSelect) {
+    const clients = CMFlowStore.getClients();
+    clientSelect.innerHTML = '';
+    clients.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.name;
+      if (c.id === post.clientId) opt.selected = true;
+      clientSelect.appendChild(opt);
+    });
+  }
+
+  if (titleEl) titleEl.textContent = 'Modifier la publication';
+  if (deleteBtn) deleteBtn.style.display = 'inline-flex';
+
+  if (dateInput) dateInput.value = post.scheduledDate || '';
+  if (timeInput) timeInput.value = post.scheduledTime || '12:00';
+  if (captionInput) captionInput.value = post.caption || '';
+  if (statusSelect) statusSelect.value = post.status || 'scheduled';
+
+  if (post.imageUrl) {
+    planningState.selectedImageUrl = post.imageUrl;
+  }
+
+  if (post.platforms && post.platforms.length > 0) {
+    planningState.selectedPlatforms = [...post.platforms];
+    document.querySelectorAll('.network-toggle-btn').forEach(btn => {
+      btn.classList.toggle('active', planningState.selectedPlatforms.includes(btn.dataset.network));
+    });
+  }
+
+  modalBackdrop.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  if (captionInput) captionInput.dispatchEvent(new Event('input'));
+}
+
+/* ==========================================================================
    INITIALISATION GLOBALE
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
   const page = window.location.pathname.split('/').pop() || 'index.html';
 
   // Pages protégées
-  const protectedPages = ['dashboard.html', 'clients.html', 'onboarding.html'];
+  const protectedPages = ['dashboard.html', 'clients.html', 'onboarding.html', 'planning.html'];
   if (protectedPages.includes(page)) {
     if (!authGuard()) return;
   }
 
-  // Init sidebar (dashboard + clients)
+  // Init sidebar
   initSidebar();
 
-  // Init modal ajout client
+  // Init modal ajout client (dashboard & clients)
   initAddClientModal();
 
   // Routing par page
@@ -705,14 +1343,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (page === 'dashboard.html') {
     renderDashboard();
 
-    // Si on arrive avec action=add-client (depuis la page de bienvenue)
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('action') === 'add-client') {
       setTimeout(() => {
         const addClientModal = document.getElementById('add-client-modal');
         if (addClientModal) addClientModal.classList.add('active');
         document.body.style.overflow = 'hidden';
-        // Nettoyer l'URL
         window.history.replaceState({}, '', 'dashboard.html');
       }, 400);
     }
@@ -722,4 +1358,9 @@ document.addEventListener('DOMContentLoaded', () => {
     renderClients();
     initClientsSearch();
   }
+
+  if (page === 'planning.html') {
+    initPlanning();
+  }
 });
+

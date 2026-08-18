@@ -1653,3 +1653,686 @@
   color: var(--text-muted);
   font-style: italic;
 }
+
+/* ==========================================================================
+   PLANNING & CALENDRIER ÉDITORIAL
+   ========================================================================== */
+
+/* Toolbar Planning */
+.planning-toolbar {
+  background: var(--bg-surface);
+  border: var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.calendar-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.calendar-month-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.02em;
+  min-width: 180px;
+}
+
+.calendar-nav-btn {
+  background: var(--bg-surface);
+  border: var(--border-light);
+  border-radius: var(--radius-sm);
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.calendar-nav-btn:hover {
+  background: var(--bg-surface-subtle);
+  border-color: #CBD5E1;
+}
+
+.calendar-nav-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-today {
+  background: var(--bg-surface-subtle);
+  border: var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.btn-today:hover {
+  background: #E2E8F0;
+}
+
+/* Filters Group */
+.planning-filters-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  padding: 8px 32px 8px 12px;
+  border: var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-body);
+  cursor: pointer;
+  outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748B'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  appearance: none;
+  transition: border-color var(--transition-fast);
+}
+
+.filter-select:focus {
+  border-color: var(--color-primary);
+}
+
+/* Calendar Card & Grid */
+.calendar-card {
+  background: var(--bg-surface);
+  border: var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.calendar-weekdays-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--bg-surface-subtle);
+  border-bottom: var(--border-light);
+  text-align: center;
+}
+
+.weekday-label {
+  padding: 12px 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.calendar-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(120px, 1fr);
+}
+
+.calendar-day-cell {
+  border-right: var(--border-subtle);
+  border-bottom: var(--border-subtle);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-surface);
+  transition: background var(--transition-fast);
+  position: relative;
+  min-height: 120px;
+}
+
+.calendar-day-cell:nth-child(7n) {
+  border-right: none;
+}
+
+.calendar-day-cell.other-month {
+  background: #FAFCFF;
+  opacity: 0.55;
+}
+
+.calendar-day-cell.is-today {
+  background: rgba(37, 99, 235, 0.03);
+}
+
+.calendar-day-cell.is-today .day-number {
+  background: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-cell-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.day-number {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1;
+}
+
+.day-cell-add-btn {
+  opacity: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 2px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+
+.calendar-day-cell:hover .day-cell-add-btn {
+  opacity: 1;
+}
+
+.day-cell-add-btn:hover {
+  color: var(--color-primary);
+}
+
+/* Post Pills in Calendar Cells */
+.day-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.post-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: var(--radius-xs);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid transparent;
+}
+
+.post-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Network colors for pills */
+.post-pill.network-instagram {
+  background: #FDF2F8;
+  color: #BE185D;
+  border-color: #FBCFE8;
+}
+
+.post-pill.network-facebook {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border-color: #BFDBFE;
+}
+
+.post-pill.network-tiktok {
+  background: #F1F5F9;
+  color: #0F172A;
+  border-color: #E2E8F0;
+}
+
+.post-pill.network-linkedin {
+  background: #F0F9FF;
+  color: #0369A1;
+  border-color: #BAE6FD;
+}
+
+.post-pill.network-x {
+  background: #F8FAFC;
+  color: #1E293B;
+  border-color: #E2E8F0;
+}
+
+.post-pill-time {
+  font-size: 0.68rem;
+  font-weight: 700;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.post-pill-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-pill-status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-draft { background: #94A3B8; }
+.dot-pending { background: #F59E0B; }
+.dot-scheduled { background: #3B82F6; }
+.dot-published { background: #10B981; }
+
+/* Status Badges */
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.status-tag.draft { background: #F1F5F9; color: #475569; }
+.status-tag.pending { background: #FEF3C7; color: #B45309; }
+.status-tag.scheduled { background: #DBEAFE; color: #1D4ED8; }
+.status-tag.published { background: #D1FAE5; color: #047857; }
+
+/* ==========================================================================
+   MODAL DE CRÉATION DE POST AVEC LIVE PREVIEW
+   ========================================================================== */
+
+.post-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-normal), visibility var(--transition-normal);
+  backdrop-filter: blur(4px);
+}
+
+.post-modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.post-modal-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+  width: 100%;
+  max-width: 960px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(20px) scale(0.98);
+  transition: transform var(--transition-smooth);
+}
+
+.post-modal-backdrop.active .post-modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.post-modal-header {
+  padding: 20px 24px;
+  border-bottom: var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.post-modal-body-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  flex: 1;
+  overflow-y: auto;
+}
+
+@media (max-width: 860px) {
+  .post-modal-body-layout {
+    grid-template-columns: 1fr;
+  }
+  .post-preview-column {
+    border-top: var(--border-light);
+  }
+}
+
+.post-form-column {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-right: var(--border-light);
+}
+
+.post-preview-column {
+  padding: 24px;
+  background: #F8FAFC;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.preview-column-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  align-self: flex-start;
+}
+
+/* Network selector buttons inside form */
+.network-toggle-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.network-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.network-toggle-btn:hover {
+  border-color: #CBD5E1;
+}
+
+.network-toggle-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+}
+
+.network-toggle-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Caption Counter & Hashtag shortcuts */
+.caption-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+.caption-char-count {
+  font-weight: 600;
+}
+
+.hashtag-chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.hashtag-chip {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-subtle);
+  border: 1px solid var(--color-primary-border);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.hashtag-chip:hover {
+  background: #DBEAFE;
+}
+
+/* Media upload box */
+.media-upload-zone {
+  border: 2px dashed #CBD5E1;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--bg-surface);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.media-upload-zone:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-subtle);
+}
+
+.media-upload-zone input {
+  display: none;
+}
+
+/* Image Presets Selector */
+.image-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.image-preset-item {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.image-preset-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-preset-item:hover {
+  transform: scale(1.04);
+}
+
+.image-preset-item.active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
+}
+
+/* Live Mockup Instagram Card */
+.mockup-phone-card {
+  width: 100%;
+  max-width: 340px;
+  background: white;
+  border-radius: 18px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.mockup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
+
+.mockup-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mockup-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  color: white;
+  font-weight: 700;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mockup-username-text {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.2;
+}
+
+.mockup-location-text {
+  font-size: 0.68rem;
+  color: #64748B;
+}
+
+.mockup-image-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #F1F5F9;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mockup-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mockup-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 6px;
+}
+
+.mockup-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #0F172A;
+}
+
+.mockup-actions-left svg,
+.mockup-bookmark-icon svg {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.mockup-likes {
+  padding: 0 14px 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.mockup-caption-box {
+  padding: 0 14px 10px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #1E293B;
+  word-break: break-word;
+  max-height: 90px;
+  overflow-y: auto;
+}
+
+.mockup-caption-box .caption-user {
+  font-weight: 700;
+  margin-right: 5px;
+}
+
+.mockup-caption-box .hashtag-hl {
+  color: #1D4ED8;
+  font-weight: 500;
+}
+
+.mockup-footer-time {
+  padding: 0 14px 12px;
+  font-size: 0.68rem;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Responsive planning */
+@media (max-width: 768px) {
+  .calendar-weekdays-header .weekday-label {
+    font-size: 0.68rem;
+    padding: 8px 2px;
+  }
+  .calendar-day-cell {
+    min-height: 80px;
+    padding: 4px;
+  }
+  .post-pill-title {
+    display: none;
+  }
+  .post-pill {
+    padding: 3px;
+    justify-content: center;
+  }
+  .post-pill-time {
+    display: none;
+  }
+}
