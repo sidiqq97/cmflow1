@@ -171,7 +171,7 @@
         <div class="header-actions">
           <span style="background: #DCFCE7; color: #15803D; padding: 6px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
             <span style="width: 8px; height: 8px; border-radius: 50%; background: #15803D; display: inline-block;"></span>
-            3 nouveaux messages
+            <span id="unread-count-badge">4 conversations</span>
           </span>
         </div>
       </header>
@@ -185,66 +185,18 @@
           <div class="inbox-sidebar-threads">
             
             <div class="inbox-sidebar-header">
-              <input type="text" id="inbox-search" placeholder="Rechercher une conversation..." style="width: 100%; padding: 8px 12px; font-size: 0.82rem; border: var(--border-light); border-radius: var(--radius-md); background: #F8FAFC; margin-bottom: 10px;">
+              <input type="text" id="inbox-search" placeholder="Rechercher par nom ou message..." style="width: 100%; padding: 8px 12px; font-size: 0.82rem; border: var(--border-light); border-radius: var(--radius-md); background: #F8FAFC; margin-bottom: 10px;">
               
-              <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;">
-                <button type="button" class="composer-net-tab-btn active" style="font-size: 0.7rem; padding: 3px 8px;">Tous (4)</button>
-                <button type="button" class="composer-net-tab-btn" style="font-size: 0.7rem; padding: 3px 8px;">Instagram</button>
-                <button type="button" class="composer-net-tab-btn" style="font-size: 0.7rem; padding: 3px 8px;">Facebook</button>
-                <button type="button" class="composer-net-tab-btn" style="font-size: 0.7rem; padding: 3px 8px;">TikTok</button>
+              <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;" id="platform-filters-row">
+                <button type="button" class="composer-net-tab-btn active" data-platform="all" style="font-size: 0.7rem; padding: 4px 10px; cursor: pointer;">Tous (<span id="count-all">4</span>)</button>
+                <button type="button" class="composer-net-tab-btn" data-platform="instagram" style="font-size: 0.7rem; padding: 4px 10px; cursor: pointer;">Instagram (<span id="count-instagram">2</span>)</button>
+                <button type="button" class="composer-net-tab-btn" data-platform="facebook" style="font-size: 0.7rem; padding: 4px 10px; cursor: pointer;">Facebook (<span id="count-facebook">1</span>)</button>
+                <button type="button" class="composer-net-tab-btn" data-platform="tiktok" style="font-size: 0.7rem; padding: 4px 10px; cursor: pointer;">TikTok (<span id="count-tiktok">1</span>)</button>
               </div>
             </div>
 
             <div class="inbox-threads-scroll" id="inbox-threads-container">
-              
-              <!-- Thread 1 -->
-              <div class="inbox-thread-item active" data-thread-id="1">
-                <img class="inbox-thread-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar">
-                <div class="inbox-thread-meta">
-                  <div class="inbox-thread-top">
-                    <span class="inbox-thread-author">Awa Ndiaye</span>
-                    <span class="inbox-thread-time">Il y a 5 min</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
-                    <span class="social-tag" style="font-size: 0.65rem; padding: 1px 5px;">Instagram DM</span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">· Teranga Gourmet</span>
-                  </div>
-                  <div class="inbox-thread-snippet">Bonjour, est-ce que vous livrez aux Almadies ce soir svp ?</div>
-                </div>
-              </div>
-
-              <!-- Thread 2 -->
-              <div class="inbox-thread-item" data-thread-id="2">
-                <img class="inbox-thread-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Avatar">
-                <div class="inbox-thread-meta">
-                  <div class="inbox-thread-top">
-                    <span class="inbox-thread-author">Mamadou Fall</span>
-                    <span class="inbox-thread-time">Il y a 22 min</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
-                    <span class="social-tag" style="font-size: 0.65rem; padding: 1px 5px;">Facebook</span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">· Teranga Gourmet</span>
-                  </div>
-                  <div class="inbox-thread-snippet">Quel est le prix du menu dégustation svp ?</div>
-                </div>
-              </div>
-
-              <!-- Thread 3 -->
-              <div class="inbox-thread-item" data-thread-id="3">
-                <img class="inbox-thread-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Avatar">
-                <div class="inbox-thread-meta">
-                  <div class="inbox-thread-top">
-                    <span class="inbox-thread-author">Fatou Diallo</span>
-                    <span class="inbox-thread-time">Il y a 1h</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
-                    <span class="social-tag" style="font-size: 0.65rem; padding: 1px 5px;">TikTok</span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">· Teranga Gourmet</span>
-                  </div>
-                  <div class="inbox-thread-snippet">La vidéo donne trop envie ! Vous êtes ouverts le dimanche ?</div>
-                </div>
-              </div>
-
+              <!-- Rendu dynamiquement via JavaScript -->
             </div>
 
           </div>
@@ -258,26 +210,19 @@
                 <div>
                   <h3 id="chat-header-name" style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0 0 2px;">Awa Ndiaye</h3>
                   <div style="display: flex; align-items: center; gap: 6px;">
-                    <span class="social-tag" style="font-size: 0.68rem; padding: 1px 6px;">Instagram Direct</span>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">Client : <strong>Teranga Gourmet Dakar</strong></span>
+                    <span class="social-tag" id="chat-header-platform" style="font-size: 0.68rem; padding: 1px 6px;">Instagram Direct</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Client : <strong id="chat-header-client">Teranga Gourmet Dakar</strong></span>
                   </div>
                 </div>
               </div>
-              <a href="https://instagram.com" target="_blank" class="btn-card-action" style="text-decoration: none;">
-                Ouvrir sur Instagram
+              <a href="https://instagram.com" target="_blank" id="chat-header-link" class="btn-card-action" style="text-decoration: none;">
+                Ouvrir sur le réseau
               </a>
             </div>
 
             <!-- Messages -->
             <div class="inbox-messages-body" id="inbox-messages-list">
-              
-              <div class="inbox-msg-row received">
-                <div class="inbox-msg-bubble">
-                  Bonjour ! J'ai vu votre publication sur le nouveau menu de saison. Est-ce que vous livrez aux Almadies ce soir vers 20h ?
-                  <div style="font-size: 0.68rem; color: #94A3B8; margin-top: 4px; text-align: right;">19:42</div>
-                </div>
-              </div>
-
+              <!-- Rendu dynamiquement via JavaScript -->
             </div>
 
             <!-- Barre de Réponse & Réponses Rapides -->
@@ -285,10 +230,10 @@
               
               <div class="inbox-quick-replies-row">
                 <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); align-self: center;">Réponses rapides :</span>
-                <button type="button" class="inbox-quick-reply-btn" onclick="insertQuickReply('Bonjour ! Oui tout à fait, nous livrons partout à Dakar (y compris Almadies). Vous pouvez commander sur WhatsApp : https://wa.me/221771234567')">
+                <button type="button" class="inbox-quick-reply-btn" onclick="insertQuickReply('Bonjour ! Oui tout à fait, nous livrons partout à Dakar (y compris Almadies). Vous pouvez commander directement sur WhatsApp : https://wa.me/221771234567')">
                   🛵 Livraison & WhatsApp
                 </button>
-                <button type="button" class="inbox-quick-reply-btn" onclick="insertQuickReply('Bonjour ! Notre carte et nos tarifs sont disponibles sur notre lien : https://terangagourmet.sn/menu')">
+                <button type="button" class="inbox-quick-reply-btn" onclick="insertQuickReply('Bonjour ! Notre carte et nos tarifs complets sont disponibles sur notre lien : https://terangagourmet.sn/menu')">
                   📖 Carte & Prix
                 </button>
                 <button type="button" class="inbox-quick-reply-btn" onclick="insertQuickReply('Bonjour ! Nous sommes ouverts du Mardi au Dimanche de 12h à 23h30. Au plaisir de vous accueillir ! ✨')">
@@ -316,6 +261,218 @@
   <script src="js/app.js"></script>
   <script src="js/backend.js"></script>
   <script>
+    // ---- DONNÉES INBOX MULTI-PLATEFORMES ----
+    const INBOX_DATA = [
+      {
+        id: 1,
+        author: 'Awa Ndiaye',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+        platform: 'instagram',
+        platformLabel: 'Instagram Direct',
+        clientName: 'Teranga Gourmet Dakar',
+        timeAgo: 'Il y a 5 min',
+        snippet: 'Bonjour, est-ce que vous livrez aux Almadies ce soir svp ?',
+        link: 'https://instagram.com',
+        messages: [
+          { sender: 'received', text: "Bonjour ! J'ai vu votre publication sur le nouveau menu de saison. Est-ce que vous livrez aux Almadies ce soir vers 20h ?", time: '19:42' }
+        ]
+      },
+      {
+        id: 2,
+        author: 'Mamadou Fall',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+        platform: 'facebook',
+        platformLabel: 'Facebook Page',
+        clientName: 'Teranga Gourmet Dakar',
+        timeAgo: 'Il y a 22 min',
+        snippet: 'Quel est le prix du menu dégustation svp ?',
+        link: 'https://facebook.com',
+        messages: [
+          { sender: 'received', text: "Salam aleikoum ! Superbe présentation. Quel est le prix du menu dégustation pour 4 personnes s'il vous plaît ?", time: '19:25' }
+        ]
+      },
+      {
+        id: 3,
+        author: 'Fatou Diallo',
+        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
+        platform: 'tiktok',
+        platformLabel: 'TikTok Commentaire',
+        clientName: 'Teranga Gourmet Dakar',
+        timeAgo: 'Il y a 1h',
+        snippet: 'La vidéo donne trop envie ! Vous êtes ouverts le dimanche ?',
+        link: 'https://tiktok.com',
+        messages: [
+          { sender: 'received', text: "La vidéo donne trop envie ! 🔥 Vous êtes ouverts le dimanche midi pour un brunch en famille ?", time: '18:50' }
+        ]
+      },
+      {
+        id: 4,
+        author: 'Karim Ba',
+        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
+        platform: 'instagram',
+        platformLabel: 'Instagram Direct',
+        clientName: 'Teranga Gourmet Dakar',
+        timeAgo: 'Hier',
+        snippet: 'Merci pour l\'accueil hier soir, c\'était parfait !',
+        link: 'https://instagram.com',
+        messages: [
+          { sender: 'received', text: "Merci pour l'accueil hier soir, la table était magnifique et le service au top ! On reviendra très vite.", time: 'Hier 22:15' },
+          { sender: 'sent', text: "Merci infiniment Karim pour votre retour chaleureux ! Toute l'équipe de Teranga Gourmet vous attend avec grand plaisir. À très bientôt ! ✨", time: 'Hier 22:20' }
+        ]
+      }
+    ];
+
+    let currentPlatformFilter = 'all';
+    let currentSearchQuery = '';
+    let activeThreadId = 1;
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+      initPlatformFilters();
+      initSearchInput();
+      initReplyKeypress();
+      renderThreadsList();
+      selectThread(activeThreadId);
+    });
+
+    // Filtres Plateformes
+    function initPlatformFilters() {
+      const filterButtons = document.querySelectorAll('#platform-filters-row button');
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentPlatformFilter = btn.dataset.platform || 'all';
+          renderThreadsList();
+        });
+      });
+    }
+
+    // Recherche
+    function initSearchInput() {
+      const searchInput = document.getElementById('inbox-search');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          currentSearchQuery = e.target.value.toLowerCase().trim();
+          renderThreadsList();
+        });
+      }
+    }
+
+    // Touche Entrée pour envoyer
+    function initReplyKeypress() {
+      const input = document.getElementById('inbox-reply-input');
+      if (input) {
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            sendInboxReply();
+          }
+        });
+      }
+    }
+
+    // Rendu de la liste des conversations
+    function renderThreadsList() {
+      const container = document.getElementById('inbox-threads-container');
+      if (!container) return;
+
+      const filtered = INBOX_DATA.filter(item => {
+        const matchesPlatform = (currentPlatformFilter === 'all' || item.platform === currentPlatformFilter);
+        const matchesSearch = !currentSearchQuery || 
+          item.author.toLowerCase().includes(currentSearchQuery) || 
+          item.snippet.toLowerCase().includes(currentSearchQuery);
+        return matchesPlatform && matchesSearch;
+      });
+
+      // Mettre à jour les compteurs
+      updateCounts();
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="padding: 32px 20px; text-align: center; color: var(--text-muted);">
+            <p style="font-size: 0.85rem; margin: 0;">Aucune conversation trouvée pour ce filtre.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => `
+        <div class="inbox-thread-item ${item.id === activeThreadId ? 'active' : ''}" onclick="selectThread(${item.id})">
+          <img class="inbox-thread-avatar" src="${item.avatar}" alt="${escapeHtml(item.author)}">
+          <div class="inbox-thread-meta">
+            <div class="inbox-thread-top">
+              <span class="inbox-thread-author">${escapeHtml(item.author)}</span>
+              <span class="inbox-thread-time">${item.timeAgo}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+              <span class="social-tag" style="font-size: 0.65rem; padding: 1px 5px;">${item.platformLabel}</span>
+              <span style="font-size: 0.7rem; color: var(--text-muted);">· ${escapeHtml(item.clientName)}</span>
+            </div>
+            <div class="inbox-thread-snippet">${escapeHtml(item.snippet)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateCounts() {
+      const allCount = INBOX_DATA.length;
+      const instaCount = INBOX_DATA.filter(i => i.platform === 'instagram').length;
+      const fbCount = INBOX_DATA.filter(i => i.platform === 'facebook').length;
+      const tkCount = INBOX_DATA.filter(i => i.platform === 'tiktok').length;
+
+      const cAll = document.getElementById('count-all');
+      const cInsta = document.getElementById('count-instagram');
+      const cFb = document.getElementById('count-facebook');
+      const cTk = document.getElementById('count-tiktok');
+
+      if (cAll) cAll.textContent = allCount;
+      if (cInsta) cInsta.textContent = instaCount;
+      if (cFb) cFb.textContent = fbCount;
+      if (cTk) cTk.textContent = tkCount;
+    }
+
+    // Sélection d'une conversation
+    function selectThread(id) {
+      activeThreadId = id;
+      const thread = INBOX_DATA.find(t => t.id === id);
+      if (!thread) return;
+
+      // Header Chat
+      const avatar = document.getElementById('chat-header-avatar');
+      const name = document.getElementById('chat-header-name');
+      const platform = document.getElementById('chat-header-platform');
+      const client = document.getElementById('chat-header-client');
+      const link = document.getElementById('chat-header-link');
+
+      if (avatar) avatar.src = thread.avatar;
+      if (name) name.textContent = thread.author;
+      if (platform) platform.textContent = thread.platformLabel;
+      if (client) client.textContent = thread.clientName;
+      if (link) {
+        link.href = thread.link;
+        link.textContent = `Ouvrir sur ${thread.platform.charAt(0).toUpperCase() + thread.platform.slice(1)}`;
+      }
+
+      // Messages Body
+      const list = document.getElementById('inbox-messages-list');
+      if (list) {
+        list.innerHTML = thread.messages.map(msg => `
+          <div class="inbox-msg-row ${msg.sender}">
+            <div class="inbox-msg-bubble">
+              ${escapeHtml(msg.text)}
+              <div style="font-size: 0.68rem; color: ${msg.sender === 'sent' ? 'rgba(255,255,255,0.7)' : '#94A3B8'}; margin-top: 4px; text-align: right;">${msg.time}</div>
+            </div>
+          </div>
+        `).join('');
+        list.scrollTop = list.scrollHeight;
+      }
+
+      // Re-rendre la liste pour mettre à jour la classe active
+      renderThreadsList();
+    }
+
+    // Insérer une réponse rapide
     function insertQuickReply(text) {
       const input = document.getElementById('inbox-reply-input');
       if (input) {
@@ -324,10 +481,22 @@
       }
     }
 
+    // Envoyer une réponse
     function sendInboxReply() {
       const input = document.getElementById('inbox-reply-input');
       const text = input?.value.trim();
       if (!text) return;
+
+      const thread = INBOX_DATA.find(t => t.id === activeThreadId);
+      if (thread) {
+        thread.messages.push({
+          sender: 'sent',
+          text: text,
+          time: 'À l\'instant'
+        });
+        thread.snippet = `Vous : ${text}`;
+        thread.timeAgo = 'À l\'instant';
+      }
 
       const list = document.getElementById('inbox-messages-list');
       if (list) {
@@ -344,7 +513,8 @@
       }
 
       input.value = '';
-      showAppToast('Réponse envoyée au client ! 💬🚀', 'success');
+      renderThreadsList();
+      showAppToast('Réponse envoyée au client avec succès ! 💬🚀', 'success');
     }
   </script>
 </body>
