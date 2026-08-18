@@ -610,6 +610,17 @@ function openCheckoutModal(planName = 'Plan Pro Illimité', amount = '9 900 FCFA
   `;
 
   modal.classList.add('active');
+  modal.style.position = 'fixed';
+  modal.style.inset = '0';
+  modal.style.background = 'rgba(15, 23, 42, 0.65)';
+  modal.style.backdropFilter = 'blur(6px)';
+  modal.style.zIndex = '999999';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.padding = '20px';
+  modal.style.opacity = '1';
+  modal.style.visibility = 'visible';
   document.body.style.overflow = 'hidden';
 }
 
@@ -653,7 +664,10 @@ function selectCheckoutMethod(method) {
 
 function closeCheckoutModal() {
   const modal = document.getElementById('cmflow-checkout-modal');
-  if (modal) modal.classList.remove('active');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
   document.body.style.overflow = '';
 }
 
