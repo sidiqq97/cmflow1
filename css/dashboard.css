@@ -2898,4 +2898,116 @@
   gap: 4px;
 }
 
+/* ==========================================================================
+   GESTIONNAIRE DE CONNEXION RÉSEAUX SOCIAUX CLIENT
+   ========================================================================== */
+.social-connections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.social-connection-item {
+  background: white;
+  border: var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: all var(--transition-fast);
+}
+
+.social-connection-item:hover {
+  border-color: #CBD5E1;
+  box-shadow: var(--shadow-sm);
+}
+
+.social-connection-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.social-net-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.social-net-icon-box.instagram {
+  background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+}
+.social-net-icon-box.facebook {
+  background: #1877F2;
+}
+.social-net-icon-box.tiktok {
+  background: #010101;
+}
+.social-net-icon-box.linkedin {
+  background: #0A66C2;
+}
+.social-net-icon-box.x {
+  background: #0F172A;
+}
+
+.social-net-meta h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.social-net-handle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.social-net-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.social-net-status-badge.connected {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.social-net-status-badge.disconnected {
+  background: #F1F5F9;
+  color: #64748B;
+}
+
+.social-connect-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.social-connect-input-row input {
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  border: var(--border-light);
+  border-radius: var(--radius-sm);
+  background: #F8FAFC;
+  width: 190px;
+}
+
+
 

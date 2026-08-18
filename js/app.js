@@ -41,6 +41,22 @@ const CMFlowStore = {
     const clients = this.getClients().filter(c => c.id !== id);
     this.setClients(clients);
   },
+  getClientById(id) {
+    return this.getClients().find(c => c.id === id) || null;
+  },
+  updateClientSocialAccount(clientId, networkKey, accountData) {
+    const clients = this.getClients();
+    const idx = clients.findIndex(c => c.id === clientId);
+    if (idx !== -1) {
+      if (!clients[idx].socialAccounts) {
+        clients[idx].socialAccounts = {};
+      }
+      clients[idx].socialAccounts[networkKey] = accountData;
+      this.setClients(clients);
+      return clients[idx];
+    }
+    return null;
+  },
 
   // ---- Posts (Planning & Publications) ----
   getPosts() {
@@ -719,6 +735,21 @@ function buildClientCard(client) {
   const date = CMFlowStore.formatDate(client.createdAt);
   const industry = client.industry || 'Autre';
 
+  // Récupérer les comptes connectés
+  const socials = client.socialAccounts || {
+    instagram: { connected: true, handle: `@${client.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}` },
+    facebook: { connected: true, handle: client.name }
+  };
+
+  const connectedList = [];
+  if (socials.instagram?.connected) connectedList.push({ name: 'Instagram', handle: socials.instagram.handle || '' });
+  if (socials.facebook?.connected) connectedList.push({ name: 'Facebook', handle: socials.facebook.handle || '' });
+  if (socials.tiktok?.connected) connectedList.push({ name: 'TikTok', handle: socials.tiktok.handle || '' });
+  if (socials.linkedin?.connected) connectedList.push({ name: 'LinkedIn', handle: socials.linkedin.handle || '' });
+  if (socials.x?.connected) connectedList.push({ name: 'X', handle: socials.x.handle || '' });
+
+  const connectedCount = connectedList.length;
+
   return `
     <div class="client-card client-card-item" data-client-name="${client.name.toLowerCase()}" data-client-industry="${industry.toLowerCase()}">
       <div class="client-card-head">
@@ -729,15 +760,24 @@ function buildClientCard(client) {
           <p class="client-date">Ajouté le ${date}</p>
         </div>
       </div>
+
       <div class="client-social-row">
-        <span class="social-tag">Instagram</span>
-        <span class="social-tag">Facebook</span>
+        ${connectedList.length > 0 ? connectedList.map(s => `
+          <span class="social-tag">${escapeHtml(s.name)}${s.handle ? ` (${escapeHtml(s.handle)})` : ''}</span>
+        `).join('') : '<span class="social-tag" style="background: #F1F5F9; color: #64748B;">Aucun compte lié</span>'}
       </div>
+
       <div class="client-status-badge">
-        <span class="status-dot-inactive" style="background: #10B981;"></span>
-        <span style="color: #059669; font-weight: 500;">Comptes prêts</span>
+        <span class="status-dot-inactive" style="background: ${connectedCount > 0 ? '#10B981' : '#94A3B8'};"></span>
+        <span style="color: ${connectedCount > 0 ? '#059669' : '#64748B'}; font-weight: 600;">
+          ${connectedCount > 0 ? `${connectedCount} réseaux prêts pour publication` : 'À connecter'}
+        </span>
       </div>
+
       <div class="client-card-actions">
+        <button type="button" class="btn-card-action" onclick="openSocialsManager('${client.id}')" style="background: #EFF6FF; color: var(--color-primary); border-color: #BFDBFE; font-weight: 600;">
+          🔗 Réseaux (${connectedCount})
+        </button>
         <button type="button" class="btn-card-action primary" onclick="window.location.href='planning.html'">Planifier</button>
         <a href="validation.html?client=${client.id}" target="_blank" class="btn-card-action" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Portail de validation client">
           <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
@@ -750,6 +790,188 @@ function buildClientCard(client) {
     </div>
   `;
 }
+
+// ---- Gestionnaire des connexions réseaux sociaux ----
+function openSocialsManager(clientId) {
+  const client = CMFlowStore.getClientById(clientId);
+  if (!client) return;
+
+  let modal = document.getElementById('manage-socials-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'manage-socials-modal';
+    modal.className = 'modal-backdrop';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.appendChild(modal);
+  }
+
+  const socials = client.socialAccounts || {
+    instagram: { connected: true, handle: `@${client.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}` },
+    facebook: { connected: true, handle: client.name },
+    tiktok: { connected: false, handle: '' },
+    linkedin: { connected: false, handle: '' },
+    x: { connected: false, handle: '' }
+  };
+
+  modal.innerHTML = `
+    <div class="modal-card" style="max-width: 620px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">🔗 Réseaux Sociaux : ${escapeHtml(client.name)}</h3>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin: 4px 0 0;">Connectez directement les comptes gérés par votre agence pour publier en 1 clic.</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeSocialsModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px;">
+        <div class="social-connections-list">
+          
+          <!-- Instagram -->
+          <div class="social-connection-item">
+            <div class="social-connection-left">
+              <div class="social-net-icon-box instagram">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </div>
+              <div class="social-net-meta">
+                <h4>Instagram Pro <span class="social-net-status-badge ${socials.instagram?.connected ? 'connected' : 'disconnected'}">${socials.instagram?.connected ? '● Connecté' : 'Non lié'}</span></h4>
+                <div class="social-net-handle">${socials.instagram?.connected ? escapeHtml(socials.instagram.handle) : 'Liez le compte Instagram de votre client'}</div>
+              </div>
+            </div>
+            <div>
+              ${socials.instagram?.connected ? `
+                <button type="button" class="btn-secondary-app" style="font-size: 0.78rem; padding: 6px 10px;" onclick="toggleSocialAccount('${client.id}', 'instagram', false)">Déconnecter</button>
+              ` : `
+                <div class="social-connect-input-row">
+                  <input type="text" id="input-social-instagram" placeholder="@nom_du_compte" value="@${client.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}">
+                  <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 6px 12px;" onclick="connectSocialAccountFromInput('${client.id}', 'instagram')">Lier</button>
+                </div>
+              `}
+            </div>
+          </div>
+
+          <!-- Facebook -->
+          <div class="social-connection-item">
+            <div class="social-connection-left">
+              <div class="social-net-icon-box facebook">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </div>
+              <div class="social-net-meta">
+                <h4>Page Facebook <span class="social-net-status-badge ${socials.facebook?.connected ? 'connected' : 'disconnected'}">${socials.facebook?.connected ? '● Connectée' : 'Non liée'}</span></h4>
+                <div class="social-net-handle">${socials.facebook?.connected ? escapeHtml(socials.facebook.handle) : 'Liez la page Facebook officielle'}</div>
+              </div>
+            </div>
+            <div>
+              ${socials.facebook?.connected ? `
+                <button type="button" class="btn-secondary-app" style="font-size: 0.78rem; padding: 6px 10px;" onclick="toggleSocialAccount('${client.id}', 'facebook', false)">Déconnecter</button>
+              ` : `
+                <div class="social-connect-input-row">
+                  <input type="text" id="input-social-facebook" placeholder="Nom de la page" value="${escapeHtml(client.name)}">
+                  <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 6px 12px;" onclick="connectSocialAccountFromInput('${client.id}', 'facebook')">Lier</button>
+                </div>
+              `}
+            </div>
+          </div>
+
+          <!-- TikTok -->
+          <div class="social-connection-item">
+            <div class="social-connection-left">
+              <div class="social-net-icon-box tiktok">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-1.01v8.86c-.03 2.1-.85 4.19-2.3 5.75-1.74 1.9-4.28 2.87-6.81 2.6-2.54-.26-4.88-1.74-6.22-3.92-1.35-2.18-1.5-4.94-.41-7.24 1.09-2.3 3.29-3.9 5.8-4.22.84-.11 1.7-.06 2.53.15v4.19c-.43-.16-.9-.23-1.36-.2-1.12.06-2.19.63-2.83 1.55-.65.92-.78 2.11-.35 3.16.42 1.04 1.41 1.77 2.53 1.86 1.13.1 2.26-.41 2.88-1.37.28-.43.43-.94.43-1.46V.02h-2.18z"/></svg>
+              </div>
+              <div class="social-net-meta">
+                <h4>TikTok Business <span class="social-net-status-badge ${socials.tiktok?.connected ? 'connected' : 'disconnected'}">${socials.tiktok?.connected ? '● Connecté' : 'Non lié'}</span></h4>
+                <div class="social-net-handle">${socials.tiktok?.connected ? escapeHtml(socials.tiktok.handle) : 'Liez le compte TikTok pour les vidéos'}</div>
+              </div>
+            </div>
+            <div>
+              ${socials.tiktok?.connected ? `
+                <button type="button" class="btn-secondary-app" style="font-size: 0.78rem; padding: 6px 10px;" onclick="toggleSocialAccount('${client.id}', 'tiktok', false)">Déconnecter</button>
+              ` : `
+                <div class="social-connect-input-row">
+                  <input type="text" id="input-social-tiktok" placeholder="@compte_tiktok" value="@${client.name.toLowerCase().replace(/[^a-z0-9]/g, '')}">
+                  <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 6px 12px;" onclick="connectSocialAccountFromInput('${client.id}', 'tiktok')">Lier</button>
+                </div>
+              `}
+            </div>
+          </div>
+
+          <!-- LinkedIn -->
+          <div class="social-connection-item">
+            <div class="social-connection-left">
+              <div class="social-net-icon-box linkedin">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </div>
+              <div class="social-net-meta">
+                <h4>Page LinkedIn <span class="social-net-status-badge ${socials.linkedin?.connected ? 'connected' : 'disconnected'}">${socials.linkedin?.connected ? '● Connectée' : 'Non liée'}</span></h4>
+                <div class="social-net-handle">${socials.linkedin?.connected ? escapeHtml(socials.linkedin.handle) : 'Liez la page entreprise LinkedIn'}</div>
+              </div>
+            </div>
+            <div>
+              ${socials.linkedin?.connected ? `
+                <button type="button" class="btn-secondary-app" style="font-size: 0.78rem; padding: 6px 10px;" onclick="toggleSocialAccount('${client.id}', 'linkedin', false)">Déconnecter</button>
+              ` : `
+                <div class="social-connect-input-row">
+                  <input type="text" id="input-social-linkedin" placeholder="Entreprise LinkedIn" value="${escapeHtml(client.name)}">
+                  <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 6px 12px;" onclick="connectSocialAccountFromInput('${client.id}', 'linkedin')">Lier</button>
+                </div>
+              `}
+            </div>
+          </div>
+
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+          <button type="button" class="btn-primary-app" onclick="closeSocialsModal()">
+            Terminer
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSocialsModal() {
+  const modal = document.getElementById('manage-socials-modal');
+  if (modal) modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function connectSocialAccountFromInput(clientId, network) {
+  const input = document.getElementById(`input-social-${network}`);
+  const handle = input?.value.trim() || `@compte_${network}`;
+
+  CMFlowStore.updateClientSocialAccount(clientId, network, {
+    connected: true,
+    handle: handle,
+    connectedAt: new Date().toISOString()
+  });
+
+  showAppToast(`Compte ${network.toUpperCase()} lié avec succès ! 🎉`, 'success');
+  openSocialsManager(clientId);
+  if (typeof renderClients === 'function') renderClients();
+}
+
+function toggleSocialAccount(clientId, network, status) {
+  CMFlowStore.updateClientSocialAccount(clientId, network, {
+    connected: status,
+    handle: '',
+    connectedAt: status ? new Date().toISOString() : null
+  });
+
+  showAppToast(`Compte ${network.toUpperCase()} déconnecté.`, 'info');
+  openSocialsManager(clientId);
+  if (typeof renderClients === 'function') renderClients();
+}
+
 
 function escapeHtml(str) {
   const div = document.createElement('div');
@@ -1042,7 +1264,7 @@ function initPostModal() {
     const selectedClientId = clientSelect?.value;
     const clients = CMFlowStore.getClients();
     const client = clients.find(c => c.id === selectedClientId) || { name: 'Votre Client' };
-    const handleName = client.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const handleName = client.socialAccounts?.instagram?.handle?.replace('@', '') || client.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
 
     if (mockupAvatar) mockupAvatar.textContent = CMFlowStore.getInitials(client.name);
     if (mockupUsername) mockupUsername.textContent = handleName;
