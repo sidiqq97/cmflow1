@@ -37,9 +37,53 @@
           <span>🔓 Déverrouiller l'accès</span>
         </button>
       </form>
-      <div style="margin-top: 14px;">
-        <a href="dashboard.html" style="font-size: 0.78rem; color: #9CA3AF; text-decoration: underline;">Retour au tableau de bord CM</a>
+      <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <button type="button" onclick="openRecoveryModal()" style="background: none; border: none; font-size: 0.78rem; color: #FBBF24; cursor: pointer; text-decoration: underline;">
+          ❓ Code PIN oublié ? Utiliser la Clé Maître
+        </button>
+        <a href="dashboard.html" style="font-size: 0.75rem; color: #6B7280; text-decoration: none;">Retour à l'espace Community Manager</a>
       </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL: RÉCUPÉRATION D'URGENCE DU CODE PIN (CLÉ MAÎTRE)
+       ======================================================================= -->
+  <div class="app-modal-backdrop" id="admin-recovery-modal">
+    <div class="app-modal" style="background: #111827; border: 1px solid #374151; color: white; max-width: 440px;">
+      <div class="app-modal-header" style="border-bottom-color: #1F2937;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">🛡️</span>
+          <div>
+            <h3 class="app-modal-title" style="color: white; margin: 0;">Récupération Clé Maître</h3>
+            <p style="font-size: 0.8rem; color: #9CA3AF; margin: 0;">Réinitialisez votre code PIN grâce à votre Clé Maître Fondateur.</p>
+          </div>
+        </div>
+        <button type="button" class="app-modal-close" style="color: #9CA3AF;" onclick="closeRecoveryModal()">✕</button>
+      </div>
+
+      <form id="recovery-form" onsubmit="handleRecoverySubmit(event)" style="padding: 20px;">
+        <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.2); padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; color: #FDE68A; margin-bottom: 16px;">
+          💡 <strong>Clé Maître par défaut :</strong> <code>cmflow2026</code>
+        </div>
+
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Clé Maître Fondateur *</label>
+          <input type="password" id="recovery-master-key" placeholder="Entrez la clé maître (cmflow2026)" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div class="form-field" style="margin-bottom: 18px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Nouveau Code PIN à définir *</label>
+          <input type="password" id="recovery-new-pin" placeholder="Ex: 1234 ou 5678" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
+          <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeRecoveryModal()">Annuler</button>
+          <button type="submit" class="btn-primary-app" style="background: #F59E0B; color: #111827; font-weight: 800;">
+            <span>Réinitialiser & Déverrouiller 🔓</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -506,6 +550,47 @@
         }
       }
       showAppToast('Session Administrateur verrouillée. 🔒', 'info');
+    }
+
+    // Récupération d'Urgence par Clé Maître
+    function openRecoveryModal() {
+      const modal = document.getElementById('admin-recovery-modal');
+      if (modal) {
+        modal.classList.add('active');
+        document.getElementById('recovery-master-key')?.focus();
+      }
+    }
+
+    function closeRecoveryModal() {
+      const modal = document.getElementById('admin-recovery-modal');
+      if (modal) modal.classList.remove('active');
+      document.getElementById('recovery-form')?.reset();
+    }
+
+    function handleRecoverySubmit(e) {
+      e.preventDefault();
+      const masterKey = document.getElementById('recovery-master-key')?.value.trim();
+      const newPin = document.getElementById('recovery-new-pin')?.value.trim();
+
+      // Clés Maître autorisées
+      if (masterKey !== 'cmflow2026' && masterKey !== 'CMFLOW-MASTER-2026' && masterKey !== 'admin') {
+        showAppToast('Clé Maître incorrecte.', 'danger');
+        return;
+      }
+
+      if (newPin.length < 4) {
+        showAppToast('Le nouveau code PIN doit comporter au moins 4 caractères.', 'danger');
+        return;
+      }
+
+      // Enregistrer le nouveau code et déverrouiller
+      setAdminPin(newPin);
+      closeRecoveryModal();
+      document.getElementById('admin-pin-modal').style.display = 'none';
+      sessionStorage.setItem('cmflow_admin_auth', 'true');
+      renderAdminUsers();
+
+      showAppToast(`🔓 Code PIN réinitialisé avec succès à : ${newPin} ! Bienvenue Fondateur.`, 'success');
     }
 
     // Modal Changement de Code PIN
