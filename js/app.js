@@ -450,11 +450,11 @@ function openPaywallModal(type = 'client') {
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button type="button" class="btn-primary-app" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;" onclick="closePaywallModal(); window.location.href='settings.html#billing';">
-          <span>🚀 Débloquer le Plan Pro (Wave / Orange Money)</span>
+        <button type="button" class="btn-primary-app" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);" onclick="closePaywallModal(); openCheckoutModal('Plan Pro Illimité', '9 900 FCFA', '/ mois');">
+          <span>🚀 Choisir mon moyen de paiement (Wave / OM)</span>
         </button>
         <button type="button" class="btn-secondary-app" style="width: 100%; justify-content: center;" onclick="closePaywallModal()">
-          Continuer avec l'essai gratuit
+          Continuer avec l'essai gratuit (1 client max)
         </button>
       </div>
     </div>
@@ -468,6 +468,230 @@ function closePaywallModal() {
   const modal = document.getElementById('paywall-upgrade-modal');
   if (modal) modal.classList.remove('active');
   document.body.style.overflow = '';
+}
+
+/* ==========================================================================
+   💳 POP-UP DE PAIEMENT & CHECKOUT MULTI-CANAL (WAVE / ORANGE MONEY / CARTE)
+   ========================================================================== */
+let selectedPaymentMethod = 'wave';
+
+function openCheckoutModal(planName = 'Plan Pro Illimité', amount = '9 900 FCFA', period = '/ mois') {
+  let modal = document.getElementById('cmflow-checkout-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'cmflow-checkout-modal';
+    modal.className = 'modal-backdrop';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.appendChild(modal);
+  }
+
+  const waveMerchant = localStorage.getItem('cmflow_wave_merchant') || '+221 77 842 19 02';
+  const omMerchant = localStorage.getItem('cmflow_om_merchant') || '+221 77 842 19 02';
+  selectedPaymentMethod = 'wave';
+
+  modal.innerHTML = `
+    <div class="paywall-modal-card" style="max-width: 520px; text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: var(--border-light);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: white;">
+            💳
+          </div>
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0;">Paiement Sécurisé</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Finalisez votre abonnement CMFlow en toute sécurité</p>
+          </div>
+        </div>
+        <button type="button" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);" onclick="closeCheckoutModal()">✕</button>
+      </div>
+
+      <!-- Récapitulatif du Plan -->
+      <div style="background: linear-gradient(135deg, #F8FAFC, #EFF6FF); border: 1.5px solid #BFDBFE; border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--color-primary); text-transform: uppercase;">Formule Choisie</span>
+          <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin: 2px 0 0;">${escapeHtml(planName)}</h4>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 1.3rem; font-weight: 900; color: #1E3A8A;">${escapeHtml(amount)}</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(period)}</span>
+        </div>
+      </div>
+
+      <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; display: block;">
+        Choisissez votre moyen de paiement :
+      </label>
+
+      <!-- Sélecteur des modes de paiement -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px;" id="checkout-methods-grid">
+        
+        <!-- Option Wave -->
+        <div class="checkout-method-card active" id="method-wave" onclick="selectCheckoutMethod('wave')" style="border: 2px solid #1E3A8A; background: #EFF6FF; border-radius: var(--radius-md); padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.2s;">
+          <div style="font-size: 1.5rem; margin-bottom: 4px;">🌊</div>
+          <strong style="font-size: 0.82rem; color: #1E3A8A; display: block;">Wave Sénégal</strong>
+          <span style="font-size: 0.7rem; color: #3B82F6;">1-clic direct</span>
+        </div>
+
+        <!-- Option Orange Money -->
+        <div class="checkout-method-card" id="method-om" onclick="selectCheckoutMethod('om')" style="border: 1.5px solid var(--border-light); background: white; border-radius: var(--radius-md); padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.2s;">
+          <div style="font-size: 1.5rem; margin-bottom: 4px;">🍊</div>
+          <strong style="font-size: 0.82rem; color: #EA580C; display: block;">Orange Money</strong>
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Paiement USSD</span>
+        </div>
+
+        <!-- Option Carte Bancaire -->
+        <div class="checkout-method-card" id="method-card" onclick="selectCheckoutMethod('card')" style="border: 1.5px solid var(--border-light); background: white; border-radius: var(--radius-md); padding: 12px 10px; text-align: center; cursor: pointer; transition: all 0.2s;">
+          <div style="font-size: 1.5rem; margin-bottom: 4px;">💳</div>
+          <strong style="font-size: 0.82rem; color: var(--text-main); display: block;">Carte Bancaire</strong>
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Visa / Mastercard</span>
+        </div>
+
+      </div>
+
+      <!-- Détails selon la méthode sélectionnée -->
+      <div id="checkout-method-details" style="margin-bottom: 20px;">
+        
+        <!-- Bloc Wave -->
+        <div id="details-wave">
+          <div style="background: rgba(30, 58, 138, 0.05); border: 1px solid rgba(30, 58, 138, 0.15); padding: 12px 14px; border-radius: var(--radius-md); font-size: 0.8rem; color: #1E3A8A; margin-bottom: 12px;">
+            🌊 <strong>Paiement Wave :</strong> Vous recevrez une notification instantanée sur votre application Wave ou vous pouvez payer directement au compte marchand CMFlow : <strong>${escapeHtml(waveMerchant)}</strong>.
+          </div>
+          <div class="form-field" style="margin-bottom: 12px;">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: block;">Votre numéro de téléphone Wave *</label>
+            <input type="tel" id="checkout-payer-phone" placeholder="Ex: +221 77 123 45 67" value="+221 77 " required style="width: 100%; padding: 10px 14px; border: var(--border-light); border-radius: var(--radius-md); font-size: 0.9rem;">
+          </div>
+        </div>
+
+        <!-- Bloc Orange Money -->
+        <div id="details-om" style="display: none;">
+          <div style="background: rgba(234, 88, 12, 0.08); border: 1px solid rgba(234, 88, 12, 0.2); padding: 12px 14px; border-radius: var(--radius-md); font-size: 0.8rem; color: #C2410C; margin-bottom: 12px;">
+            🍊 <strong>Orange Money Sénégal :</strong> Composez <code>#144#391#</code> pour obtenir votre code de validation ou effectuez le transfert vers <strong>${escapeHtml(omMerchant)}</strong>.
+          </div>
+          <div class="form-field" style="margin-bottom: 12px;">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: block;">Votre numéro Orange Money *</label>
+            <input type="tel" id="checkout-om-phone" placeholder="Ex: +221 77 / 78 ..." value="+221 77 " style="width: 100%; padding: 10px 14px; border: var(--border-light); border-radius: var(--radius-md); font-size: 0.9rem;">
+          </div>
+        </div>
+
+        <!-- Bloc Carte Bancaire -->
+        <div id="details-card" style="display: none;">
+          <div class="form-field" style="margin-bottom: 10px;">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: block;">Numéro de Carte Bancaire</label>
+            <input type="text" placeholder="4242 •••• •••• 4242" maxlength="19" style="width: 100%; padding: 10px 14px; border: var(--border-light); border-radius: var(--radius-md); font-size: 0.9rem;">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-field">
+              <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: block;">Expiration</label>
+              <input type="text" placeholder="MM/AA" maxlength="5" style="width: 100%; padding: 10px 14px; border: var(--border-light); border-radius: var(--radius-md); font-size: 0.9rem;">
+            </div>
+            <div class="form-field">
+              <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: block;">CVC</label>
+              <input type="text" placeholder="123" maxlength="4" style="width: 100%; padding: 10px 14px; border: var(--border-light); border-radius: var(--radius-md); font-size: 0.9rem;">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bouton de validation -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn-primary-app" id="checkout-submit-btn" style="width: 100%; justify-content: center; padding: 14px; font-size: 1rem; font-weight: 800; background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);" onclick="processCheckoutPayment('${escapeHtml(planName)}', '${escapeHtml(amount)}')">
+          <span id="checkout-btn-text">🚀 Valider le Paiement Wave (${escapeHtml(amount)})</span>
+        </button>
+        <button type="button" class="btn-secondary-app" style="width: 100%; justify-content: center;" onclick="closeCheckoutModal()">
+          Annuler
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; font-size: 0.75rem; color: var(--text-muted);">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" style="color: #059669;"><path fill-rule="evenodd" d="M10 1a9 9 0 100 18 9 9 0 000-18zm3.707 7.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        <span>Paiement crypté & sécurisé · Facture générée automatiquement</span>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function selectCheckoutMethod(method) {
+  selectedPaymentMethod = method;
+  
+  // Style des cartes
+  ['wave', 'om', 'card'].forEach(m => {
+    const card = document.getElementById(`method-${m}`);
+    const details = document.getElementById(`details-${m}`);
+    if (card) {
+      if (m === method) {
+        card.style.borderColor = m === 'wave' ? '#1E3A8A' : (m === 'om' ? '#EA580C' : '#2563EB');
+        card.style.background = m === 'wave' ? '#EFF6FF' : (m === 'om' ? '#FFF7ED' : '#F8FAFC');
+      } else {
+        card.style.borderColor = 'var(--border-light)';
+        card.style.background = 'white';
+      }
+    }
+    if (details) {
+      details.style.display = m === method ? 'block' : 'none';
+    }
+  });
+
+  // Bouton
+  const btnText = document.getElementById('checkout-btn-text');
+  const submitBtn = document.getElementById('checkout-submit-btn');
+  if (btnText && submitBtn) {
+    if (method === 'wave') {
+      btnText.textContent = `🚀 Valider le Paiement Wave`;
+      submitBtn.style.background = 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)';
+    } else if (method === 'om') {
+      btnText.textContent = `🍊 Valider par Orange Money`;
+      submitBtn.style.background = 'linear-gradient(135deg, #C2410C 0%, #EA580C 100%)';
+    } else {
+      btnText.textContent = `💳 Payer par Carte Bancaire`;
+      submitBtn.style.background = 'linear-gradient(135deg, #1E293B 0%, #334155 100%)';
+    }
+  }
+}
+
+function closeCheckoutModal() {
+  const modal = document.getElementById('cmflow-checkout-modal');
+  if (modal) modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function processCheckoutPayment(planName, amount) {
+  const submitBtn = document.getElementById('checkout-submit-btn');
+  const btnText = document.getElementById('checkout-btn-text');
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    if (btnText) btnText.textContent = '⏳ Traitement du paiement en cours...';
+  }
+
+  setTimeout(() => {
+    // Débloquer le plan Pro dans CMFlowStore
+    CMFlowStore.setUserPlan('pro');
+
+    // Mettre à jour l'utilisateur si existant
+    try {
+      const user = CMFlowStore.getUser();
+      if (user) {
+        user.plan = 'pro';
+        localStorage.setItem('cmflow_user', JSON.stringify(user));
+      }
+    } catch(e) {}
+
+    closeCheckoutModal();
+
+    showAppToast(`🎉 Paiement de ${amount} validé avec succès ! Bienvenue sur le ${planName}. Vos quotas sont désormais illimités !`, 'success');
+
+    // Rafraîchir l'affichage
+    setTimeout(() => {
+      if (typeof renderDashboard === 'function') renderDashboard();
+      if (typeof renderClients === 'function') renderClients();
+      const planBadge = document.querySelector('.plan-badge-active');
+      if (planBadge) planBadge.textContent = '● Plan Pro Actif (9 900 F / mois)';
+    }, 400);
+
+  }, 1200);
 }
 
 /* ==========================================================================
