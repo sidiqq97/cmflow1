@@ -68,9 +68,9 @@
           <span style="width: 8px; height: 8px; border-radius: 50%; background: #34D399;"></span>
           Serveurs & Paiements Actifs
         </span>
-        <a href="dashboard.html" class="btn-secondary-app" style="font-size: 0.82rem; background: #1F2937; color: white; border-color: #374151; text-decoration: none;">
-          ⬅️ Mon Espace CM
-        </a>
+        <button type="button" class="btn-secondary-app" style="font-size: 0.82rem; background: #1F2937; color: #FCA5A5; border-color: #7F1D1D;" onclick="logoutAdmin()">
+          🔒 Verrouiller
+        </button>
       </div>
     </header>
 
@@ -176,7 +176,7 @@
             <div style="color: #9CA3AF; margin-bottom: 2px;">Compte Orange Money</div>
             <strong style="color: white;">+221 77 842 19 02</strong>
           </div>
-          <button type="button" class="btn-secondary-app" style="width: 100%; justify-content: center; font-size: 0.8rem; background: #374151; color: white; border: none;" onclick="showAppToast('Paramètres marchands enregistrés !', 'success')">
+          <button type="button" class="btn-secondary-app" style="width: 100%; justify-content: center; font-size: 0.8rem; background: #374151; color: white; border: none;" onclick="showAppToast('Paramètres marchands synchronisés !', 'success')">
             ⚙️ Modifier les numéros
           </button>
         </div>
@@ -192,7 +192,7 @@
       <div class="admin-table-header">
         <div>
           <h2 style="font-size: 1.15rem; font-weight: 800; margin: 0 0 4px; color: white;">Répertoire des Community Managers</h2>
-          <span style="font-size: 0.8rem; color: #9CA3AF;">Gérez les abonnements, offrez des accès Pro et contactez vos clients sur WhatsApp</span>
+          <span style="font-size: 0.8rem; color: #9CA3AF;">Gérez les abonnements, ajoutez de nouveaux CMs et contactez-les en 1 clic</span>
         </div>
 
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
@@ -200,12 +200,16 @@
           
           <div style="display: flex; gap: 4px;">
             <button type="button" class="composer-net-tab-btn active" data-admin-filter="all" onclick="setAdminFilter('all')" style="font-size: 0.72rem; padding: 4px 10px;">Tous</button>
-            <button type="button" class="composer-net-tab-btn" data-admin-filter="pro" onclick="setAdminFilter('pro')" style="font-size: 0.72rem; padding: 4px 10px;">Pro (125)</button>
-            <button type="button" class="composer-net-tab-btn" data-admin-filter="trial" onclick="setAdminFilter('trial')" style="font-size: 0.72rem; padding: 4px 10px;">Essai (340)</button>
+            <button type="button" class="composer-net-tab-btn" data-admin-filter="pro" onclick="setAdminFilter('pro')" style="font-size: 0.72rem; padding: 4px 10px;">Pro</button>
+            <button type="button" class="composer-net-tab-btn" data-admin-filter="trial" onclick="setAdminFilter('trial')" style="font-size: 0.72rem; padding: 4px 10px;">Essai</button>
           </div>
 
+          <button type="button" class="btn-primary-app" style="font-size: 0.8rem; padding: 8px 14px; background: #4F46E5; font-weight: 700;" onclick="openAddUserModal()">
+            <span>➕ Ajouter un CM</span>
+          </button>
+
           <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 8px 12px; background: #10B981;" onclick="exportUsersCSV()">
-            📥 Exporter CSV
+            📥 CSV
           </button>
         </div>
       </div>
@@ -217,8 +221,8 @@
               <th style="color: #9CA3AF; border-color: #1F2937;">Community Manager</th>
               <th style="color: #9CA3AF; border-color: #1F2937;">Contact WhatsApp</th>
               <th style="color: #9CA3AF; border-color: #1F2937;">Statut Plan</th>
-              <th style="color: #9CA3AF; border-color: #1F2937;">Clients Gérés</th>
-              <th style="color: #9CA3AF; border-color: #1F2937;">Posts Créés</th>
+              <th style="color: #9CA3AF; border-color: #1F2937;">Clients</th>
+              <th style="color: #9CA3AF; border-color: #1F2937;">Posts</th>
               <th style="color: #9CA3AF; border-color: #1F2937; text-align: right;">Actions Super-Admin</th>
             </tr>
           </thead>
@@ -232,14 +236,69 @@
 
   </div>
 
+  <!-- =======================================================================
+       MODAL: AJOUTER UN NOUVEL UTILISATEUR CM
+       ======================================================================= -->
+  <div class="app-modal-backdrop" id="add-user-modal">
+    <div class="app-modal" style="background: #111827; border: 1px solid #374151; color: white; max-width: 480px;">
+      <div class="app-modal-header" style="border-bottom-color: #1F2937;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">👤</span>
+          <div>
+            <h3 class="app-modal-title" style="color: white; margin: 0;">Ajouter un Community Manager</h3>
+            <p style="font-size: 0.8rem; color: #9CA3AF; margin: 0;">Créez manuellement un compte utilisateur dans la base de données.</p>
+          </div>
+        </div>
+        <button type="button" class="app-modal-close" style="color: #9CA3AF;" onclick="closeAddUserModal()">✕</button>
+      </div>
+
+      <form id="add-user-form" onsubmit="handleAddUserSubmit(event)" style="padding: 20px;">
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Nom et Prénom *</label>
+          <input type="text" id="new-user-name" placeholder="Ex: Ibrahima Ndao" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Agence / Activité</label>
+          <input type="text" id="new-user-agency" placeholder="Ex: Ndao Digital Agency" style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Adresse Email *</label>
+          <input type="email" id="new-user-email" placeholder="Ex: ibrahima@ndaodigital.sn" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Numéro WhatsApp *</label>
+          <input type="tel" id="new-user-phone" placeholder="Ex: +221 77 999 88 77" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div class="form-field" style="margin-bottom: 18px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Plan Initial Attribué</label>
+          <select id="new-user-plan" style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+            <option value="pro">💎 Plan Pro (15 000 FCFA / mois)</option>
+            <option value="trial" selected>⏳ Essai Gratuit (14 jours)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
+          <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeAddUserModal()">Annuler</button>
+          <button type="submit" class="btn-primary-app" style="background: #4F46E5;">
+            <span>Enregistrer le CM</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="app-toast" id="app-toast" role="alert" aria-live="polite"></div>
 
   <script src="js/app.js"></script>
   <script src="js/backend.js"></script>
   <script>
-    // ---- BASE DE DONNÉES UTILISATEURS SUPER-ADMIN ----
-    let ADMIN_USERS = [
+    // ---- BASE DE DONNÉES UTILISATEURS SUPER-ADMIN AVEC PERSISTANCE LOCALSTORAGE ----
+    const DEFAULT_ADMIN_USERS = [
       {
         id: 'u_sidiq',
         name: 'Sidiq Ndiaye',
@@ -308,13 +367,28 @@
       }
     ];
 
+    let ADMIN_USERS = loadAdminUsers();
     let currentAdminFilter = 'all';
+
+    function loadAdminUsers() {
+      try {
+        const stored = localStorage.getItem('cmflow_admin_users');
+        if (stored) return JSON.parse(stored);
+      } catch(e) {}
+      return [...DEFAULT_ADMIN_USERS];
+    }
+
+    function saveAdminUsers() {
+      try {
+        localStorage.setItem('cmflow_admin_users', JSON.stringify(ADMIN_USERS));
+      } catch(e) {}
+    }
 
     // PIN Security Check
     function handlePinSubmit(e) {
       e.preventDefault();
       const pin = document.getElementById('admin-pin-input')?.value.trim();
-      if (pin === '1234' || pin === 'admin' || pin === 'cmflow') {
+      if (pin === '1234' || pin === 'admin' || pin === 'cmflow' || pin === 'admin2026') {
         document.getElementById('admin-pin-modal').style.display = 'none';
         sessionStorage.setItem('cmflow_admin_auth', 'true');
         showAppToast('Bienvenue dans votre Espace Super-Admin ! 👑', 'success');
@@ -322,6 +396,20 @@
       } else {
         showAppToast('Code PIN incorrect. Veuillez réessayer.', 'danger');
       }
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('cmflow_admin_auth');
+      const modal = document.getElementById('admin-pin-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        const pinInput = document.getElementById('admin-pin-input');
+        if (pinInput) {
+          pinInput.value = '';
+          pinInput.focus();
+        }
+      }
+      showAppToast('Session Administrateur verrouillée. 🔒', 'info');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -366,7 +454,7 @@
           <td>
             <div style="display: flex; align-items: center; gap: 10px;">
               <div style="width: 38px; height: 38px; border-radius: 50%; background: #374151; color: white; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">
-                ${u.name.split(' ').map(n=>n[0]).join('').slice(0,2)}
+                ${u.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()}
               </div>
               <div>
                 <strong style="color: white; font-size: 0.88rem;">${escapeHtml(u.name)}</strong>
@@ -375,7 +463,7 @@
             </div>
           </td>
           <td>
-            <div style="color: #E2E8F0; font-size: 0.8rem;">${u.phone}</div>
+            <div style="color: #E2E8F0; font-size: 0.8rem; font-weight: 600;">${u.phone}</div>
             <div style="font-size: 0.72rem; color: #9CA3AF;">${u.email}</div>
           </td>
           <td>
@@ -398,6 +486,11 @@
                 💬 WhatsApp
               </a>
 
+              <!-- Supprimer l'utilisateur -->
+              <button type="button" class="admin-action-btn" style="background: rgba(239, 68, 68, 0.15); color: #F87171; border-color: rgba(239, 68, 68, 0.3);" title="Supprimer cet utilisateur" onclick="deleteAdminUser('${u.id}')">
+                🗑️
+              </button>
+
             </div>
           </td>
         </tr>
@@ -417,6 +510,67 @@
       if (trialEl) trialEl.textContent = `${trialCount} CMs`;
     }
 
+    // Modal Ajout Utilisateur
+    function openAddUserModal() {
+      const modal = document.getElementById('add-user-modal');
+      if (modal) {
+        modal.classList.add('active');
+        document.getElementById('new-user-name')?.focus();
+      }
+    }
+
+    function closeAddUserModal() {
+      const modal = document.getElementById('add-user-modal');
+      if (modal) modal.classList.remove('active');
+      document.getElementById('add-user-form')?.reset();
+    }
+
+    function handleAddUserSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-user-name')?.value.trim();
+      const agency = document.getElementById('new-user-agency')?.value.trim() || 'Agence Indépendante';
+      const email = document.getElementById('new-user-email')?.value.trim();
+      const phone = document.getElementById('new-user-phone')?.value.trim();
+      const plan = document.getElementById('new-user-plan')?.value || 'trial';
+
+      if (!name || !email || !phone) {
+        showAppToast('Veuillez remplir tous les champs obligatoires.', 'danger');
+        return;
+      }
+
+      const newUser = {
+        id: 'u_' + Date.now(),
+        name,
+        agency,
+        email,
+        phone,
+        plan,
+        clientsCount: plan === 'pro' ? 3 : 1,
+        postsCount: 0,
+        registeredAt: "Aujourd'hui"
+      };
+
+      ADMIN_USERS.unshift(newUser);
+      saveAdminUsers();
+      closeAddUserModal();
+      renderAdminUsers();
+
+      showAppToast(`🎉 Utilisateur ${name} ajouté avec succès !`, 'success');
+    }
+
+    // Suppression d'utilisateur
+    function deleteAdminUser(userId) {
+      const user = ADMIN_USERS.find(u => u.id === userId);
+      if (!user) return;
+
+      if (confirm(`Êtes-vous sûr de vouloir supprimer définitivement le compte de ${user.name} (${user.email}) ?`)) {
+        ADMIN_USERS = ADMIN_USERS.filter(u => u.id !== userId);
+        saveAdminUsers();
+        renderAdminUsers();
+        showAppToast(`Compte de ${user.name} supprimé avec succès. 🗑️`, 'info');
+      }
+    }
+
     function toggleUserPlan(userId) {
       const user = ADMIN_USERS.find(u => u.id === userId);
       if (!user) return;
@@ -429,6 +583,7 @@
         showAppToast(`💎 Plan Pro (15 000 FCFA/m) activé avec succès pour ${user.name} !`, 'success');
       }
 
+      saveAdminUsers();
       renderAdminUsers();
     }
 
