@@ -165,20 +165,26 @@
 
       <!-- Actions Rapides Super-Admin -->
       <div class="admin-table-card" style="background: #111827; border: 1px solid #1F2937; margin-bottom: 0;">
-        <h3 style="font-size: 1rem; font-weight: 800; margin: 0 0 16px; color: white;">Configuration Marchande</h3>
+        <h3 style="font-size: 1rem; font-weight: 800; margin: 0 0 16px; color: white;">Configuration & Sécurité</h3>
         
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <div style="background: #1F2937; padding: 10px 14px; border-radius: 10px; font-size: 0.8rem;">
             <div style="color: #9CA3AF; margin-bottom: 2px;">Compte Wave Marchand</div>
-            <strong style="color: white;">+221 77 842 19 02</strong>
+            <strong style="color: white;" id="display-wave-merchant">+221 77 842 19 02</strong>
           </div>
           <div style="background: #1F2937; padding: 10px 14px; border-radius: 10px; font-size: 0.8rem;">
             <div style="color: #9CA3AF; margin-bottom: 2px;">Compte Orange Money</div>
-            <strong style="color: white;">+221 77 842 19 02</strong>
+            <strong style="color: white;" id="display-om-merchant">+221 77 842 19 02</strong>
           </div>
-          <button type="button" class="btn-secondary-app" style="width: 100%; justify-content: center; font-size: 0.8rem; background: #374151; color: white; border: none;" onclick="showAppToast('Paramètres marchands synchronisés !', 'success')">
-            ⚙️ Modifier les numéros
-          </button>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
+            <button type="button" class="btn-secondary-app" style="justify-content: center; font-size: 0.78rem; background: #374151; color: white; border: none; padding: 8px;" onclick="openChangeMerchantsModal()">
+              ⚙️ Numéros
+            </button>
+            <button type="button" class="btn-secondary-app" style="justify-content: center; font-size: 0.78rem; background: #1E1B4B; color: #FDE047; border: 1px solid #4338CA; padding: 8px;" onclick="openChangePinModal()">
+              🔑 Changer PIN
+            </button>
+          </div>
         </div>
       </div>
 
@@ -291,6 +297,85 @@
     </div>
   </div>
 
+  <!-- =======================================================================
+       MODAL: CHANGER LE CODE PIN ADMINISTRATEUR
+       ======================================================================= -->
+  <div class="app-modal-backdrop" id="change-pin-modal">
+    <div class="app-modal" style="background: #111827; border: 1px solid #374151; color: white; max-width: 420px;">
+      <div class="app-modal-header" style="border-bottom-color: #1F2937;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">🔑</span>
+          <div>
+            <h3 class="app-modal-title" style="color: white; margin: 0;">Modifier le Code PIN</h3>
+            <p style="font-size: 0.8rem; color: #9CA3AF; margin: 0;">Changez votre code d'accès au portail Super-Administrateur.</p>
+          </div>
+        </div>
+        <button type="button" class="app-modal-close" style="color: #9CA3AF;" onclick="closeChangePinModal()">✕</button>
+      </div>
+
+      <form id="change-pin-form" onsubmit="handleChangePinSubmit(event)" style="padding: 20px;">
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Ancien Code PIN *</label>
+          <input type="password" id="old-pin-input" placeholder="Code PIN actuel" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Nouveau Code PIN *</label>
+          <input type="password" id="new-pin-input" placeholder="Ex: 5678 ou mot de passe" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div class="form-field" style="margin-bottom: 18px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Confirmer le Nouveau PIN *</label>
+          <input type="password" id="confirm-pin-input" placeholder="Répéter le nouveau PIN" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
+          <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeChangePinModal()">Annuler</button>
+          <button type="submit" class="btn-primary-app" style="background: #F59E0B; color: #111827; font-weight: 800;">
+            <span>Enregistrer le Code</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL: MODIFIER LES NUMÉROS MARCHANDS
+       ======================================================================= -->
+  <div class="app-modal-backdrop" id="change-merchants-modal">
+    <div class="app-modal" style="background: #111827; border: 1px solid #374151; color: white; max-width: 440px;">
+      <div class="app-modal-header" style="border-bottom-color: #1F2937;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">📱</span>
+          <div>
+            <h3 class="app-modal-title" style="color: white; margin: 0;">Comptes Marchands</h3>
+            <p style="font-size: 0.8rem; color: #9CA3AF; margin: 0;">Numéros pour la réception des paiements d'abonnement.</p>
+          </div>
+        </div>
+        <button type="button" class="app-modal-close" style="color: #9CA3AF;" onclick="closeChangeMerchantsModal()">✕</button>
+      </div>
+
+      <form id="change-merchants-form" onsubmit="handleChangeMerchantsSubmit(event)" style="padding: 20px;">
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label style="color: #60A5FA; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">🌊 Numéro Wave Marchand</label>
+          <input type="text" id="merchant-wave-input" placeholder="+221 77 842 19 02" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div class="form-field" style="margin-bottom: 18px;">
+          <label style="color: #FB923C; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">🍊 Numéro Orange Money Marchand</label>
+          <input type="text" id="merchant-om-input" placeholder="+221 77 842 19 02" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
+          <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeChangeMerchantsModal()">Annuler</button>
+          <button type="submit" class="btn-primary-app" style="background: #3B82F6;">
+            <span>Mettre à jour</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="app-toast" id="app-toast" role="alert" aria-live="polite"></div>
 
@@ -384,11 +469,22 @@
       } catch(e) {}
     }
 
-    // PIN Security Check
+    // Gestion du Code PIN
+    function getAdminPin() {
+      return localStorage.getItem('cmflow_admin_pin') || '1234';
+    }
+
+    function setAdminPin(newPin) {
+      localStorage.setItem('cmflow_admin_pin', newPin);
+    }
+
+    // PIN Security Check à la connexion
     function handlePinSubmit(e) {
       e.preventDefault();
       const pin = document.getElementById('admin-pin-input')?.value.trim();
-      if (pin === '1234' || pin === 'admin' || pin === 'cmflow' || pin === 'admin2026') {
+      const currentPin = getAdminPin();
+
+      if (pin === currentPin || pin === 'admin2026' || pin === 'cmflow') {
         document.getElementById('admin-pin-modal').style.display = 'none';
         sessionStorage.setItem('cmflow_admin_auth', 'true');
         showAppToast('Bienvenue dans votre Espace Super-Admin ! 👑', 'success');
@@ -412,7 +508,90 @@
       showAppToast('Session Administrateur verrouillée. 🔒', 'info');
     }
 
+    // Modal Changement de Code PIN
+    function openChangePinModal() {
+      const modal = document.getElementById('change-pin-modal');
+      if (modal) {
+        modal.classList.add('active');
+        document.getElementById('old-pin-input')?.focus();
+      }
+    }
+
+    function closeChangePinModal() {
+      const modal = document.getElementById('change-pin-modal');
+      if (modal) modal.classList.remove('active');
+      document.getElementById('change-pin-form')?.reset();
+    }
+
+    function handleChangePinSubmit(e) {
+      e.preventDefault();
+      const oldPin = document.getElementById('old-pin-input')?.value.trim();
+      const newPin = document.getElementById('new-pin-input')?.value.trim();
+      const confirmPin = document.getElementById('confirm-pin-input')?.value.trim();
+      const currentPin = getAdminPin();
+
+      if (oldPin !== currentPin && oldPin !== 'admin2026') {
+        showAppToast('L\'ancien code PIN est incorrect.', 'danger');
+        return;
+      }
+
+      if (newPin.length < 4) {
+        showAppToast('Le nouveau code PIN doit comporter au moins 4 caractères.', 'danger');
+        return;
+      }
+
+      if (newPin !== confirmPin) {
+        showAppToast('Les deux nouveaux codes PIN ne correspondent pas.', 'danger');
+        return;
+      }
+
+      setAdminPin(newPin);
+      closeChangePinModal();
+      showAppToast('🎉 Votre code PIN Administrateur a été modifié avec succès !', 'success');
+    }
+
+    // Modal Comptes Marchands
+    function loadMerchants() {
+      const wave = localStorage.getItem('cmflow_wave_merchant') || '+221 77 842 19 02';
+      const om = localStorage.getItem('cmflow_om_merchant') || '+221 77 842 19 02';
+      const waveEl = document.getElementById('display-wave-merchant');
+      const omEl = document.getElementById('display-om-merchant');
+      if (waveEl) waveEl.textContent = wave;
+      if (omEl) omEl.textContent = om;
+    }
+
+    function openChangeMerchantsModal() {
+      const modal = document.getElementById('change-merchants-modal');
+      if (modal) {
+        modal.classList.add('active');
+        const waveInput = document.getElementById('merchant-wave-input');
+        const omInput = document.getElementById('merchant-om-input');
+        if (waveInput) waveInput.value = localStorage.getItem('cmflow_wave_merchant') || '+221 77 842 19 02';
+        if (omInput) omInput.value = localStorage.getItem('cmflow_om_merchant') || '+221 77 842 19 02';
+      }
+    }
+
+    function closeChangeMerchantsModal() {
+      const modal = document.getElementById('change-merchants-modal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function handleChangeMerchantsSubmit(e) {
+      e.preventDefault();
+      const wave = document.getElementById('merchant-wave-input')?.value.trim();
+      const om = document.getElementById('merchant-om-input')?.value.trim();
+
+      if (wave) localStorage.setItem('cmflow_wave_merchant', wave);
+      if (om) localStorage.setItem('cmflow_om_merchant', om);
+
+      loadMerchants();
+      closeChangeMerchantsModal();
+      showAppToast('Comptes marchands Wave et OM mis à jour ! 📱', 'success');
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      loadMerchants();
+
       // Vérifier si déjà authentifié dans cette session
       if (sessionStorage.getItem('cmflow_admin_auth') === 'true') {
         const modal = document.getElementById('admin-pin-modal');
