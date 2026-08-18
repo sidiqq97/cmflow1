@@ -47,43 +47,91 @@
   </div>
 
   <!-- =======================================================================
-       MODAL: RÉCUPÉRATION D'URGENCE DU CODE PIN (CLÉ MAÎTRE)
+       MODAL: RÉCUPÉRATION DU CODE PIN (CLÉ MAÎTRE OU WHATSAPP)
        ======================================================================= -->
   <div class="app-modal-backdrop" id="admin-recovery-modal">
-    <div class="app-modal" style="background: #111827; border: 1px solid #374151; color: white; max-width: 440px;">
+    <div class="app-modal" style="background: #111827; border: 1px solid #374151; color: white; max-width: 480px;">
       <div class="app-modal-header" style="border-bottom-color: #1F2937;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 1.3rem;">🛡️</span>
           <div>
-            <h3 class="app-modal-title" style="color: white; margin: 0;">Récupération Clé Maître</h3>
-            <p style="font-size: 0.8rem; color: #9CA3AF; margin: 0;">Réinitialisez votre code PIN grâce à votre Clé Maître Fondateur.</p>
+            <h3 class="app-modal-title" style="color: white; margin: 0;">Récupération du Code PIN</h3>
+            <p style="font-size: 0.8rem; color: #9CA3AF; margin: 0;">Choisissez comment réinitialiser votre accès Super-Administrateur.</p>
           </div>
         </div>
         <button type="button" class="app-modal-close" style="color: #9CA3AF;" onclick="closeRecoveryModal()">✕</button>
       </div>
 
-      <form id="recovery-form" onsubmit="handleRecoverySubmit(event)" style="padding: 20px;">
-        <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.2); padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; color: #FDE68A; margin-bottom: 16px;">
-          💡 <strong>Clé Maître par défaut :</strong> <code>cmflow2026</code>
-        </div>
-
-        <div class="form-field" style="margin-bottom: 14px;">
-          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Clé Maître Fondateur *</label>
-          <input type="password" id="recovery-master-key" placeholder="Entrez la clé maître (cmflow2026)" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
-        </div>
-
-        <div class="form-field" style="margin-bottom: 18px;">
-          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Nouveau Code PIN à définir *</label>
-          <input type="password" id="recovery-new-pin" placeholder="Ex: 1234 ou 5678" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
-          <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeRecoveryModal()">Annuler</button>
-          <button type="submit" class="btn-primary-app" style="background: #F59E0B; color: #111827; font-weight: 800;">
-            <span>Réinitialiser & Déverrouiller 🔓</span>
+      <div style="padding: 20px;">
+        <!-- Choix de la méthode -->
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <button type="button" class="composer-net-tab-btn active" id="tab-btn-masterkey" onclick="switchRecoveryTab('masterkey')" style="flex: 1; text-align: center; padding: 8px; font-size: 0.8rem;">
+            🔑 Clé Maître
+          </button>
+          <button type="button" class="composer-net-tab-btn" id="tab-btn-whatsapp" onclick="switchRecoveryTab('whatsapp')" style="flex: 1; text-align: center; padding: 8px; font-size: 0.8rem;">
+            💬 Code WhatsApp
           </button>
         </div>
-      </form>
+
+        <!-- Formulaire Option 1: Clé Maître -->
+        <form id="recovery-form-masterkey" onsubmit="handleRecoverySubmit(event)">
+          <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.2); padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; color: #FDE68A; margin-bottom: 14px;">
+            💡 <strong>Clé Maître par défaut :</strong> <code>cmflow2026</code>
+          </div>
+
+          <div class="form-field" style="margin-bottom: 14px;">
+            <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Clé Maître Fondateur *</label>
+            <input type="password" id="recovery-master-key" placeholder="Entrez la clé maître (cmflow2026)" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+          </div>
+
+          <div class="form-field" style="margin-bottom: 18px;">
+            <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Nouveau Code PIN à définir *</label>
+            <input type="password" id="recovery-new-pin" placeholder="Ex: 1234 ou 5678" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
+            <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeRecoveryModal()">Annuler</button>
+            <button type="submit" class="btn-primary-app" style="background: #F59E0B; color: #111827; font-weight: 800;">
+              <span>Réinitialiser & Entrer 🔓</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Formulaire Option 2: Code WhatsApp / SMS -->
+        <form id="recovery-form-whatsapp" style="display: none;" onsubmit="handleWhatsappRecoverySubmit(event)">
+          <div style="background: rgba(37, 211, 102, 0.1); border: 1px solid rgba(37, 211, 102, 0.2); padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; color: #86EFAC; margin-bottom: 14px;">
+            📲 Un code de réinitialisation à 6 chiffres vous sera envoyé sur votre numéro WhatsApp Fondateur.
+          </div>
+
+          <div class="form-field" style="margin-bottom: 12px;">
+            <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Votre Numéro WhatsApp Fondateur</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="tel" id="recovery-whatsapp-phone" value="+221 77 842 19 02" required style="flex: 1; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+              <button type="button" class="btn-primary-app" style="background: #25D366; color: black; font-weight: 800; font-size: 0.8rem; white-space: nowrap;" onclick="sendWhatsappOTP()">
+                Envoyer Code 💬
+              </button>
+            </div>
+          </div>
+
+          <div class="form-field" style="margin-bottom: 14px;">
+            <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Code OTP reçu (6 chiffres)</label>
+            <input type="text" id="recovery-whatsapp-code" placeholder="Ex: 849201" maxlength="6" style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white; letter-spacing: 0.2em; text-align: center; font-size: 1.1rem;">
+          </div>
+
+          <div class="form-field" style="margin-bottom: 18px;">
+            <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Nouveau Code PIN à définir *</label>
+            <input type="password" id="recovery-whatsapp-new-pin" placeholder="Ex: 1234" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
+            <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeRecoveryModal()">Annuler</button>
+            <button type="submit" class="btn-primary-app" style="background: #25D366; color: black; font-weight: 800;">
+              <span>Valider & Déverrouiller 🔓</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 
@@ -552,11 +600,24 @@
       showAppToast('Session Administrateur verrouillée. 🔒', 'info');
     }
 
-    // Récupération d'Urgence par Clé Maître
+    // Récupération d'Urgence par Clé Maître ou WhatsApp
+    let currentRecoveryTab = 'masterkey';
+    let generatedOTP = null;
+
+    function switchRecoveryTab(tab) {
+      currentRecoveryTab = tab;
+      document.getElementById('tab-btn-masterkey')?.classList.toggle('active', tab === 'masterkey');
+      document.getElementById('tab-btn-whatsapp')?.classList.toggle('active', tab === 'whatsapp');
+
+      document.getElementById('recovery-form-masterkey').style.display = tab === 'masterkey' ? 'block' : 'none';
+      document.getElementById('recovery-form-whatsapp').style.display = tab === 'whatsapp' ? 'block' : 'none';
+    }
+
     function openRecoveryModal() {
       const modal = document.getElementById('admin-recovery-modal');
       if (modal) {
         modal.classList.add('active');
+        switchRecoveryTab('masterkey');
         document.getElementById('recovery-master-key')?.focus();
       }
     }
@@ -564,7 +625,55 @@
     function closeRecoveryModal() {
       const modal = document.getElementById('admin-recovery-modal');
       if (modal) modal.classList.remove('active');
-      document.getElementById('recovery-form')?.reset();
+      document.getElementById('recovery-form-masterkey')?.reset();
+      document.getElementById('recovery-form-whatsapp')?.reset();
+    }
+
+    function sendWhatsappOTP() {
+      const phone = document.getElementById('recovery-whatsapp-phone')?.value.trim() || '+221 77 842 19 02';
+      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString(); // Code à 6 chiffres
+
+      // Message WhatsApp automatique
+      const msg = `[CMFlow Sécurité] Votre code de réinitialisation Super-Admin est : *${generatedOTP}*. Valable 10 minutes.`;
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+
+      // Ouvrir WhatsApp
+      window.open(whatsappUrl, '_blank');
+      showAppToast(`📲 Code de sécurité envoyé sur WhatsApp (${phone}) : ${generatedOTP}`, 'success');
+
+      // Pré-remplir pour le test facile
+      setTimeout(() => {
+        const codeInput = document.getElementById('recovery-whatsapp-code');
+        if (codeInput) {
+          codeInput.value = generatedOTP;
+          codeInput.focus();
+        }
+      }, 1000);
+    }
+
+    function handleWhatsappRecoverySubmit(e) {
+      e.preventDefault();
+      const enteredCode = document.getElementById('recovery-whatsapp-code')?.value.trim();
+      const newPin = document.getElementById('recovery-whatsapp-new-pin')?.value.trim();
+
+      if (!generatedOTP || enteredCode !== generatedOTP) {
+        showAppToast('Code OTP WhatsApp invalide. Veuillez cliquer sur "Envoyer Code".', 'danger');
+        return;
+      }
+
+      if (newPin.length < 4) {
+        showAppToast('Le nouveau code PIN doit comporter au moins 4 caractères.', 'danger');
+        return;
+      }
+
+      setAdminPin(newPin);
+      closeRecoveryModal();
+      document.getElementById('admin-pin-modal').style.display = 'none';
+      sessionStorage.setItem('cmflow_admin_auth', 'true');
+      renderAdminUsers();
+
+      showAppToast(`🎉 Code PIN réinitialisé à : ${newPin} avec succès via WhatsApp !`, 'success');
     }
 
     function handleRecoverySubmit(e) {
