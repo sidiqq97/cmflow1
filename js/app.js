@@ -2291,5 +2291,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (page === 'planning.html') {
     initPlanning();
   }
+
+  // Raccourci Clavier Secret Fondateur : Ctrl + Shift + A
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+      e.preventDefault();
+      window.location.href = 'admin.html';
+    }
+  });
 });
 
