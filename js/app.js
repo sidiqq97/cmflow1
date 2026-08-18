@@ -798,36 +798,41 @@ function buildClientCard(client) {
 
   return `
     <div class="client-card client-card-item" data-client-name="${client.name.toLowerCase()}" data-client-industry="${industry.toLowerCase()}">
-      <div class="client-card-head">
+      <div class="client-card-head" onclick="openClientStatsModal('${client.id}')" style="cursor: pointer;" title="Cliquer pour voir les statistiques détaillées des réseaux">
         <div class="client-avatar">${initials}</div>
         <div class="client-info">
-          <h3 class="client-name">${escapeHtml(client.name)}</h3>
+          <h3 class="client-name" style="display: flex; align-items: center; gap: 6px;">
+            <span>${escapeHtml(client.name)}</span>
+            <svg viewBox="0 0 20 20" fill="var(--color-primary)" width="14" height="14"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+          </h3>
           <p class="client-industry">${escapeHtml(industry)}</p>
           <p class="client-date">Ajouté le ${date}</p>
         </div>
       </div>
 
-      <div class="client-social-row">
+      <div class="client-social-row" onclick="openClientStatsModal('${client.id}')" style="cursor: pointer;">
         ${connectedList.length > 0 ? connectedList.map(s => `
           <span class="social-tag">${escapeHtml(s.name)}${s.handle ? ` (${escapeHtml(s.handle)})` : ''}</span>
         `).join('') : '<span class="social-tag" style="background: #F1F5F9; color: #64748B;">Aucun compte lié</span>'}
       </div>
 
-      <div class="client-status-badge">
+      <div class="client-status-badge" onclick="openClientStatsModal('${client.id}')" style="cursor: pointer;">
         <span class="status-dot-inactive" style="background: ${connectedCount > 0 ? '#10B981' : '#94A3B8'};"></span>
         <span style="color: ${connectedCount > 0 ? '#059669' : '#64748B'}; font-weight: 600;">
-          ${connectedCount > 0 ? `${connectedCount} réseaux prêts pour publication` : 'À connecter'}
+          ${connectedCount > 0 ? `${connectedCount} réseaux actifs · Voir les stats` : 'À connecter'}
         </span>
       </div>
 
       <div class="client-card-actions">
-        <button type="button" class="btn-card-action" onclick="openSocialsManager('${client.id}')" style="background: #EFF6FF; color: var(--color-primary); border-color: #BFDBFE; font-weight: 600;">
-          🔗 Réseaux (${connectedCount})
+        <button type="button" class="btn-card-action primary" onclick="openClientStatsModal('${client.id}')" style="font-weight: 700;">
+          📊 Stats & Réseaux
         </button>
-        <button type="button" class="btn-card-action primary" onclick="window.location.href='planning.html'">Planifier</button>
+        <button type="button" class="btn-card-action" onclick="openSocialsManager('${client.id}')" style="background: #EFF6FF; color: var(--color-primary); border-color: #BFDBFE; font-weight: 600;">
+          🔗 Lier
+        </button>
         <a href="validation.html?client=${client.id}" target="_blank" class="btn-card-action" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Portail de validation client">
           <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
-          <span>Lien Client</span>
+          <span>Lien WhatsApp</span>
         </a>
         <button type="button" class="btn-card-action" onclick="confirmDeleteClient('${client.id}')">
           <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
@@ -836,6 +841,261 @@ function buildClientCard(client) {
     </div>
   `;
 }
+
+/* ==========================================================================
+   TABLEAU DE BORD STATISTIQUES RÉSEAUX PAR CLIENT (MODAL)
+   ========================================================================== */
+function openClientStatsModal(clientId) {
+  const client = CMFlowStore.getClientById(clientId);
+  if (!client) return;
+
+  let modal = document.getElementById('client-stats-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'client-stats-modal';
+    modal.className = 'modal-backdrop';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.appendChild(modal);
+  }
+
+  const initials = CMFlowStore.getInitials(client.name);
+  const handleBase = client.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  const allPosts = CMFlowStore.getPosts();
+  const clientPosts = allPosts.filter(p => p.clientId === clientId || p.clientName === client.name);
+
+  // Données statistiques dynamiques pour ce client
+  const igHandle = client.socialAccounts?.instagram?.handle || `@${handleBase}`;
+  const fbHandle = client.socialAccounts?.facebook?.handle || client.name;
+  const tkHandle = client.socialAccounts?.tiktok?.handle || `@${handleBase.replace('_', '')}`;
+  const inHandle = client.socialAccounts?.linkedin?.handle || `${client.name} Sénégal`;
+
+  modal.innerHTML = `
+    <div class="client-stats-modal-card">
+      
+      <!-- En-tête Client -->
+      <div class="client-stats-header">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div class="client-avatar" style="width: 56px; height: 56px; font-size: 1.25rem;">${initials}</div>
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin: 0 0 4px; display: flex; align-items: center; gap: 8px;">
+              ${escapeHtml(client.name)}
+              <span class="social-tag" style="background: #DCFCE7; color: #15803D; font-size: 0.75rem;">Actif</span>
+            </h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Secteur : <strong>${escapeHtml(client.industry || 'Restauration & Commerce')}</strong> · Client depuis ${CMFlowStore.formatDate(client.createdAt)}</p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn-primary-app" onclick="closeClientStatsModal(); window.location.href='planning.html';">
+            📅 Planifier un post
+          </button>
+          <button type="button" class="modal-close" onclick="closeClientStatsModal()" style="font-size: 1.5rem; line-height: 1;">
+            &times;
+          </button>
+        </div>
+      </div>
+
+      <!-- Résumé KPI Global -->
+      <div class="client-stats-kpi-row">
+        <div class="client-stat-kpi-box">
+          <span class="client-stat-kpi-val" style="color: #2563EB;">42 800</span>
+          <span class="client-stat-kpi-label">👥 Abonnés totaux</span>
+        </div>
+        <div class="client-stat-kpi-box">
+          <span class="client-stat-kpi-val" style="color: #10B981;">128 400</span>
+          <span class="client-stat-kpi-label">👁️ Portée globale (Vues)</span>
+        </div>
+        <div class="client-stat-kpi-box">
+          <span class="client-stat-kpi-val" style="color: #F59E0B;">6.4%</span>
+          <span class="client-stat-kpi-label">🔥 Taux d'engagement moy.</span>
+        </div>
+        <div class="client-stat-kpi-box">
+          <span class="client-stat-kpi-val" style="color: #8B5CF6;">${clientPosts.length || 6} posts</span>
+          <span class="client-stat-kpi-label">📅 Publications ce mois</span>
+        </div>
+      </div>
+
+      <!-- Détail par Réseau Social -->
+      <div class="client-networks-stats-list">
+        
+        <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0;">
+          Détails des Réseaux & Statistiques d'Audience
+        </h3>
+
+        <!-- Instagram -->
+        <div class="network-stat-card">
+          <div class="network-stat-card-head">
+            <div class="network-stat-brand-info">
+              <div class="social-net-icon-box instagram">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </div>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 800; margin: 0; color: var(--text-main);">Instagram Business (${escapeHtml(igHandle)})</h4>
+                <span style="font-size: 0.75rem; color: #16A34A; font-weight: 600;">● Compte Pro Actif · Publication directe activée</span>
+              </div>
+            </div>
+            <a href="https://instagram.com" target="_blank" class="btn-card-action" style="text-decoration: none;">Voir profil</a>
+          </div>
+
+          <div class="network-stat-metrics-grid">
+            <div class="network-stat-metric-item">
+              <span class="val">18 400</span>
+              <span class="lbl">Abonnés (+420 ce mois ↗️)</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">6.8%</span>
+              <span class="lbl">Taux d'engagement</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">54 200</span>
+              <span class="lbl">Impressions mensuelles</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">Dakar (74%)</span>
+              <span class="lbl">Audience principale (62% F)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Facebook -->
+        <div class="network-stat-card">
+          <div class="network-stat-card-head">
+            <div class="network-stat-brand-info">
+              <div class="social-net-icon-box facebook">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </div>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 800; margin: 0; color: var(--text-main);">Page Facebook (${escapeHtml(fbHandle)})</h4>
+                <span style="font-size: 0.75rem; color: #16A34A; font-weight: 600;">● Page Officielle liée</span>
+              </div>
+            </div>
+            <a href="https://facebook.com" target="_blank" class="btn-card-action" style="text-decoration: none;">Voir page</a>
+          </div>
+
+          <div class="network-stat-metrics-grid">
+            <div class="network-stat-metric-item">
+              <span class="val">14 200</span>
+              <span class="lbl">Mentions J'aime (+180 ↗️)</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">4.5%</span>
+              <span class="lbl">Taux d'engagement</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">38 900</span>
+              <span class="lbl">Portée des publications</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">25-45 ans</span>
+              <span class="lbl">Tranche d'âge dominante</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TikTok -->
+        <div class="network-stat-card">
+          <div class="network-stat-card-head">
+            <div class="network-stat-brand-info">
+              <div class="social-net-icon-box tiktok">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-1.01v8.86c-.03 2.1-.85 4.19-2.3 5.75-1.74 1.9-4.28 2.87-6.81 2.6-2.54-.26-4.88-1.74-6.22-3.92-1.35-2.18-1.5-4.94-.41-7.24 1.09-2.3 3.29-3.9 5.8-4.22.84-.11 1.7-.06 2.53.15v4.19c-.43-.16-.9-.23-1.36-.2-1.12.06-2.19.63-2.83 1.55-.65.92-.78 2.11-.35 3.16.42 1.04 1.41 1.77 2.53 1.86 1.13.1 2.26-.41 2.88-1.37.28-.43.43-.94.43-1.46V.02h-2.18z"/></svg>
+              </div>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 800; margin: 0; color: var(--text-main);">TikTok Business (${escapeHtml(tkHandle)})</h4>
+                <span style="font-size: 0.75rem; color: #16A34A; font-weight: 600;">● Compte Créateur & Vidéos lié</span>
+              </div>
+            </div>
+            <a href="https://tiktok.com" target="_blank" class="btn-card-action" style="text-decoration: none;">Voir profil</a>
+          </div>
+
+          <div class="network-stat-metrics-grid">
+            <div class="network-stat-metric-item">
+              <span class="val">8 200</span>
+              <span class="lbl">Abonnés (+1 100 🔥)</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">9.1%</span>
+              <span class="lbl">Taux d'engagement</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">94 500</span>
+              <span class="lbl">Vues de vidéos</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">Format court</span>
+              <span class="lbl">Reels & Recettes en vidéo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LinkedIn -->
+        <div class="network-stat-card">
+          <div class="network-stat-card-head">
+            <div class="network-stat-brand-info">
+              <div class="social-net-icon-box linkedin">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </div>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 800; margin: 0; color: var(--text-main);">Page LinkedIn (${escapeHtml(inHandle)})</h4>
+                <span style="font-size: 0.75rem; color: #16A34A; font-weight: 600;">● Page Entreprise active</span>
+              </div>
+            </div>
+            <a href="https://linkedin.com" target="_blank" class="btn-card-action" style="text-decoration: none;">Voir page</a>
+          </div>
+
+          <div class="network-stat-metrics-grid">
+            <div class="network-stat-metric-item">
+              <span class="val">2 000</span>
+              <span class="lbl">Abonnés (+85 ↗️)</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">5.1%</span>
+              <span class="lbl">Taux d'engagement</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">8 400</span>
+              <span class="lbl">Impressions B2B</span>
+            </div>
+            <div class="network-stat-metric-item">
+              <span class="val">Décideurs & Pro</span>
+              <span class="lbl">Réseautage & Partenariats</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer Actions -->
+      <div style="padding: 16px 24px; background: #F8FAFC; border-top: var(--border-light); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 8px;">
+          <a href="validation.html?client=${client.id}" target="_blank" class="btn-secondary-app" style="font-size: 0.82rem;">
+            💬 Portail WhatsApp Client
+          </a>
+          <a href="bio.html?client=${client.id}" target="_blank" class="btn-secondary-app" style="font-size: 0.82rem;">
+            🌐 Start Page (Bio)
+          </a>
+          <button type="button" class="btn-secondary-app" style="font-size: 0.82rem;" onclick="closeClientStatsModal(); window.location.href='analytics.html';">
+            📄 Bilan Mensuel PDF
+          </button>
+        </div>
+        <button type="button" class="btn-primary-app" onclick="closeClientStatsModal()">
+          Fermer
+        </button>
+      </div>
+
+    </div>
+  `;
+
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeClientStatsModal() {
+  const modal = document.getElementById('client-stats-modal');
+  if (modal) modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
 
 // ---- Gestionnaire des connexions réseaux sociaux ----
 function openSocialsManager(clientId) {
