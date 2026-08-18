@@ -3558,6 +3558,323 @@
   font-weight: 600;
 }
 
+/* ==========================================================================
+   🔒 PAYWALL MODAL — QUOTAS ESSAI GRATUIT & UPGRADE WAVE / OM
+   ========================================================================== */
+.paywall-modal-card {
+  background: white;
+  border-radius: var(--radius-2xl);
+  max-width: 540px;
+  width: 100%;
+  padding: 32px 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  position: relative;
+}
+
+.paywall-crown-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  color: #D97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.paywall-badge {
+  display: inline-block;
+  background: #FEF3C7;
+  color: #B45309;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.paywall-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 8px;
+}
+
+.paywall-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.paywall-perks-box {
+  background: #F8FAFC;
+  border: var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 16px 20px;
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.paywall-perk-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  padding: 6px 0;
+}
+
+.paywall-perk-item svg {
+  color: #10B981;
+  flex-shrink: 0;
+}
+
+.paywall-price-tag {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
+/* ==========================================================================
+   🤖 ASSISTANT IA DANS LE COMPOSER
+   ========================================================================== */
+.ai-assistant-card {
+  background: linear-gradient(135deg, #F0FDF4 0%, #EFF6FF 100%);
+  border: 1.5px solid #BFDBFE;
+  border-radius: var(--radius-xl);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.ai-assistant-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.ai-tone-chips-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+.ai-tone-chip {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #CBD5E1;
+  background: white;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ai-tone-chip.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* ==========================================================================
+   💬 SOCIAL INBOX (BOÎTE DE RÉCEPTION UNIFIÉE)
+   ========================================================================== */
+.inbox-main-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 20px;
+  background: white;
+  border: var(--border-light);
+  border-radius: var(--radius-2xl);
+  min-height: 680px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 900px) {
+  .inbox-main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inbox-sidebar-threads {
+  border-right: var(--border-light);
+  display: flex;
+  flex-direction: column;
+  background: #F8FAFC;
+}
+
+.inbox-sidebar-header {
+  padding: 18px 20px;
+  border-bottom: var(--border-light);
+  background: white;
+}
+
+.inbox-threads-scroll {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.inbox-thread-item {
+  padding: 14px 18px;
+  border-bottom: var(--border-subtle);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: white;
+}
+
+.inbox-thread-item:hover {
+  background: #F1F5F9;
+}
+
+.inbox-thread-item.active {
+  background: #EFF6FF;
+  border-left: 3px solid var(--color-primary);
+}
+
+.inbox-thread-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-pill);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.inbox-thread-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.inbox-thread-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.inbox-thread-author {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inbox-thread-time {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.inbox-thread-snippet {
+  font-size: 0.78rem;
+  color: var(--text-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Chat view */
+.inbox-chat-view {
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.inbox-chat-header {
+  padding: 16px 24px;
+  border-bottom: var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inbox-messages-body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.inbox-msg-row {
+  display: flex;
+  gap: 10px;
+  max-width: 75%;
+}
+
+.inbox-msg-row.sent {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.inbox-msg-bubble {
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.inbox-msg-row.received .inbox-msg-bubble {
+  background: #F1F5F9;
+  color: var(--text-main);
+  border-bottom-left-radius: 4px;
+}
+
+.inbox-msg-row.sent .inbox-msg-bubble {
+  background: var(--color-primary);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.inbox-reply-bar {
+  padding: 16px 24px;
+  border-top: var(--border-light);
+  background: #F8FAFC;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inbox-quick-replies-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.inbox-quick-reply-btn {
+  background: white;
+  border: var(--border-light);
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.inbox-quick-reply-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: #EFF6FF;
+}
+
+
 
 
 

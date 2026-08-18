@@ -25,6 +25,33 @@ const CMFlowStore = {
     localStorage.setItem('cmflow_workspace', JSON.stringify(ws));
   },
 
+  // ---- Plan & Quotas (Essai Gratuit vs Pro) ----
+  getUserPlan() {
+    return localStorage.getItem('cmflow_user_plan') || 'trial';
+  },
+  setUserPlan(plan) {
+    localStorage.setItem('cmflow_user_plan', plan);
+  },
+  canAddClient() {
+    const plan = this.getUserPlan();
+    if (plan === 'pro') return true;
+    const clients = this.getClients();
+    return clients.length < 1; // 1 seul client en essai gratuit
+  },
+  canConnectNetwork(clientId, targetNetwork) {
+    const plan = this.getUserPlan();
+    if (plan === 'pro') return true;
+    const client = this.getClientById(clientId);
+    if (!client || !client.socialAccounts) return true;
+    
+    // Si ce réseau est déjà connecté, on peut le modifier
+    if (client.socialAccounts[targetNetwork]?.connected) return true;
+
+    // Compter les réseaux déjà connectés
+    const connectedCount = Object.values(client.socialAccounts).filter(acc => acc?.connected).length;
+    return connectedCount < 1; // 1 seul réseau par client en essai gratuit
+  },
+
   // ---- Clients ----
   getClients() {
     try { return JSON.parse(localStorage.getItem('cmflow_clients')) || []; } catch { return []; }
@@ -367,6 +394,83 @@ function initSidebar() {
 }
 
 /* ==========================================================================
+   🔒 PAYWALL MODAL — QUOTAS ESSAI GRATUIT & UPGRADE WAVE / OM
+   ========================================================================== */
+function openPaywallModal(type = 'client') {
+  let modal = document.getElementById('paywall-upgrade-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'paywall-upgrade-modal';
+    modal.className = 'modal-backdrop';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.appendChild(modal);
+  }
+
+  const isClientLimit = type === 'client';
+  const title = isClientLimit 
+    ? "🔒 Limite de l'Essai Gratuit : 1 seul client" 
+    : "🔒 Limite de l'Essai Gratuit : 1 seul réseau social";
+  
+  const desc = isClientLimit
+    ? "En version d'essai gratuit, vous pouvez gérer 1 seul client. Pour ajouter d'autres clients ou marques et développer votre agence, passez au Plan Pro !"
+    : "En version d'essai gratuit, vous pouvez connecter 1 seul réseau social par client. Pour multi-publier sur Instagram, Facebook, TikTok, LinkedIn et X en 1 clic, débloquez le Plan Pro !";
+
+  modal.innerHTML = `
+    <div class="paywall-modal-card">
+      <div class="paywall-crown-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+
+      <span class="paywall-badge">Passer à l'abonnement supérieur</span>
+      <h3 class="paywall-title">${title}</h3>
+      <p class="paywall-desc">${desc}</p>
+
+      <div class="paywall-perks-box">
+        <div class="paywall-perk-item">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <span>Clients & Marques <strong>Illimités</strong></span>
+        </div>
+        <div class="paywall-perk-item">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <span>Multi-diffusion sur 5 réseaux (Instagram, FB, TikTok, LinkedIn, X)</span>
+        </div>
+        <div class="paywall-perk-item">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <span>Assistant IA Générateur de Légendes Illimité ✨</span>
+        </div>
+        <div class="paywall-perk-item">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <span>Portail WhatsApp & Rapports PDF avec votre logo</span>
+        </div>
+      </div>
+
+      <div class="paywall-price-tag">
+        15 000 FCFA <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">/ mois</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn-primary-app" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;" onclick="closePaywallModal(); window.location.href='settings.html#billing';">
+          <span>🚀 Débloquer le Plan Pro (Wave / Orange Money)</span>
+        </button>
+        <button type="button" class="btn-secondary-app" style="width: 100%; justify-content: center;" onclick="closePaywallModal()">
+          Continuer avec l'essai gratuit
+        </button>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePaywallModal() {
+  const modal = document.getElementById('paywall-upgrade-modal');
+  if (modal) modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+/* ==========================================================================
    MODAL AJOUTER UN CLIENT
    ========================================================================== */
 function initAddClientModal() {
@@ -378,6 +482,10 @@ function initAddClientModal() {
   if (!modalBackdrop) return;
 
   const open = () => {
+    if (!CMFlowStore.canAddClient()) {
+      openPaywallModal('client');
+      return;
+    }
     modalBackdrop.classList.add('active');
     document.body.style.overflow = 'hidden';
     // Focus sur le premier champ
@@ -1252,6 +1360,12 @@ function closeSocialsModal() {
 }
 
 function connectSocialAccountFromInput(clientId, network) {
+  if (!CMFlowStore.canConnectNetwork(clientId, network)) {
+    closeSocialsModal();
+    openPaywallModal('network');
+    return;
+  }
+
   const input = document.getElementById(`input-social-${network}`);
   const handle = input?.value.trim() || `@compte_${network}`;
 
@@ -1283,6 +1397,25 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.appendChild(document.createTextNode(str || ''));
   return div.innerHTML;
+}
+
+function generateAIPost(topic, tone = 'engaging', industry = 'Restauration', clientName = 'Notre Marque') {
+  const templates = {
+    engaging: [
+      `🔥 ALERTE GOURMANDE chez ${clientName} ! ✨\n\nVous cherchez le spot parfait à Dakar pour vous régaler ? Notre spécialité ${topic || 'du jour'} est préparée avec amour et les meilleurs ingrédients locaux. 🍽️\n\n👉 Identifiez un(e) ami(e) en commentaire avec qui vous devez absolument tester ça !\n\n📍 Réservations en DM ou par WhatsApp (Lien en bio)\n\n#DakarFood #Senegal #TerangaGourmet #FoodLover #DakarVibes #BonPlanDakar`,
+      `✨ Ce week-end, faites-vous plaisir chez ${clientName} ! 😍\n\nVenez savourer notre ${topic || 'plat signature'} dans une ambiance chaleureuse et conviviale. Une expérience culinaire que vous n'êtes pas prêts d'oublier ! 🌟\n\n📲 Commandez directement en 1 clic sur WhatsApp via notre lien en bio !\n\n#DakarVibes #RestaurantDakar #GastronomieLocale #SenegalFood #Teranga`
+    ],
+    professional: [
+      `💼 Excellence & Savoir-faire : Découvrez l'engagement de ${clientName}.\n\nDans un environnement dynamique, nous mettons un point d'honneur à sublimer ${topic || 'le savoir-faire local'} avec rigueur et passion.\n\n🤝 Partenariats et commandes professionnelles : contactez notre équipe commerciale via notre lien en bio.\n\n#Leadership #BusinessSenegal #MadeInSenegal #AfriqueInnovation #Entrepreneuriat #DakarBusiness`,
+      `📈 L'innovation au cœur de notre vision chez ${clientName}.\n\nNous partageons aujourd'hui les coulisses de ${topic || 'notre projet phare'} pour accompagner au mieux nos partenaires et clients au quotidien. 🇸🇳💼\n\n💬 Discutons-en en commentaire ou en message privé !\n\n#Vision #ImpactLocal #Croissance #SenegalDigital`
+    ],
+    promo: [
+      `🚨 OFFRE EXCLUSIVE : -15% CE WEEK-END SEULEMENT ! 💥\n\nProfitez d'une remise exceptionnelle sur ${topic || 'toute notre carte'} chez ${clientName} ! 🎁\n\nComment en profiter ?\n1️⃣ Aimez cette publication ❤️\n2️⃣ Cliquez sur notre lien en bio WhatsApp avec le code PROMO : DAKAR15\n\n⏳ Offre limitée aux 50 premières commandes !\n\n#PromoDakar #BonPlan #DakarPromo #SenegalDeal #OffreSpeciale #Reduction`
+    ]
+  };
+
+  const pool = templates[tone] || templates.engaging;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function showComingSoon() {
@@ -1834,6 +1967,43 @@ function initPostModal() {
   if (clientSelect) clientSelect.addEventListener('change', updateLivePreview);
   if (dateInput) dateInput.addEventListener('change', updateLivePreview);
   if (timeInput) timeInput.addEventListener('change', updateLivePreview);
+
+  // Assistant IA : Sélection de Ton & Génération
+  let selectedAITone = 'engaging';
+  document.querySelectorAll('.ai-tone-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.ai-tone-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedAITone = chip.dataset.tone || 'engaging';
+    });
+  });
+
+  const btnGenerateAI = document.getElementById('btn-generate-ai-caption');
+  const aiTopicInput = document.getElementById('ai-topic-input');
+
+  if (btnGenerateAI) {
+    btnGenerateAI.addEventListener('click', () => {
+      const topic = aiTopicInput?.value.trim() || 'Spécialités et offres exclusives';
+      const selectedClientId = clientSelect?.value;
+      const clients = CMFlowStore.getClients();
+      const client = clients.find(c => c.id === selectedClientId) || { name: 'Notre Marque', industry: 'Restauration' };
+
+      btnGenerateAI.disabled = true;
+      btnGenerateAI.innerHTML = '<span>✨ Rédaction en cours...</span>';
+
+      setTimeout(() => {
+        const generated = generateAIPost(topic, selectedAITone, client.industry, client.name);
+        if (captionInput) {
+          captionInput.value = generated;
+          captionInput.focus();
+          updateLivePreview();
+        }
+        btnGenerateAI.disabled = false;
+        btnGenerateAI.innerHTML = '<span>✨ Générer</span>';
+        showAppToast('Légende rédigée par l\'IA avec succès ! ✨🎉', 'success');
+      }, 600);
+    });
+  }
 
   // Hashtag chips clic
   document.querySelectorAll('.hashtag-chip').forEach(chip => {

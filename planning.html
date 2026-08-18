@@ -73,6 +73,13 @@
           <span>Planning & Queue</span>
         </a>
 
+        <a href="inbox.html" class="sidebar-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>Messagerie (Inbox)</span>
+        </a>
+
         <a href="startpage.html" class="sidebar-nav-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
@@ -364,9 +371,34 @@
             </div>
           </div>
 
+          <!-- 🤖 ASSISTANT IA DE RÉDACTION -->
+          <div class="ai-assistant-card">
+            <div class="ai-assistant-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.1rem;">✨</span>
+                <strong style="font-size: 0.88rem; color: var(--text-main);">Assistant IA — Rédacteur de Posts</strong>
+              </div>
+              <span style="font-size: 0.72rem; color: #16A34A; font-weight: 700; background: #DCFCE7; padding: 2px 8px; border-radius: 9999px;">IA Active</span>
+            </div>
+            
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="ai-topic-input" placeholder="Sujet du post (ex: Plat du jour, Promo week-end, Événement...)" style="font-size: 0.82rem; padding: 8px 12px; background: white; border: 1px solid #CBD5E1; border-radius: var(--radius-md); flex: 1;">
+              <button type="button" class="btn-primary-app" id="btn-generate-ai-caption" style="font-size: 0.8rem; padding: 8px 14px; white-space: nowrap;">
+                ✨ Générer
+              </button>
+            </div>
+
+            <div class="ai-tone-chips-row">
+              <span style="font-size: 0.72rem; color: var(--text-muted); align-self: center;">Ton :</span>
+              <button type="button" class="ai-tone-chip active" data-tone="engaging">🔥 Vendeur & Captivant</button>
+              <button type="button" class="ai-tone-chip" data-tone="promo">🎁 Promo & Offre</button>
+              <button type="button" class="ai-tone-chip" data-tone="professional">💼 Pro & B2B</button>
+            </div>
+          </div>
+
           <div class="form-field">
             <label for="post-caption">Texte / Légende principale *</label>
-            <textarea id="post-caption" placeholder="Rédigez la légende, ajoutez des émojis et vos hashtags..." required style="min-height: 110px;"></textarea>
+            <textarea id="post-caption" placeholder="Rédigez la légende ou cliquez sur 'Générer' avec l'IA..." required style="min-height: 110px;"></textarea>
             
             <div class="caption-toolbar">
               <span>Hashtags suggérés :</span>
