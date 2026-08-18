@@ -674,6 +674,9 @@ function closeCheckoutModal() {
 function processCheckoutPayment(planName, amount) {
   const submitBtn = document.getElementById('checkout-submit-btn');
   const btnText = document.getElementById('checkout-btn-text');
+  const payerPhone = document.getElementById('checkout-payer-phone')?.value.trim() || '+221 77 123 45 67';
+  const methodLabel = selectedPaymentMethod === 'wave' ? 'Wave Sénégal 🌊' : (selectedPaymentMethod === 'om' ? 'Orange Money 🍊' : 'Carte Bancaire 💳');
+  const txRef = 'TX-' + (selectedPaymentMethod.toUpperCase()) + '-' + Math.floor(100000 + Math.random() * 900000);
 
   if (submitBtn) {
     submitBtn.disabled = true;
@@ -686,16 +689,15 @@ function processCheckoutPayment(planName, amount) {
 
     // Mettre à jour l'utilisateur si existant
     try {
-      const user = CMFlowStore.getUser();
-      if (user) {
-        user.plan = 'pro';
-        localStorage.setItem('cmflow_user', JSON.stringify(user));
-      }
+      const user = CMFlowStore.getUser() || { name: 'Community Manager' };
+      user.plan = 'pro';
+      localStorage.setItem('cmflow_user', JSON.stringify(user));
     } catch(e) {}
 
     closeCheckoutModal();
 
-    showAppToast(`🎉 Paiement de ${amount} validé avec succès ! Bienvenue sur le ${planName}. Vos quotas sont désormais illimités !`, 'success');
+    // Ouvrir la Modale de Reçu de Paiement & Félicitations
+    openPaymentSuccessModal(planName, amount, methodLabel, payerPhone, txRef);
 
     // Rafraîchir l'affichage
     setTimeout(() => {
@@ -706,6 +708,101 @@ function processCheckoutPayment(planName, amount) {
     }, 400);
 
   }, 1200);
+}
+
+/* ==========================================================================
+   🎉 MODALE DE SUCCÈS & REÇU DE PAIEMENT TÉLÉCHARGEABLE
+   ========================================================================== */
+function openPaymentSuccessModal(planName, amount, methodLabel, payerPhone, txRef) {
+  let modal = document.getElementById('cmflow-payment-success-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'cmflow-payment-success-modal';
+    modal.className = 'modal-backdrop';
+    document.body.appendChild(modal);
+  }
+
+  const today = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  modal.innerHTML = `
+    <div class="paywall-modal-card" style="max-width: 500px; text-align: center; border: 2px solid #22C55E;">
+      
+      <!-- Icône de succès avec confetti -->
+      <div style="width: 70px; height: 70px; border-radius: 50%; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 16px; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);">
+        ✓
+      </div>
+
+      <span style="background: #DCFCE7; color: #15803D; font-size: 0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 9999px; text-transform: uppercase;">Paiement Réussi & Compte Activé</span>
+      <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin: 8px 0 6px;">Félicitations ! Bienvenue sur le ${escapeHtml(planName)} 🚀</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 20px;">Votre transaction a été validée avec succès. Toutes vos limites ont été débloquées.</p>
+
+      <!-- Reçu de paiement style ticket -->
+      <div style="background: #F8FAFC; border: 1.5px dashed #CBD5E1; border-radius: var(--radius-lg); padding: 18px 20px; text-align: left; margin-bottom: 20px; font-size: 0.85rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Référence :</span>
+          <strong style="color: var(--text-main); font-family: monospace;">${escapeHtml(txRef)}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Date :</span>
+          <strong style="color: var(--text-main);">${today}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Moyen de paiement :</span>
+          <strong style="color: #1E3A8A;">${escapeHtml(methodLabel)}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+          <span style="color: var(--text-muted);">Numéro payeur :</span>
+          <strong style="color: var(--text-main);">${escapeHtml(payerPhone)}</strong>
+        </div>
+        <div style="border-top: 1px solid #E2E8F0; padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <strong style="font-size: 0.95rem; color: var(--text-main);">Montant Réglé :</strong>
+          <span style="font-size: 1.3rem; font-weight: 900; color: #15803D;">${escapeHtml(amount)}</span>
+        </div>
+      </div>
+
+      <!-- Fonctionnalités débloquées -->
+      <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: var(--radius-md); padding: 12px 14px; text-align: left; font-size: 0.8rem; color: #15803D; margin-bottom: 20px;">
+        <div style="font-weight: 800; margin-bottom: 4px;">👑 Avantages débloqués immédiatement :</div>
+        <div>✓ Clients & Marques <strong>Illimités</strong></div>
+        <div>✓ Tous les réseaux sociaux connectés</div>
+        <div>✓ Assistant IA Générateur Illimité ✨</div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn-primary-app" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; font-weight: 800;" onclick="closeSuccessModal(); window.location.href='dashboard.html';">
+          <span>🚀 Accéder à mon Espace de Travail Débloqué</span>
+        </button>
+        <button type="button" class="btn-secondary-app" style="width: 100%; justify-content: center;" onclick="window.print()">
+          📄 Imprimer / Télécharger le Reçu
+        </button>
+      </div>
+
+    </div>
+  `;
+
+  modal.classList.add('active');
+  modal.style.position = 'fixed';
+  modal.style.inset = '0';
+  modal.style.background = 'rgba(15, 23, 42, 0.7)';
+  modal.style.backdropFilter = 'blur(6px)';
+  modal.style.zIndex = '999999';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.padding = '20px';
+  modal.style.opacity = '1';
+  modal.style.visibility = 'visible';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSuccessModal() {
+  const modal = document.getElementById('cmflow-payment-success-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
+  document.body.style.overflow = '';
 }
 
 /* ==========================================================================
