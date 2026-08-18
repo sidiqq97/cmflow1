@@ -59,6 +59,52 @@ const CMFlowStore = {
   },
 
   // ---- Posts (Planning & Publications) ----
+  getPostingSchedule() {
+    try {
+      const s = JSON.parse(localStorage.getItem('cmflow_schedule'));
+      if (s && s.length) return s;
+    } catch {}
+    return [
+      { day: 'Lundi', dayIndex: 1, times: ['11:00', '18:30'] },
+      { day: 'Mardi', dayIndex: 2, times: ['14:00', '19:00'] },
+      { day: 'Mercredi', dayIndex: 3, times: ['12:00', '18:00'] },
+      { day: 'Jeudi', dayIndex: 4, times: ['14:00', '20:00'] },
+      { day: 'Vendredi', dayIndex: 5, times: ['10:30', '17:00'] },
+      { day: 'Samedi', dayIndex: 6, times: ['11:00', '15:00'] },
+      { day: 'Dimanche', dayIndex: 0, times: ['16:00', '20:30'] },
+    ];
+  },
+  setPostingSchedule(schedule) {
+    localStorage.setItem('cmflow_schedule', JSON.stringify(schedule));
+  },
+  getNextQueueSlot() {
+    const today = new Date();
+    const schedule = this.getPostingSchedule();
+    const posts = this.getPosts();
+
+    for (let dayOffset = 0; dayOffset < 14; dayOffset++) {
+      const targetDate = new Date();
+      targetDate.setDate(today.getDate() + dayOffset);
+      const dayIdx = targetDate.getDay();
+      const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}-${String(targetDate.getDate()).padStart(2, '0')}`;
+
+      const dayConfig = schedule.find(s => s.dayIndex === dayIdx);
+      if (dayConfig && dayConfig.times) {
+        for (const time of dayConfig.times) {
+          const isOccupied = posts.some(p => p.scheduledDate === dateStr && p.scheduledTime === time);
+          if (!isOccupied) {
+            return { date: dateStr, time: time };
+          }
+        }
+      }
+    }
+    const tmrw = new Date();
+    tmrw.setDate(tmrw.getDate() + 1);
+    return {
+      date: `${tmrw.getFullYear()}-${String(tmrw.getMonth() + 1).padStart(2, '0')}-${String(tmrw.getDate()).padStart(2, '0')}`,
+      time: '14:00'
+    };
+  },
   getPosts() {
     try {
       let posts = JSON.parse(localStorage.getItem('cmflow_posts'));
@@ -1018,6 +1064,35 @@ function initPlanning() {
   const filterStatus = document.getElementById('filter-status');
   const openPostModalBtns = document.querySelectorAll('[data-open-create-post]');
 
+  // Navigation des 4 vues Buffer (Queue, Calendrier, Brouillons, Horaires)
+  const viewTabs = document.querySelectorAll('.planning-view-tab');
+  const monthNav = document.getElementById('calendar-month-nav');
+
+  viewTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      viewTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const targetViewId = tab.dataset.view;
+      document.querySelectorAll('.planning-view-pane').forEach(pane => {
+        pane.style.display = 'none';
+        pane.classList.remove('active');
+      });
+
+      const targetPane = document.getElementById(targetViewId);
+      if (targetPane) {
+        targetPane.style.display = 'block';
+        targetPane.classList.add('active');
+      }
+
+      if (monthNav) {
+        monthNav.style.display = targetViewId === 'view-calendar' ? 'flex' : 'none';
+      }
+
+      renderAllPlanningViews();
+    });
+  });
+
   // Remplir le filtre client
   if (filterClient) {
     const clients = CMFlowStore.getClients();
@@ -1031,21 +1106,21 @@ function initPlanning() {
 
     filterClient.addEventListener('change', (e) => {
       planningState.filterClient = e.target.value;
-      renderPlanningCalendar();
+      renderAllPlanningViews();
     });
   }
 
   if (filterPlatform) {
     filterPlatform.addEventListener('change', (e) => {
       planningState.filterPlatform = e.target.value;
-      renderPlanningCalendar();
+      renderAllPlanningViews();
     });
   }
 
   if (filterStatus) {
     filterStatus.addEventListener('change', (e) => {
       planningState.filterStatus = e.target.value;
-      renderPlanningCalendar();
+      renderAllPlanningViews();
     });
   }
 
@@ -1072,15 +1147,213 @@ function initPlanning() {
 
   openPostModalBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      const today = new Date();
-      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-      openPostModalForDate(todayStr);
+      const slot = CMFlowStore.getNextQueueSlot();
+      openPostModalForDate(slot.date, slot.time);
     });
   });
 
   initPostModal();
-  renderPlanningCalendar();
+  renderAllPlanningViews();
 }
+
+function renderAllPlanningViews() {
+  renderQueueView();
+  renderPlanningCalendar();
+  renderDraftsView();
+  renderPostingSchedule();
+}
+
+/* ==========================================================================
+   1. VUE FILE D'ATTENTE (BUFFER QUEUE VIEW)
+   ========================================================================== */
+function renderQueueView() {
+  const container = document.getElementById('queue-container');
+  if (!container) return;
+
+  const allPosts = CMFlowStore.getPosts();
+  const filteredPosts = allPosts.filter(post => {
+    if (post.status === 'draft') return false; // Les brouillons vont dans l'onglet brouillons
+    if (planningState.filterClient !== 'all' && post.clientId !== planningState.filterClient) return false;
+    if (planningState.filterPlatform !== 'all' && !post.platforms?.includes(planningState.filterPlatform)) return false;
+    if (planningState.filterStatus !== 'all' && post.status !== planningState.filterStatus) return false;
+    return true;
+  });
+
+  // Grouper par date
+  const postsByDate = {};
+  filteredPosts.forEach(p => {
+    const d = p.scheduledDate || 'Date non définie';
+    if (!postsByDate[d]) postsByDate[d] = [];
+    postsByDate[d].push(p);
+  });
+
+  // Trier les dates
+  const sortedDates = Object.keys(postsByDate).sort();
+
+  if (sortedDates.length === 0) {
+    container.innerHTML = `
+      <div style="background: white; border: var(--border-light); border-radius: var(--radius-xl); padding: 48px 24px; text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">📥</div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin: 0 0 6px;">Votre file d'attente est vide</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 400px; margin: 0 auto 20px;">
+          Ajoutez des publications pour remplir automatiquement les prochains créneaux de diffusion.
+        </p>
+        <button type="button" class="btn-primary-app" onclick="const s = CMFlowStore.getNextQueueSlot(); openPostModalForDate(s.date, s.time);">
+          <span>+ Ajouter à la file d'attente</span>
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = sortedDates.map(dateStr => {
+    const posts = postsByDate[dateStr];
+    // Formater la date en français
+    const dateObj = new Date(dateStr + 'T00:00:00');
+    const dateFormatted = !isNaN(dateObj.getTime())
+      ? dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+      : dateStr;
+
+    return `
+      <div class="queue-day-block">
+        <div class="queue-day-header">
+          <h3 class="queue-day-title">
+            📅 ${dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1)}
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-primary); background: var(--color-primary-subtle); padding: 2px 8px; border-radius: 9999px;">
+              ${posts.length} publication${posts.length > 1 ? 's' : ''}
+            </span>
+          </h3>
+        </div>
+
+        <div class="queue-day-slots-list">
+          ${posts.map(post => `
+            <div class="queue-slot-item">
+              <div class="queue-slot-time-col">
+                <span>⏰ ${post.scheduledTime || '12:00'}</span>
+                <span class="social-tag" style="font-size: 0.68rem; padding: 1px 6px;">${post.platforms?.[0] || 'Instagram'}</span>
+              </div>
+              <div class="queue-slot-content-col">
+                <img class="queue-slot-thumb" src="${post.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80'}" alt="Thumb">
+                <div class="queue-slot-text-meta">
+                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">${escapeHtml(post.clientName || 'Client')}</div>
+                  <div class="queue-slot-caption">${escapeHtml(post.caption || 'Sans texte')}</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <button type="button" class="btn-secondary-app" style="font-size: 0.75rem; padding: 4px 10px;" onclick="openPostModalForEdit('${post.id}')">
+                  Modifier
+                </button>
+              </div>
+            </div>
+          `).join('')}
+
+          <!-- Créneau d'ajout rapide vide Buffer -->
+          <div class="queue-empty-slot" onclick="openPostModalForDate('${dateStr}', '18:00')">
+            <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);">
+              ➕ Ajouter une publication sur ce jour (${dateStr})
+            </span>
+            <span style="font-size: 0.75rem; color: var(--color-primary); font-weight: 700;">+ Créer</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ==========================================================================
+   2. VUE BROUILLONS & EN ATTENTE (DRAFTS VIEW)
+   ========================================================================== */
+function renderDraftsView() {
+  const container = document.getElementById('drafts-container');
+  if (!container) return;
+
+  const allPosts = CMFlowStore.getPosts();
+  const drafts = allPosts.filter(p => p.status === 'draft' || p.status === 'pending');
+
+  if (drafts.length === 0) {
+    container.innerHTML = `
+      <div style="background: white; border: var(--border-light); border-radius: var(--radius-xl); padding: 48px 24px; text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">📝</div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin: 0 0 6px;">Aucun brouillon en attente</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Tous vos posts sont programmés ou validés par vos clients !</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="queue-day-block">
+      <div class="queue-day-header">
+        <h3 class="queue-day-title">📝 Brouillons et Publications en attente de retour (${drafts.length})</h3>
+      </div>
+      <div class="queue-day-slots-list">
+        ${drafts.map(post => `
+          <div class="queue-slot-item">
+            <div class="queue-slot-time-col">
+              <span class="post-pill-status status-${post.status}" style="font-size: 0.72rem;">${post.status === 'pending' ? 'À valider' : 'Brouillon'}</span>
+            </div>
+            <div class="queue-slot-content-col">
+              <img class="queue-slot-thumb" src="${post.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80'}" alt="Thumb">
+              <div class="queue-slot-text-meta">
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">${escapeHtml(post.clientName || 'Client')}</div>
+                <div class="queue-slot-caption">${escapeHtml(post.caption || 'Sans texte')}</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button type="button" class="btn-primary-app" style="font-size: 0.75rem; padding: 4px 10px;" onclick="openPostModalForEdit('${post.id}')">
+                Finaliser & Programmer
+              </button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/* ==========================================================================
+   3. VUE HORAIRES DE PUBLICATION (POSTING SCHEDULE)
+   ========================================================================== */
+function renderPostingSchedule() {
+  const grid = document.getElementById('schedule-week-grid');
+  if (!grid) return;
+
+  const schedule = CMFlowStore.getPostingSchedule();
+
+  grid.innerHTML = schedule.map(day => `
+    <div class="schedule-day-card">
+      <div class="schedule-day-name">${day.day}</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        ${day.times.map(t => `
+          <div class="schedule-time-pill">
+            <span>⏰ ${t}</span>
+          </div>
+        `).join('')}
+      </div>
+      <button type="button" class="btn-card-action" style="font-size: 0.72rem; padding: 4px;" onclick="addPostingSlotToDay(${day.dayIndex})">
+        + Créneau
+      </button>
+    </div>
+  `).join('');
+}
+
+function addPostingSlotToDay(dayIndex) {
+  const time = prompt('Entrez une heure de publication (format HH:MM, ex: 15:30) :');
+  if (!time || !/^\d{2}:\d{2}$/.test(time)) return;
+
+  const schedule = CMFlowStore.getPostingSchedule();
+  const day = schedule.find(s => s.dayIndex === dayIndex);
+  if (day) {
+    if (!day.times.includes(time)) {
+      day.times.push(time);
+      day.times.sort();
+      CMFlowStore.setPostingSchedule(schedule);
+      renderPostingSchedule();
+      showAppToast(`Créneau ${time} ajouté pour le ${day.day} ! ⏰`, 'success');
+    }
+  }
+}
+
 
 function renderPlanningCalendar() {
   const grid = document.getElementById('planning-calendar-grid');
@@ -1418,7 +1691,7 @@ function initPostModal() {
         }
 
         close();
-        renderPlanningCalendar();
+        renderAllPlanningViews();
         if (typeof renderDashboard === 'function') renderDashboard();
 
         if (submitBtn) {
@@ -1437,13 +1710,13 @@ function initPostModal() {
       CMFlowStore.deletePost(planningState.editingPostId);
       showAppToast('Publication supprimée.', 'success');
       close();
-      renderPlanningCalendar();
+      renderAllPlanningViews();
       if (typeof renderDashboard === 'function') renderDashboard();
     });
   }
 }
 
-function openPostModalForDate(dateStr) {
+function openPostModalForDate(dateStr, timeStr = '14:00') {
   const modalBackdrop = document.getElementById('post-modal-backdrop');
   const form = document.getElementById('form-create-post');
   const titleEl = document.getElementById('post-modal-title');
@@ -1474,11 +1747,11 @@ function openPostModalForDate(dateStr) {
     }
   }
 
-  if (titleEl) titleEl.textContent = 'Nouvelle publication';
+  if (titleEl) titleEl.textContent = 'Nouvelle publication (Buffer Queue)';
   if (deleteBtn) deleteBtn.style.display = 'none';
 
-  if (dateInput) dateInput.value = dateStr;
-  if (timeInput) timeInput.value = '14:00';
+  if (dateInput) dateInput.value = dateStr || new Date().toISOString().split('T')[0];
+  if (timeInput) timeInput.value = timeStr || '14:00';
   if (captionInput) captionInput.value = '';
   if (statusSelect) statusSelect.value = 'scheduled';
 

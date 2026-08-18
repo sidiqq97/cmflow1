@@ -70,7 +70,15 @@
             <line x1="8" y1="2" x2="8" y2="6"/>
             <line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
-          <span>Planning & Posts</span>
+          <span>Planning & Queue</span>
+        </a>
+
+        <a href="startpage.html" class="sidebar-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18"/>
+          </svg>
+          <span>Start Page (Lien Bio)</span>
         </a>
 
         <a href="analytics.html" class="sidebar-nav-item active">
@@ -391,6 +399,95 @@
               </div>
             </div>
 
+          </div>
+        </div>
+
+        <!-- Section Tableau Détaillé Post par Post (Style Buffer Analytics) -->
+        <div style="margin-top: 36px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0 0 4px;">
+                📊 Analyse Détaillée Post par Post
+              </h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Performances individuelles pour identifier les contenus qui génèrent le plus de conversions.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <select class="filter-select" id="analytics-sort-select">
+                <option value="engagement">Trier par : Taux d'engagement</option>
+                <option value="reach">Trier par : Portée (Reach)</option>
+                <option value="likes">Trier par : J'aime</option>
+                <option value="recent">Trier par : Date récente</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="post-analytics-table-container">
+            <table class="post-analytics-table">
+              <thead>
+                <tr>
+                  <th style="width: 320px;">Publication & Réseau</th>
+                  <th>Date</th>
+                  <th>Portée (Reach)</th>
+                  <th>Likes ❤️</th>
+                  <th>Coms 💬</th>
+                  <th>Clics 🔗</th>
+                  <th>Taux d'Engagement</th>
+                </tr>
+              </thead>
+              <tbody id="analytics-posts-tbody">
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=100&auto=format&fit=crop&q=80" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover;" alt="Thumbnail">
+                      <div>
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 0.85rem;">Nouveau menu de saison 🍽️</div>
+                        <span class="social-tag" style="font-size: 0.7rem; padding: 1px 6px;">Instagram</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Hier à 14:00</td>
+                  <td style="font-weight: 700;">14 200</td>
+                  <td>840</td>
+                  <td>128</td>
+                  <td>94</td>
+                  <td><span style="background: #DCFCE7; color: #15803D; padding: 3px 8px; border-radius: 9999px; font-weight: 800;">8.2% 🔥</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=100&auto=format&fit=crop&q=80" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover;" alt="Thumbnail">
+                      <div>
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 0.85rem;">Coulisses avec le Chef 👨‍🍳</div>
+                        <span class="social-tag" style="font-size: 0.7rem; padding: 1px 6px;">TikTok</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Il y a 3 jours</td>
+                  <td style="font-weight: 700;">18 900</td>
+                  <td>620</td>
+                  <td>94</td>
+                  <td>42</td>
+                  <td><span style="background: #DCFCE7; color: #15803D; padding: 3px 8px; border-radius: 9999px; font-weight: 800;">6.5%</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=100&auto=format&fit=crop&q=80" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover;" alt="Thumbnail">
+                      <div>
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 0.85rem;">Partenariat terroir 🇸🇳</div>
+                        <span class="social-tag" style="font-size: 0.7rem; padding: 1px 6px;">LinkedIn</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Il y a 5 jours</td>
+                  <td style="font-weight: 700;">9 400</td>
+                  <td>410</td>
+                  <td>45</td>
+                  <td>118</td>
+                  <td><span style="background: #EFF6FF; color: #2563EB; padding: 3px 8px; border-radius: 9999px; font-weight: 800;">5.1%</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
