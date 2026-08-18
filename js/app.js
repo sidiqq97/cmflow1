@@ -517,6 +517,18 @@ function openCheckoutModal(planName = 'Plan Pro Illimité', amount = '9 900 FCFA
         </div>
       </div>
 
+      <!-- Informations Client / Création de Compte -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+        <div class="form-field">
+          <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: block;">Votre Nom complet *</label>
+          <input type="text" id="checkout-payer-name" value="${escapeHtml(CMFlowStore.getUser()?.name || '')}" placeholder="ex: Aminata Diallo" required style="width: 100%; padding: 9px 12px; border: var(--border-light); border-radius: var(--radius-md); font-size: 0.85rem;">
+        </div>
+        <div class="form-field">
+          <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: block;">Votre Adresse Email *</label>
+          <input type="email" id="checkout-payer-email" value="${escapeHtml(CMFlowStore.getUser()?.email || '')}" placeholder="aminata@agence.sn" required style="width: 100%; padding: 9px 12px; border: var(--border-light); border-radius: var(--radius-md); font-size: 0.85rem;">
+        </div>
+      </div>
+
       <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; display: block;">
         Choisissez votre moyen de paiement :
       </label>
@@ -684,13 +696,39 @@ function processCheckoutPayment(planName, amount) {
   }
 
   setTimeout(() => {
+    // Récupérer le nom et l'email renseignés
+    const payerName = document.getElementById('checkout-payer-name')?.value.trim() || 'Community Manager';
+    const payerEmail = document.getElementById('checkout-payer-email')?.value.trim() || 'cm@cmflow.sn';
+
     // Débloquer le plan Pro dans CMFlowStore
     CMFlowStore.setUserPlan('pro');
 
-    // Mettre à jour l'utilisateur si existant
+    // Mettre à jour ou créer l'utilisateur
     try {
-      const user = CMFlowStore.getUser() || { name: 'Community Manager' };
-      user.plan = 'pro';
+      let user = CMFlowStore.getUser();
+      if (!user) {
+        const nameParts = payerName.split(' ');
+        user = {
+          id: 'u_' + Date.now().toString(36),
+          name: payerName,
+          firstName: nameParts[0] || 'CM',
+          lastName: nameParts.slice(1).join(' ') || '',
+          email: payerEmail,
+          activityName: 'Agence ' + (nameParts[0] || 'CM'),
+          plan: 'pro'
+        };
+        const ws = {
+          id: 'ws_' + Date.now().toString(36),
+          ownerId: user.id,
+          name: user.activityName,
+          createdAt: new Date().toISOString()
+        };
+        localStorage.setItem('cmflow_workspace', JSON.stringify(ws));
+      } else {
+        user.name = payerName;
+        user.email = payerEmail;
+        user.plan = 'pro';
+      }
       localStorage.setItem('cmflow_user', JSON.stringify(user));
     } catch(e) {}
 
