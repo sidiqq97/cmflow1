@@ -180,6 +180,12 @@
           <h1>Paramètres & Configuration</h1>
           <p>Personnalisez votre profil Community Manager, votre marque et votre abonnement</p>
         </div>
+
+        <div class="header-actions">
+          <a href="admin.html" class="btn-secondary-app" style="background: #FEF3C7; color: #B45309; border: 1.5px solid #FDE68A; font-weight: 800; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <span>👑 Espace Super-Admin</span>
+          </a>
+        </div>
       </header>
 
       <!-- Page Content -->
@@ -202,6 +208,10 @@
           <button type="button" class="settings-tab-btn" data-tab="tab-security">
             <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
             <span>Sécurité & Données</span>
+          </button>
+          <button type="button" class="settings-tab-btn" data-tab="tab-admin" style="color: #B45309; font-weight: 800; background: #FEF3C7; border-color: #FDE68A;">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-1L10 2z"/></svg>
+            <span>👑 Super-Admin</span>
           </button>
         </div>
 
@@ -411,6 +421,82 @@
             </button>
           </div>
         </div>
+
+        <!-- ===================================================================
+             ONGLET 5 : SUPER-ADMINISTRATEUR (MRR & GESTION SAAS)
+             =================================================================== -->
+        <div class="settings-tab-pane" id="tab-admin">
+          
+          <!-- Banner Hero Super-Admin -->
+          <div class="settings-card" style="background: linear-gradient(135deg, #111827 0%, #1E1B4B 100%); color: white; border: 1px solid #374151;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                  <span style="font-size: 1.3rem;">👑</span>
+                  <h2 style="font-size: 1.2rem; font-weight: 800; color: #FDE047; margin: 0;">Espace Super-Administrateur CMFlow</h2>
+                  <span class="admin-badge">FONDATEUR</span>
+                </div>
+                <p style="font-size: 0.85rem; color: #D1D5DB; margin: 0;">Supervisez en temps réel le chiffre d'affaires récurrent (MRR), les abonnements Wave/OM et les 465 CMs.</p>
+              </div>
+              <a href="admin.html" class="btn-primary-app" style="background: #F59E0B; color: #111827; font-weight: 800; text-decoration: none; padding: 10px 18px; font-size: 0.9rem;">
+                <span>🚀 Ouvrir le Backoffice Plein Écran (Code: 1234)</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Mini KPIs Grid -->
+          <div class="admin-kpi-grid">
+            <div class="admin-kpi-card gold" style="border-color: #FDE68A;">
+              <div class="admin-kpi-title">Revenu Récurrent (MRR)</div>
+              <div class="admin-kpi-val" style="color: #D97706;">1 875 000 FCFA</div>
+              <div class="admin-kpi-trend up">+18.4% ce mois</div>
+            </div>
+
+            <div class="admin-kpi-card purple">
+              <div class="admin-kpi-title">Abonnés Pro Payants</div>
+              <div class="admin-kpi-val" style="color: #7C3AED;">125 CMs</div>
+              <div class="admin-kpi-trend">15 000 FCFA / m</div>
+            </div>
+
+            <div class="admin-kpi-card">
+              <div class="admin-kpi-title">Essais Gratuits Actifs</div>
+              <div class="admin-kpi-val" style="color: #2563EB;">340 CMs</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Conversion : 26.8%</div>
+            </div>
+
+            <div class="admin-kpi-card green">
+              <div class="admin-kpi-title">Encaissements Totaux</div>
+              <div class="admin-kpi-val" style="color: #059669;">12 450 000 FCFA</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Wave & OM</div>
+            </div>
+          </div>
+
+          <!-- Configuration & Numéros Marchands -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <h3 class="settings-card-title">Comptes Marchands de Réception des Paiements</h3>
+              <p class="settings-card-subtitle">Numéros Wave et Orange Money sur lesquels vos utilisateurs effectuent leurs paiements.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div class="form-field">
+                <label>Compte Wave Marchand (Sénégal)</label>
+                <input type="text" value="+221 77 842 19 02" readonly style="background: #EFF6FF; font-weight: 700; color: #1D4ED8;">
+              </div>
+              <div class="form-field">
+                <label>Compte Orange Money Marchand</label>
+                <input type="text" value="+221 77 842 19 02" readonly style="background: #FFF7ED; font-weight: 700; color: #C2410C;">
+              </div>
+            </div>
+
+            <a href="admin.html" class="btn-secondary-app" style="text-decoration: none; display: inline-flex;">
+              Gérer tous les Community Managers dans le Backoffice ➔
+            </a>
+          </div>
+
+        </div>
+
+      </div>
 
       </div>
     </main>
