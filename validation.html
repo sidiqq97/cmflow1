@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation des publications — CMFlow Client</title>
+  <meta name="description" content="Espace client sécurisé pour la validation des publications réseaux sociaux.">
+
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Cpath d='M9 16a7 7 0 0 1 7-7h2a5 5 0 0 1 5 5v2a5 5 0 0 1-5 5h-2a7 7 0 0 1-7-5z' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='13' cy='16' r='2' fill='white'/%3E%3Ccircle cx='19' cy='16' r='2' fill='%2393c5fd'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class="client-portal-layout">
+
+  <!-- Topbar Client -->
+  <header class="portal-topbar">
+    <div class="portal-brand">
+      <div class="sidebar-logo-icon" style="width: 32px; height: 32px;">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 18C10 13.5817 13.5817 10 18 10H20C23.3137 10 26 12.6863 26 16C26 19.3137 23.3137 22 20 22H16" stroke="white" stroke-width="2.6" stroke-linecap="round" />
+          <path d="M26 18C26 22.4183 22.4183 26 18 26H16C12.6863 26 10 23.3137 10 20C10 16.6863 12.6863 14 16 14H20" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0.5 4" />
+          <circle cx="14" cy="18" r="2.2" fill="white" />
+          <circle cx="22" cy="18" r="2.2" fill="#93C5FD" />
+        </svg>
+      </div>
+      <span style="font-family: var(--font-heading); font-weight: 800; font-size: 1.1rem; color: var(--text-main);">CM<span style="color: var(--color-primary);">Flow</span></span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span class="portal-agency-badge" id="portal-agency-name">Géré par votre Community Manager</span>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <div class="portal-hero">
+    <h1>Espace de Validation des Contenus</h1>
+    <p>Consultez vos prochaines publications prévues, validez-les d'un clic ou indiquez vos ajustements à votre Community Manager.</p>
+  </div>
+
+  <!-- Summary Bar -->
+  <div class="portal-summary-bar">
+    <div class="portal-stats-row">
+      <div class="portal-stat-item">
+        <span class="portal-stat-num" id="portal-stat-total">0</span>
+        <span class="portal-stat-lbl">Publications</span>
+      </div>
+      <div class="portal-stat-item">
+        <span class="portal-stat-num" id="portal-stat-approved" style="color: #10B981;">0</span>
+        <span class="portal-stat-lbl">Validées</span>
+      </div>
+      <div class="portal-stat-item">
+        <span class="portal-stat-num" id="portal-stat-pending" style="color: #F59E0B;">0</span>
+        <span class="portal-stat-lbl">En attente</span>
+      </div>
+    </div>
+
+    <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">
+      Client : <strong id="portal-client-title" style="color: var(--text-main);">Tous les comptes</strong>
+    </div>
+  </div>
+
+  <!-- Posts Container -->
+  <main class="portal-posts-container" id="portal-posts-list">
+    <!-- Rendu dynamique des cartes de post -->
+  </main>
+
+  <!-- Modal Demande de Retouche -->
+  <div class="modal-backdrop" id="revision-modal" role="dialog" aria-modal="true" aria-labelledby="revision-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="revision-modal-title">Demander une retouche</h3>
+        <button type="button" class="modal-close" id="revision-modal-close-btn" aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form class="modal-body" id="form-revision">
+        <div class="form-field">
+          <label for="revision-comment">Vos remarques & consignes de modification *</label>
+          <textarea id="revision-comment" placeholder="Ex: Veuillez modifier le prix à 25 000 FCFA, corriger le numéro WhatsApp, ou ajuster le visuel..." required style="min-height: 120px;"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary-app">
+            <span>Envoyer la demande</span>
+          </button>
+          <button type="button" class="btn-secondary-app" id="revision-cancel-btn">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script src="js/backend.js"></script>
+  <script>
+    // Initialisation du portail client
+    document.addEventListener('DOMContentLoaded', () => {
+      initValidationPortal();
+    });
+
+    let currentRevisionPostId = null;
+
+    function initValidationPortal() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const clientId = urlParams.get('client');
+      const ws = CMFlowStore.getWorkspace();
+      const clients = CMFlowStore.getClients();
+
+      const agencyLabel = document.getElementById('portal-agency-name');
+      const clientTitle = document.getElementById('portal-client-title');
+
+      if (agencyLabel && ws?.name) {
+        agencyLabel.textContent = `Géré par ${ws.name}`;
+      }
+
+      let targetClient = null;
+      if (clientId) {
+        targetClient = clients.find(c => c.id === clientId);
+      }
+
+      if (clientTitle) {
+        clientTitle.textContent = targetClient ? targetClient.name : 'Toutes les marques';
+      }
+
+      renderPortalPosts(clientId);
+
+      // Modal de retouche
+      const revModal = document.getElementById('revision-modal');
+      const closeBtn = document.getElementById('revision-modal-close-btn');
+      const cancelBtn = document.getElementById('revision-cancel-btn');
+      const formRev = document.getElementById('form-revision');
+
+      const closeRevModal = () => {
+        revModal.classList.remove('active');
+        document.body.style.overflow = '';
+        currentRevisionPostId = null;
+        if (formRev) formRev.reset();
+      };
+
+      if (closeBtn) closeBtn.addEventListener('click', closeRevModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeRevModal);
+
+      if (formRev) {
+        formRev.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const comment = document.getElementById('revision-comment')?.value.trim();
+          if (!comment || !currentRevisionPostId) return;
+
+          CMFlowBackend.requestRevision(currentRevisionPostId, comment);
+          showAppToast('Votre demande de modification a été transmise à votre CM ! 📝', 'info');
+          closeRevModal();
+          renderPortalPosts(clientId);
+        });
+      }
+
+      // Écouter les mises à jour temps réel
+      window.addEventListener('cmflow:post_updated', () => {
+        renderPortalPosts(clientId);
+      });
+    }
+
+    function renderPortalPosts(clientId = null) {
+      const container = document.getElementById('portal-posts-list');
+      const allPosts = CMFlowStore.getPosts();
+
+      const posts = clientId 
+        ? allPosts.filter(p => p.clientId === clientId)
+        : allPosts;
+
+      const totalEl = document.getElementById('portal-stat-total');
+      const approvedEl = document.getElementById('portal-stat-approved');
+      const pendingEl = document.getElementById('portal-stat-pending');
+
+      const approvedCount = posts.filter(p => p.status === 'scheduled' || p.status === 'published' || p.clientApproved).length;
+      const pendingCount = posts.filter(p => p.status === 'pending' || !p.clientApproved).length;
+
+      if (totalEl) totalEl.textContent = posts.length;
+      if (approvedEl) approvedEl.textContent = approvedCount;
+      if (pendingEl) pendingEl.textContent = pendingCount;
+
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (posts.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-card" style="background: white;">
+            <div class="empty-state-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="32" height="32">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <h3 class="empty-state-title">Aucune publication en attente</h3>
+            <p class="empty-state-text">Toutes vos publications prévues sont à jour ou déjà validées.</p>
+          </div>
+        `;
+        return;
+      }
+
+      posts.forEach(post => {
+        const isApproved = post.clientApproved || post.status === 'scheduled' || post.status === 'published';
+        const hasFeedback = post.clientFeedback && post.clientFeedback.length > 0;
+
+        const card = document.createElement('div');
+        card.className = 'portal-post-card';
+        card.innerHTML = `
+          <div class="portal-post-media">
+            <img src="${post.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&auto=format&fit=crop&q=80'}" alt="Visuel prévu">
+          </div>
+
+          <div class="portal-post-content">
+            <div>
+              <div class="portal-post-header">
+                <span class="portal-post-date-badge">
+                  📅 ${post.scheduledDate ? CMFlowStore.formatDate(post.scheduledDate) : 'Date à définir'} à ${post.scheduledTime || '14:00'}
+                </span>
+                <span class="status-tag ${isApproved ? 'published' : 'pending'}">
+                  ${isApproved ? '✅ Validé pour publication' : '⏳ En attente de validation'}
+                </span>
+              </div>
+
+              <div style="margin: 12px 0 6px;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Légende & Hashtags :</span>
+              </div>
+              <div class="portal-post-text">${escapeHtml(post.caption || '')}</div>
+
+              ${hasFeedback ? `
+                <div class="portal-feedback-bubble" style="margin-top: 10px;">
+                  <strong>Dernière remarque envoyée :</strong> ${escapeHtml(post.clientFeedback)}
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="portal-post-actions">
+              ${!isApproved ? `
+                <button type="button" class="btn-approve-post" onclick="approvePostFromPortal('${post.id}')">
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  <span>Valider ce post</span>
+                </button>
+              ` : `
+                <span style="font-size: 0.85rem; font-weight: 600; color: #059669; display: inline-flex; align-items: center; gap: 6px;">
+                  ✓ Vous avez validé cette publication
+                </span>
+              `}
+
+              <button type="button" class="btn-revision-post" onclick="openRevisionModal('${post.id}')">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/></svg>
+                <span>Demander une retouche</span>
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function approvePostFromPortal(postId) {
+      CMFlowBackend.approvePost(postId);
+      showAppToast('Publication validée avec succès ! 🎉', 'success');
+      const urlParams = new URLSearchParams(window.location.search);
+      renderPortalPosts(urlParams.get('client'));
+    }
+
+    function openRevisionModal(postId) {
+      currentRevisionPostId = postId;
+      const modal = document.getElementById('revision-modal');
+      if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+          document.getElementById('revision-comment')?.focus();
+        }, 150);
+      }
+    }
+  </script>
+</body>
+</html>
