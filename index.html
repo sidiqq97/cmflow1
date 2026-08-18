@@ -666,7 +666,7 @@
               <li><span class="check-bullet">✓</span> Paiement <strong>Wave</strong> & <strong>Orange Money</strong></li>
             </ul>
 
-            <button type="button" class="btn btn-outline-primary btn-block" data-auth-target="register">Commencer avec Starter</button>
+            <button type="button" class="btn btn-outline-primary btn-block" onclick="openCheckoutModal('Starter Solo', '4 900 FCFA', '/ mois')">Commencer avec Starter</button>
           </div>
 
           <!-- Plan Pro (Mis en avant / Le plus populaire) -->
@@ -695,7 +695,7 @@
               <li><span class="check-bullet">✓</span> Paiement <strong>Wave</strong> & <strong>Orange Money</strong></li>
             </ul>
 
-            <button type="button" class="btn btn-primary btn-block" data-auth-target="register">Passer au Plan Pro 🚀</button>
+            <button type="button" class="btn btn-primary btn-block" onclick="openCheckoutModal('Plan Pro Illimité', '9 900 FCFA', '/ mois')">Passer au Plan Pro 🚀</button>
           </div>
 
           <!-- Plan Agency -->
@@ -720,7 +720,7 @@
               <li><span class="check-bullet">✓</span> <strong>Support WhatsApp VIP dédié 7j/7</strong></li>
             </ul>
 
-            <button type="button" class="btn btn-outline-primary btn-block" data-auth-target="register">Choisir la formule Agence</button>
+            <button type="button" class="btn btn-outline-primary btn-block" onclick="openCheckoutModal('Agence & Studio', '19 900 FCFA', '/ mois')">Choisir la formule Agence</button>
           </div>
 
         </div>
@@ -1041,5 +1041,7 @@
 
   <!-- Scripts -->
   <script src="js/script.js"></script>
+  <script src="js/backend.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
