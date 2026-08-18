@@ -446,7 +446,7 @@ function openPaywallModal(type = 'client') {
       </div>
 
       <div class="paywall-price-tag">
-        15 000 FCFA <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">/ mois</span>
+        9 900 FCFA <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">/ mois</span>
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px;">

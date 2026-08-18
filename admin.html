@@ -862,7 +862,7 @@
           </td>
           <td>
             <span class="admin-plan-badge ${u.plan}">
-              ${u.plan === 'pro' ? '💎 Pro (15k FCFA)' : (u.plan === 'trial' ? '⏳ Essai Gratuit' : '⛔ Expiré')}
+              ${u.plan === 'pro' ? '💎 Pro (9 900 FCFA)' : (u.plan === 'trial' ? '⏳ Essai Gratuit' : '⛔ Expiré')}
             </span>
           </td>
           <td style="font-weight: 700; color: white;">${u.clientsCount} marque${u.clientsCount > 1 ? 's' : ''}</td>
@@ -893,7 +893,7 @@
       // Recalculer les KPIs
       const proCount = ADMIN_USERS.filter(u => u.plan === 'pro').length;
       const trialCount = ADMIN_USERS.filter(u => u.plan === 'trial').length;
-      const mrr = proCount * 15000;
+      const mrr = proCount * 9900;
 
       const mrrEl = document.getElementById('admin-mrr-val');
       const proEl = document.getElementById('admin-pro-count');
