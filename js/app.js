@@ -92,25 +92,98 @@ const CMFlowSecurity = {
   },
 
   /**
-   * Valide rigoureusement une adresse email selon les standards RFC 5322
+   * Liste noire des domaines d'emails jetables et temporaires (Anti-Fake)
+   */
+  DISPOSABLE_DOMAINS: [
+    'yopmail.com', 'yopmail.fr', 'yopmail.net', 'tempmail.com', 'temp-mail.org', 'temp-mail.io',
+    '10minutemail.com', '10minutemail.net', 'guerrillamail.com', 'guerrillamail.net', 'guerrillamail.org',
+    'mailinator.com', 'mailinator2.com', 'trashmail.com', 'trashmail.net', 'trashmail.org',
+    'dispostable.com', 'getnada.com', 'mohmal.com', 'sharklasers.com', 'fakeinbox.com',
+    'burnermail.io', 'throwawaymail.com', 'crazymailing.com', 'maildrop.cc', 'generator.email',
+    'inboxkitten.com', 'mytemp.email', 'tempinbox.com', 'emailondeck.com', 'nada.ltd',
+    'mailnesia.com', 'fakemailgenerator.com', 'fakemail.net', 'fakemail.xyz', 'dropmail.me',
+    'armyspy.com', 'cuvox.de', 'dayrep.com', 'fleckens.hu', 'gustr.com', 'jourrapide.com',
+    'rhyta.com', 'superrito.com', 'teleworm.us', 'einrot.com', 'mailsac.com', 'harakirimail.com',
+    'guerrillamailblock.com', 'pokemail.net', 'spam4.me', 'grr.la', 'guerrillamail.biz'
+  ],
+
+  /**
+   * Domaines factices ou fictifs interdits
+   */
+  BLOCKED_DOMAINS: [
+    'test.com', 'test.test', 'example.com', 'example.org', 'example.net', 'sample.com',
+    'fake.com', 'none.com', 'nowhere.com', 'asdf.com', 'aaa.com', 'temp.com', 'invalid.com',
+    'localhost', 'local.host', 'mail.test', 'domain.com', 'cmflow.test'
+  ],
+
+  /**
+   * Détecte les fautes de frappe courantes dans les adresses emails
+   * @param {string} domain
+   * @returns {string|null} Suggestion de domaine corrigé ou null
+   */
+  suggestEmailCorrection(domain) {
+    if (!domain) return null;
+    const clean = domain.toLowerCase().trim();
+    const typos = {
+      'gmai.com': 'gmail.com', 'gmaill.com': 'gmail.com', 'gamil.com': 'gmail.com', 'gmial.com': 'gmail.com', 'gmaik.com': 'gmail.com',
+      'hotmial.com': 'hotmail.com', 'hotmai.com': 'hotmail.com', 'hotmaill.com': 'hotmail.com',
+      'yaho.com': 'yahoo.com', 'yahooo.com': 'yahoo.com', 'yhaoo.com': 'yahoo.com', 'yaho.fr': 'yahoo.fr',
+      'outlok.com': 'outlook.com', 'outloo.com': 'outlook.com', 'outlock.com': 'outlook.com',
+      'iclud.com': 'icloud.com', 'icoud.com': 'icloud.com'
+    };
+    return typos[clean] || null;
+  },
+
+  /**
+   * Analyse la réputation et la légitimité d'une adresse email
+   * @param {string} email
+   * @returns {{ valid: boolean, error: string|null, suggestion: string|null }}
+   */
+  checkEmailReputation(email) {
+    if (!email || typeof email !== 'string') {
+      return { valid: false, error: 'Veuillez saisir une adresse email.', suggestion: null };
+    }
+    const clean = email.trim();
+    
+    // 1. Format RFC 5322
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+    if (!emailRegex.test(clean)) {
+      return { valid: false, error: 'Format d\'adresse email invalide (ex: nom@agence.sn).', suggestion: null };
+    }
+
+    const parts = clean.split('@');
+    if (parts.length !== 2) {
+      return { valid: false, error: 'Format d\'adresse email invalide.', suggestion: null };
+    }
+
+    const domain = parts[1].toLowerCase();
+
+    // 2. Blocage des domaines jetables / temporaires
+    if (this.DISPOSABLE_DOMAINS.includes(domain)) {
+      return { valid: false, error: 'Les adresses e-mails temporaires ou jetables sont strictement interdites.', suggestion: null };
+    }
+
+    // 3. Blocage des domaines factices évidents
+    if (this.BLOCKED_DOMAINS.includes(domain)) {
+      return { valid: false, error: 'Ce nom de domaine factice n\'est pas autorisé.', suggestion: null };
+    }
+
+    // 4. Détection de fautes de frappe courantes
+    const suggestion = this.suggestEmailCorrection(domain);
+    if (suggestion) {
+      return { valid: false, error: `Vouliez-vous dire @${suggestion} ?`, suggestion: `${parts[0]}@${suggestion}` };
+    }
+
+    return { valid: true, error: null, suggestion: null };
+  },
+
+  /**
+   * Valide rigoureusement une adresse email selon les standards RFC 5322 & Anti-Disposable
    * @param {string} email
    * @returns {boolean}
    */
   isValidEmail(email) {
-    if (!email || typeof email !== 'string') return false;
-    const clean = email.trim();
-    // Regex stricte avec vérification de domaine valide (.com, .sn, .fr, etc.)
-    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-    if (!emailRegex.test(clean)) return false;
-
-    // Refuser les domaines factices évidents
-    const parts = clean.split('@');
-    if (parts.length !== 2) return false;
-    const domain = parts[1];
-    const blockedDomains = ['test.test', 'example.com', 'fakemail.xyz', 'tempmail.com'];
-    if (blockedDomains.includes(domain.toLowerCase())) return false;
-
-    return true;
+    return this.checkEmailReputation(email).valid;
   },
 
   /**

@@ -424,9 +424,17 @@ function initAuthModal() {
       return false;
     }
 
-    if (input.type === 'email' && val && !isValidEmail(val)) {
-      setFieldError(input, 'Veuillez entrer une adresse email valide (ex: contact@agence.sn).');
-      return false;
+    if (input.type === 'email' && val) {
+      if (typeof CMFlowSecurity !== 'undefined') {
+        const rep = CMFlowSecurity.checkEmailReputation(val);
+        if (!rep.valid) {
+          setFieldError(input, rep.error || 'Veuillez entrer une adresse email valide (ex: contact@agence.sn).');
+          return false;
+        }
+      } else if (!isValidEmail(val)) {
+        setFieldError(input, 'Veuillez entrer une adresse email valide (ex: contact@agence.sn).');
+        return false;
+      }
     }
 
     // Validation renforcée pour l'inscription (min 8 carac, Majuscule, Chiffre)
