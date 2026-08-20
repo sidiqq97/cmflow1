@@ -595,11 +595,18 @@ function initAuthModal() {
         });
         localStorage.removeItem('cmflow_prefs');
 
+        // Initialiser les listeners et persister le state
+        try {
+          await CMFlowStore.migrateToFirestore();
+        } catch (e) {
+          console.warn('Migration status:', e);
+        }
+
         submitBtn.disabled = false;
         submitBtn.textContent = 'Créer mon compte';
         closeModal();
         showToast('Compte créé avec succès ! Bienvenue sur CMFlow 🎉', 'success');
-        setTimeout(() => { window.location.href = 'onboarding.html'; }, 500);
+        setTimeout(() => { window.location.href = 'onboarding.html'; }, 600);
       } else {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Créer mon compte';

@@ -91,26 +91,64 @@ const CMFlowBackend = {
 
     try {
       const credential = await cmfireAuth.createUserWithEmailAndPassword(email, password);
-      
-      // Mettre à jour le displayName
-      if (displayName && credential.user) {
-        await credential.user.updateProfile({ displayName: displayName });
+      const fbUser = credential.user;
+
+      // Mettre à jour le displayName Firebase Auth
+      if (displayName && fbUser) {
+        await fbUser.updateProfile({ displayName: displayName });
+      }
+
+      // Créer immédiatement le document utilisateur dans Firestore
+      if (cmfireDb && fbUser) {
+        const userRef = cmfireDb.collection('users').doc(fbUser.uid);
+        const nameParts = (displayName || '').split(' ');
+        const firstName = nameParts[0] || 'Ami';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        await userRef.collection('data').doc('profile').set({
+          id: fbUser.uid,
+          name: displayName || email.split('@')[0],
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          activityName: 'Mon Agence',
+          plan: 'trial',
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+
+        await userRef.collection('data').doc('workspace').set({
+          id: 'ws_' + Date.now().toString(36),
+          ownerId: fbUser.uid,
+          name: 'Mon Agence',
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+
+        console.log('✅ Profil Firestore initialisé avec succès pour:', email);
       }
 
       console.log('✅ Compte Firebase créé pour:', email);
-      return { success: true, user: credential.user };
+      return { success: true, user: fbUser };
     } catch (err) {
       console.error('❌ Erreur inscription Firebase:', err);
-      let errorMsg = 'Erreur lors de la création du compte.';
+      let errorMsg = err.message || 'Erreur lors de la création du compte.';
       switch (err.code) {
         case 'auth/email-already-in-use':
-          errorMsg = 'Cet email est déjà utilisé. Connectez-vous ou utilisez un autre email.';
+          errorMsg = 'Cet email est déjà utilisé. Connectez-vous avec cet email ou utilisez-en un autre.';
           break;
         case 'auth/weak-password':
           errorMsg = 'Le mot de passe doit contenir au moins 6 caractères.';
           break;
         case 'auth/invalid-email':
           errorMsg = 'Adresse email invalide.';
+          break;
+        case 'auth/operation-not-allowed':
+          errorMsg = 'Le fournisseur Email/Mot de passe n\'est pas encore activé dans votre console Firebase.';
+          break;
+        case 'auth/unauthorized-domain':
+          errorMsg = 'Domaine non autorisé. Ajoutez ce domaine dans Authentication > Paramètres > Domaines autorisés.';
+          break;
+        default:
+          errorMsg = `[${err.code || 'Erreur'}] ${err.message}`;
           break;
       }
       return { success: false, error: errorMsg };
