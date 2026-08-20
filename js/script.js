@@ -277,14 +277,54 @@ function initAuthModal() {
   // Google OAuth
   document.querySelectorAll('#btn-google-login, #btn-google-register').forEach(btn => {
     if (btn) {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         btn.disabled = true;
         btn.textContent = 'Connexion avec Google...';
 
+        // Si Firebase Auth est configuré avec Google Provider
+        if (typeof cmfireReady !== 'undefined' && cmfireReady && cmfireAuth) {
+          try {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const result = await cmfireAuth.signInWithPopup(provider);
+            const fbUser = result.user;
+
+            // Créer/mettre à jour l'utilisateur local
+            let user = CMFlowStore.getUser();
+            if (!user) {
+              user = {
+                id: fbUser.uid,
+                name: fbUser.displayName || 'Utilisateur',
+                firstName: fbUser.displayName ? fbUser.displayName.split(' ')[0] : '',
+                lastName: fbUser.displayName ? fbUser.displayName.split(' ').slice(1).join(' ') : '',
+                email: fbUser.email,
+                activityName: 'Mon Agence',
+              };
+              CMFlowStore.setUser(user);
+              CMFlowStore.setWorkspace({
+                id: 'ws_' + Date.now().toString(36),
+                ownerId: user.id,
+                name: user.activityName,
+                createdAt: new Date().toISOString(),
+              });
+            }
+
+            showToast('Connexion Google réussie ! Redirection...', 'success');
+            const prefs = CMFlowStore.getPrefs();
+            setTimeout(() => {
+              window.location.href = (prefs && prefs.onboardingComplete) ? 'dashboard.html' : 'onboarding.html';
+            }, 600);
+          } catch (err) {
+            console.error('Erreur Google Auth:', err);
+            btn.disabled = false;
+            btn.textContent = 'Continuer avec Google';
+            showToast('Erreur connexion Google: ' + (err.message || 'Réessayez.'), 'error');
+          }
+          return;
+        }
+
+        // Fallback : mode localStorage (Firebase non configuré)
         setTimeout(() => {
-          let user = null;
-          try { user = JSON.parse(localStorage.getItem('cmflow_user')); } catch { user = null; }
-          
+          let user = CMFlowStore.getUser();
           if (!user) {
             user = {
               id: 'u_' + Date.now().toString(36),
@@ -294,39 +334,48 @@ function initAuthModal() {
               email: 'ami.diop@gmail.com',
               activityName: 'Teranga Social Media',
             };
-            localStorage.setItem('cmflow_user', JSON.stringify(user));
-            
-            const ws = {
+            CMFlowStore.setUser(user);
+            CMFlowStore.setWorkspace({
               id: 'ws_' + Date.now().toString(36),
               ownerId: user.id,
               name: 'Teranga Social Media',
               createdAt: new Date().toISOString(),
-            };
-            localStorage.setItem('cmflow_workspace', JSON.stringify(ws));
+            });
           }
 
-          let prefs = null;
-          try { prefs = JSON.parse(localStorage.getItem('cmflow_prefs')); } catch { prefs = null; }
-
+          const prefs = CMFlowStore.getPrefs();
           showToast('Connexion Google réussie ! Redirection...', 'success');
           setTimeout(() => {
-            if (prefs && prefs.onboardingComplete) {
-              window.location.href = 'dashboard.html';
-            } else {
-              window.location.href = 'onboarding.html';
-            }
+            window.location.href = (prefs && prefs.onboardingComplete) ? 'dashboard.html' : 'onboarding.html';
           }, 600);
         }, 800);
       });
     }
   });
 
-  // Mot de passe oublié simulé
+  // Mot de passe oublié — Firebase Auth reset
   const forgotLink = document.getElementById('forgot-pass-link');
   if (forgotLink) {
-    forgotLink.addEventListener('click', (e) => {
+    forgotLink.addEventListener('click', async (e) => {
       e.preventDefault();
-      showToast('Un lien de réinitialisation a été envoyé à votre adresse email.', 'info');
+      const emailInput = document.getElementById('login-email');
+      const email = emailInput?.value.trim();
+
+      if (!email) {
+        showToast('Entrez votre adresse email ci-dessus pour réinitialiser le mot de passe.', 'info');
+        return;
+      }
+
+      if (typeof CMFlowBackend !== 'undefined' && CMFlowBackend.isFirebaseActive()) {
+        const result = await CMFlowBackend.resetPassword(email);
+        if (result.success) {
+          showToast('Un lien de réinitialisation a été envoyé à ' + email, 'success');
+        } else {
+          showToast(result.error, 'error');
+        }
+      } else {
+        showToast('Un lien de réinitialisation a été envoyé à votre adresse email.', 'info');
+      }
     });
   }
 
@@ -412,20 +461,65 @@ function initAuthModal() {
   // GESTION RÉELLE DE L'AUTHENTIFICATION & REDIRECTION
   // -------------------------------------------------------------------------
 
-  function simulateLogin() {
+  async function simulateLogin() {
     const submitBtn = formLogin.querySelector('[type="submit"]');
     const emailInput = document.getElementById('login-email');
+    const passInput = document.getElementById('login-password');
     if (!submitBtn) return;
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Connexion...';
 
     const email = emailInput?.value.trim() || 'cm@cmflow.com';
+    const password = passInput?.value || '';
 
+    // ===== FIREBASE AUTH =====
+    if (typeof CMFlowBackend !== 'undefined' && CMFlowBackend.useFirebase) {
+      const result = await CMFlowBackend.login(email, password);
+
+      if (result.success) {
+        // Mettre à jour le profil local si nécessaire
+        let user = CMFlowStore.getUser();
+        if (!user || user.email !== email) {
+          const namePart = email.split('@')[0];
+          const firstName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+          user = {
+            id: result.user.uid,
+            name: result.user.displayName || firstName,
+            firstName: firstName,
+            lastName: '',
+            email: email,
+            activityName: 'Agence ' + firstName,
+          };
+          CMFlowStore.setUser(user);
+          CMFlowStore.setWorkspace({
+            id: 'ws_' + Date.now().toString(36),
+            ownerId: user.id,
+            name: user.activityName,
+            createdAt: new Date().toISOString(),
+          });
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Se connecter';
+        closeModal();
+        showToast('Connexion réussie ! Redirection...', 'success');
+
+        const prefs = CMFlowStore.getPrefs();
+        setTimeout(() => {
+          window.location.href = (prefs && prefs.onboardingComplete) ? 'dashboard.html' : 'onboarding.html';
+        }, 500);
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Se connecter';
+        showToast(result.error, 'error');
+      }
+      return;
+    }
+
+    // ===== FALLBACK localStorage =====
     setTimeout(() => {
-      let user = null;
-      try { user = JSON.parse(localStorage.getItem('cmflow_user')); } catch { user = null; }
-
+      let user = CMFlowStore.getUser();
       if (!user || user.email !== email) {
         const namePart = email.split('@')[0];
         const firstName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
@@ -437,40 +531,33 @@ function initAuthModal() {
           email: email,
           activityName: 'Agence ' + firstName,
         };
-        localStorage.setItem('cmflow_user', JSON.stringify(user));
-
-        const ws = {
+        CMFlowStore.setUser(user);
+        CMFlowStore.setWorkspace({
           id: 'ws_' + Date.now().toString(36),
           ownerId: user.id,
           name: user.activityName,
           createdAt: new Date().toISOString(),
-        };
-        localStorage.setItem('cmflow_workspace', JSON.stringify(ws));
+        });
       }
 
-      let prefs = null;
-      try { prefs = JSON.parse(localStorage.getItem('cmflow_prefs')); } catch { prefs = null; }
-
+      const prefs = CMFlowStore.getPrefs();
       submitBtn.disabled = false;
       submitBtn.textContent = 'Se connecter';
       closeModal();
       showToast('Connexion réussie ! Redirection...', 'success');
 
       setTimeout(() => {
-        if (prefs && prefs.onboardingComplete) {
-          window.location.href = 'dashboard.html';
-        } else {
-          window.location.href = 'onboarding.html';
-        }
+        window.location.href = (prefs && prefs.onboardingComplete) ? 'dashboard.html' : 'onboarding.html';
       }, 500);
     }, 600);
   }
 
-  function simulateRegister() {
+  async function simulateRegister() {
     const submitBtn = formRegister.querySelector('[type="submit"]');
     const nameInput = document.getElementById('reg-name');
     const emailInput = document.getElementById('reg-email');
     const activityInput = document.getElementById('reg-activity');
+    const passInput = document.getElementById('reg-password');
     if (!submitBtn) return;
 
     submitBtn.disabled = true;
@@ -479,11 +566,49 @@ function initAuthModal() {
     const fullName = nameInput?.value.trim() || '';
     const email = emailInput?.value.trim() || '';
     const activity = activityInput?.value.trim() || '';
+    const password = passInput?.value || '';
 
     const nameParts = fullName.split(' ');
     const firstName = nameParts[0] || 'Ami';
     const lastName = nameParts.slice(1).join(' ') || '';
 
+    // ===== FIREBASE AUTH =====
+    if (typeof CMFlowBackend !== 'undefined' && CMFlowBackend.useFirebase) {
+      const result = await CMFlowBackend.register(email, password, fullName);
+
+      if (result.success) {
+        const user = {
+          id: result.user.uid,
+          name: fullName,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          activityName: activity,
+          createdAt: new Date().toISOString(),
+        };
+        CMFlowStore.setUser(user);
+        CMFlowStore.setWorkspace({
+          id: 'ws_' + Date.now().toString(36),
+          ownerId: user.id,
+          name: activity || `Espace de ${firstName}`,
+          createdAt: new Date().toISOString(),
+        });
+        localStorage.removeItem('cmflow_prefs');
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Créer mon compte';
+        closeModal();
+        showToast('Compte créé avec succès ! Bienvenue sur CMFlow 🎉', 'success');
+        setTimeout(() => { window.location.href = 'onboarding.html'; }, 500);
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Créer mon compte';
+        showToast(result.error, 'error');
+      }
+      return;
+    }
+
+    // ===== FALLBACK localStorage =====
     const user = {
       id: 'u_' + Date.now().toString(36),
       name: fullName,
@@ -493,18 +618,13 @@ function initAuthModal() {
       activityName: activity,
       createdAt: new Date().toISOString(),
     };
-
-    localStorage.setItem('cmflow_user', JSON.stringify(user));
-
-    const ws = {
+    CMFlowStore.setUser(user);
+    CMFlowStore.setWorkspace({
       id: 'ws_' + Date.now().toString(36),
       ownerId: user.id,
       name: activity || `Espace de ${firstName}`,
       createdAt: new Date().toISOString(),
-    };
-    localStorage.setItem('cmflow_workspace', JSON.stringify(ws));
-
-    // Reset onboarding prefs for new user
+    });
     localStorage.removeItem('cmflow_prefs');
 
     setTimeout(() => {
@@ -512,10 +632,7 @@ function initAuthModal() {
       submitBtn.textContent = 'Créer mon compte';
       closeModal();
       showToast('Compte créé avec succès ! Bienvenue sur CMFlow 🎉', 'success');
-
-      setTimeout(() => {
-        window.location.href = 'onboarding.html';
-      }, 500);
+      setTimeout(() => { window.location.href = 'onboarding.html'; }, 500);
     }, 600);
   }
 }

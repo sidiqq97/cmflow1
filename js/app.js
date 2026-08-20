@@ -1,36 +1,111 @@
 /**
  * CMFlow — App JS (Onboarding, Dashboard, Clients)
- * Architecture : localStorage store + auth guard + routing simple
+ * Architecture : Firestore (cloud) + localStorage (cache synchrone) + auth guard + routing simple
+ * 
+ * Stratégie : 
+ *   - Les lectures sont synchrones (depuis localStorage/mémoire)
+ *   - Les écritures vont en localStorage (instant) + Firestore (async, en arrière-plan)
+ *   - Les onSnapshot Firestore maintiennent le cache à jour automatiquement
+ *   - Fallback complet sur localStorage si Firebase n'est pas configuré
  */
 
 'use strict';
 
 /* ==========================================================================
-   STORE — GESTION DES DONNÉES (localStorage)
+   STORE — GESTION DES DONNÉES (Firestore + localStorage cache)
    ========================================================================== */
 const CMFlowStore = {
-  // ---- User ----
+  // Listeners Firestore actifs (pour unsubscribe)
+  _listeners: [],
+  // Flag pour éviter les boucles de mise à jour
+  _suppressFirestoreWrite: false,
+
+  // ========================================================================
+  // CACHE HELPERS (localStorage comme cache synchrone rapide)
+  // ========================================================================
+  _cacheGet(key, fallback = null) {
+    try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch { return fallback; }
+  },
+  _cacheSet(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  },
+
+  // ========================================================================
+  // FIRESTORE WRITE HELPERS (écriture async en arrière-plan)
+  // ========================================================================
+
+  /** Écrire un document dans la sous-collection de l'utilisateur */
+  _firestoreSetDoc(path, data) {
+    if (!cmfireIsOnline() || this._suppressFirestoreWrite) return;
+    const uid = cmfireGetUid();
+    if (!uid) return;
+    const ref = cmfireDb.collection('users').doc(uid);
+    // path peut être 'profile', 'workspace', ou 'settings/schedule' etc.
+    if (path.includes('/')) {
+      const parts = path.split('/');
+      ref.collection(parts[0]).doc(parts[1]).set(data, { merge: true }).catch(err => {
+        console.warn('⚠️ Firestore write error (' + path + '):', err);
+      });
+    } else {
+      ref.collection('data').doc(path).set(data, { merge: true }).catch(err => {
+        console.warn('⚠️ Firestore write error (' + path + '):', err);
+      });
+    }
+  },
+
+  /** Écrire/mettre à jour un document dans une sous-collection */
+  _firestoreSetInCollection(collectionName, docId, data) {
+    if (!cmfireIsOnline() || this._suppressFirestoreWrite) return;
+    const uid = cmfireGetUid();
+    if (!uid) return;
+    cmfireDb.collection('users').doc(uid)
+      .collection(collectionName).doc(docId)
+      .set(data, { merge: true })
+      .catch(err => console.warn('⚠️ Firestore write error (' + collectionName + '/' + docId + '):', err));
+  },
+
+  /** Supprimer un document dans une sous-collection */
+  _firestoreDeleteInCollection(collectionName, docId) {
+    if (!cmfireIsOnline()) return;
+    const uid = cmfireGetUid();
+    if (!uid) return;
+    cmfireDb.collection('users').doc(uid)
+      .collection(collectionName).doc(docId)
+      .delete()
+      .catch(err => console.warn('⚠️ Firestore delete error (' + collectionName + '/' + docId + '):', err));
+  },
+
+  // ========================================================================
+  // USER
+  // ========================================================================
   getUser() {
-    try { return JSON.parse(localStorage.getItem('cmflow_user')); } catch { return null; }
+    return this._cacheGet('cmflow_user');
   },
   setUser(user) {
-    localStorage.setItem('cmflow_user', JSON.stringify(user));
+    this._cacheSet('cmflow_user', user);
+    this._firestoreSetDoc('profile', user);
   },
 
-  // ---- Workspace ----
+  // ========================================================================
+  // WORKSPACE
+  // ========================================================================
   getWorkspace() {
-    try { return JSON.parse(localStorage.getItem('cmflow_workspace')); } catch { return null; }
+    return this._cacheGet('cmflow_workspace');
   },
   setWorkspace(ws) {
-    localStorage.setItem('cmflow_workspace', JSON.stringify(ws));
+    this._cacheSet('cmflow_workspace', ws);
+    this._firestoreSetDoc('workspace', ws);
   },
 
-  // ---- Plan & Quotas (Essai Gratuit vs Pro) ----
+  // ========================================================================
+  // PLAN & QUOTAS (Essai Gratuit vs Pro)
+  // ========================================================================
   getUserPlan() {
     return localStorage.getItem('cmflow_user_plan') || 'trial';
   },
   setUserPlan(plan) {
     localStorage.setItem('cmflow_user_plan', plan);
+    this._firestoreSetDoc('profile', { plan: plan });
   },
   canAddClient() {
     const plan = this.getUserPlan();
@@ -52,21 +127,31 @@ const CMFlowStore = {
     return connectedCount < 1; // 1 seul réseau par client en essai gratuit
   },
 
-  // ---- Clients ----
+  // ========================================================================
+  // CLIENTS (collection Firestore: users/{uid}/clients)
+  // ========================================================================
   getClients() {
-    try { return JSON.parse(localStorage.getItem('cmflow_clients')) || []; } catch { return []; }
+    return this._cacheGet('cmflow_clients', []);
   },
   setClients(clients) {
-    localStorage.setItem('cmflow_clients', JSON.stringify(clients));
+    this._cacheSet('cmflow_clients', clients);
+    // Sync chaque client individuellement dans Firestore
+    if (!this._suppressFirestoreWrite && cmfireIsOnline()) {
+      clients.forEach(c => {
+        if (c.id) this._firestoreSetInCollection('clients', c.id, c);
+      });
+    }
   },
   addClient(client) {
     const clients = this.getClients();
     clients.push(client);
-    this.setClients(clients);
+    this._cacheSet('cmflow_clients', clients);
+    if (client.id) this._firestoreSetInCollection('clients', client.id, client);
   },
   deleteClient(id) {
     const clients = this.getClients().filter(c => c.id !== id);
-    this.setClients(clients);
+    this._cacheSet('cmflow_clients', clients);
+    this._firestoreDeleteInCollection('clients', id);
   },
   getClientById(id) {
     return this.getClients().find(c => c.id === id) || null;
@@ -79,13 +164,16 @@ const CMFlowStore = {
         clients[idx].socialAccounts = {};
       }
       clients[idx].socialAccounts[networkKey] = accountData;
-      this.setClients(clients);
+      this._cacheSet('cmflow_clients', clients);
+      this._firestoreSetInCollection('clients', clientId, clients[idx]);
       return clients[idx];
     }
     return null;
   },
 
-  // ---- Posts (Planning & Publications) ----
+  // ========================================================================
+  // POSTS (collection Firestore: users/{uid}/posts)
+  // ========================================================================
   getPostingSchedule() {
     try {
       const s = JSON.parse(localStorage.getItem('cmflow_schedule'));
@@ -103,6 +191,7 @@ const CMFlowStore = {
   },
   setPostingSchedule(schedule) {
     localStorage.setItem('cmflow_schedule', JSON.stringify(schedule));
+    this._firestoreSetDoc('settings/schedule', { days: schedule });
   },
   getNextQueueSlot() {
     const today = new Date();
@@ -201,43 +290,248 @@ const CMFlowStore = {
     }
   },
   setPosts(posts) {
-    localStorage.setItem('cmflow_posts', JSON.stringify(posts));
+    this._cacheSet('cmflow_posts', posts);
+    // Sync chaque post individuellement dans Firestore
+    if (!this._suppressFirestoreWrite && cmfireIsOnline()) {
+      posts.forEach(p => {
+        if (p.id) this._firestoreSetInCollection('posts', p.id, p);
+      });
+    }
   },
   addPost(post) {
     const posts = this.getPosts();
     posts.push(post);
-    this.setPosts(posts);
+    this._cacheSet('cmflow_posts', posts);
+    if (post.id) this._firestoreSetInCollection('posts', post.id, post);
   },
   updatePost(id, updatedData) {
     const posts = this.getPosts().map(p => p.id === id ? { ...p, ...updatedData } : p);
-    this.setPosts(posts);
+    this._cacheSet('cmflow_posts', posts);
+    this._firestoreSetInCollection('posts', id, updatedData);
   },
   deletePost(id) {
     const posts = this.getPosts().filter(p => p.id !== id);
-    this.setPosts(posts);
+    this._cacheSet('cmflow_posts', posts);
+    this._firestoreDeleteInCollection('posts', id);
   },
   getPostById(id) {
     return this.getPosts().find(p => p.id === id) || null;
   },
 
-  // ---- UserPreferences ----
+  // ========================================================================
+  // USER PREFERENCES
+  // ========================================================================
   getPrefs() {
-    try { return JSON.parse(localStorage.getItem('cmflow_prefs')); } catch { return null; }
+    return this._cacheGet('cmflow_prefs');
   },
   setPrefs(prefs) {
-    localStorage.setItem('cmflow_prefs', JSON.stringify(prefs));
+    this._cacheSet('cmflow_prefs', prefs);
+    this._firestoreSetDoc('prefs', prefs);
   },
 
-  // ---- Clear all ----
+  // ========================================================================
+  // LOGOUT — Déconnexion complète (localStorage + Firebase Auth)
+  // ========================================================================
   logout() {
+    // Détacher tous les listeners Firestore
+    this._listeners.forEach(unsub => { try { unsub(); } catch {} });
+    this._listeners = [];
+
+    // Nettoyer le cache local
     localStorage.removeItem('cmflow_user');
     localStorage.removeItem('cmflow_workspace');
     localStorage.removeItem('cmflow_clients');
     localStorage.removeItem('cmflow_posts');
     localStorage.removeItem('cmflow_prefs');
+    localStorage.removeItem('cmflow_schedule');
+    localStorage.removeItem('cmflow_user_plan');
+
+    // Déconnexion Firebase Auth
+    if (cmfireReady && cmfireAuth) {
+      cmfireAuth.signOut().catch(err => console.warn('⚠️ Firebase signOut error:', err));
+    }
   },
 
-  // ---- Helpers ----
+  // ========================================================================
+  // FIRESTORE REAL-TIME LISTENERS — Synchronisation temps-réel
+  // ========================================================================
+
+  /** Initialiser les listeners Firestore pour garder le cache à jour */
+  initFirestoreListeners() {
+    if (!cmfireIsOnline()) return;
+    const uid = cmfireGetUid();
+    if (!uid) return;
+
+    // Détacher les anciens listeners
+    this._listeners.forEach(unsub => { try { unsub(); } catch {} });
+    this._listeners = [];
+
+    const userRef = cmfireDb.collection('users').doc(uid);
+
+    // --- Listener : Profil utilisateur ---
+    this._listeners.push(
+      userRef.collection('data').doc('profile').onSnapshot(snap => {
+        if (snap.exists) {
+          this._suppressFirestoreWrite = true;
+          const data = snap.data();
+          this._cacheSet('cmflow_user', data);
+          if (data.plan) localStorage.setItem('cmflow_user_plan', data.plan);
+          this._suppressFirestoreWrite = false;
+          window.dispatchEvent(new CustomEvent('cmflow:data_synced', { detail: { type: 'profile' } }));
+        }
+      }, err => console.warn('⚠️ Listener profile error:', err))
+    );
+
+    // --- Listener : Workspace ---
+    this._listeners.push(
+      userRef.collection('data').doc('workspace').onSnapshot(snap => {
+        if (snap.exists) {
+          this._suppressFirestoreWrite = true;
+          this._cacheSet('cmflow_workspace', snap.data());
+          this._suppressFirestoreWrite = false;
+          window.dispatchEvent(new CustomEvent('cmflow:data_synced', { detail: { type: 'workspace' } }));
+        }
+      }, err => console.warn('⚠️ Listener workspace error:', err))
+    );
+
+    // --- Listener : Préférences ---
+    this._listeners.push(
+      userRef.collection('data').doc('prefs').onSnapshot(snap => {
+        if (snap.exists) {
+          this._suppressFirestoreWrite = true;
+          this._cacheSet('cmflow_prefs', snap.data());
+          this._suppressFirestoreWrite = false;
+        }
+      }, err => console.warn('⚠️ Listener prefs error:', err))
+    );
+
+    // --- Listener : Clients (collection) ---
+    this._listeners.push(
+      userRef.collection('clients').onSnapshot(snapshot => {
+        this._suppressFirestoreWrite = true;
+        const clients = [];
+        snapshot.forEach(doc => clients.push({ ...doc.data(), id: doc.id }));
+        this._cacheSet('cmflow_clients', clients);
+        this._suppressFirestoreWrite = false;
+        window.dispatchEvent(new CustomEvent('cmflow:data_synced', { detail: { type: 'clients' } }));
+      }, err => console.warn('⚠️ Listener clients error:', err))
+    );
+
+    // --- Listener : Posts (collection) ---
+    this._listeners.push(
+      userRef.collection('posts').onSnapshot(snapshot => {
+        this._suppressFirestoreWrite = true;
+        const posts = [];
+        snapshot.forEach(doc => posts.push({ ...doc.data(), id: doc.id }));
+        this._cacheSet('cmflow_posts', posts);
+        this._suppressFirestoreWrite = false;
+        window.dispatchEvent(new CustomEvent('cmflow:data_synced', { detail: { type: 'posts' } }));
+      }, err => console.warn('⚠️ Listener posts error:', err))
+    );
+
+    // --- Listener : Schedule ---
+    this._listeners.push(
+      userRef.collection('settings').doc('schedule').onSnapshot(snap => {
+        if (snap.exists && snap.data().days) {
+          this._suppressFirestoreWrite = true;
+          localStorage.setItem('cmflow_schedule', JSON.stringify(snap.data().days));
+          this._suppressFirestoreWrite = false;
+        }
+      }, err => console.warn('⚠️ Listener schedule error:', err))
+    );
+
+    console.log('🔄 Listeners Firestore temps-réel activés');
+  },
+
+  // ========================================================================
+  // MIGRATION — localStorage → Firestore (premier login Firebase)
+  // ========================================================================
+
+  /** Migrer les données localStorage existantes vers Firestore */
+  async migrateToFirestore() {
+    if (!cmfireIsOnline()) return;
+    const uid = cmfireGetUid();
+    if (!uid) return;
+
+    const userRef = cmfireDb.collection('users').doc(uid);
+
+    // Vérifier si des données existent déjà dans Firestore
+    const profileSnap = await userRef.collection('data').doc('profile').get();
+    
+    if (profileSnap.exists) {
+      // Des données existent dans Firestore → les charger dans le cache local
+      console.log('📥 Données Firestore existantes détectées, synchronisation vers le cache local...');
+      // Les listeners onSnapshot feront le travail automatiquement
+      return;
+    }
+
+    // Pas de données Firestore → migrer depuis localStorage
+    console.log('📤 Migration des données localStorage vers Firestore...');
+
+    const batch = cmfireDb.batch();
+
+    // Profil
+    const user = this._cacheGet('cmflow_user');
+    if (user) {
+      const plan = localStorage.getItem('cmflow_user_plan') || 'trial';
+      batch.set(userRef.collection('data').doc('profile'), { ...user, plan: plan }, { merge: true });
+    }
+
+    // Workspace
+    const ws = this._cacheGet('cmflow_workspace');
+    if (ws) {
+      batch.set(userRef.collection('data').doc('workspace'), ws, { merge: true });
+    }
+
+    // Préférences
+    const prefs = this._cacheGet('cmflow_prefs');
+    if (prefs) {
+      batch.set(userRef.collection('data').doc('prefs'), prefs, { merge: true });
+    }
+
+    // Schedule
+    const schedule = this._cacheGet('cmflow_schedule');
+    if (schedule) {
+      batch.set(userRef.collection('settings').doc('schedule'), { days: schedule }, { merge: true });
+    }
+
+    try {
+      await batch.commit();
+      console.log('✅ Batch principal migré (profil, workspace, prefs, schedule)');
+    } catch (err) {
+      console.error('❌ Erreur migration batch principal:', err);
+    }
+
+    // Clients (en dehors du batch car potentiellement > 500 docs)
+    const clients = this._cacheGet('cmflow_clients', []);
+    for (const client of clients) {
+      if (client.id) {
+        try {
+          await userRef.collection('clients').doc(client.id).set(client, { merge: true });
+        } catch (err) {
+          console.warn('⚠️ Erreur migration client ' + client.id + ':', err);
+        }
+      }
+    }
+
+    // Posts
+    const posts = this._cacheGet('cmflow_posts', []);
+    for (const post of posts) {
+      if (post.id) {
+        try {
+          await userRef.collection('posts').doc(post.id).set(post, { merge: true });
+        } catch (err) {
+          console.warn('⚠️ Erreur migration post ' + post.id + ':', err);
+        }
+      }
+    }
+
+    console.log('✅ Migration localStorage → Firestore terminée !');
+  },
+
+  // ========================================================================
+  // HELPERS
+  // ========================================================================
   generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
   },
