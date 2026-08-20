@@ -135,6 +135,33 @@ const CMFlowSecurity = {
   },
 
   /**
+   * Vérifie et sécurise une URL pour bloquer les attaques via javascript: ou data:
+   * @param {string} url
+   * @returns {string} URL nettoyée ou '#'
+   */
+  sanitizeUrl(url) {
+    if (!url || typeof url !== 'string') return '#';
+    const clean = url.trim();
+    // Autoriser uniquement http, https, mailto, tel et les chemins relatifs
+    if (/^(https?:\/\/|mailto:|tel:|\/|\.\/|#)/i.test(clean)) {
+      return clean;
+    }
+    return '#';
+  },
+
+  /**
+   * Valide si une URL d'image est conforme
+   * @param {string} url
+   * @returns {boolean}
+   */
+  isValidImageUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const clean = url.trim().toLowerCase();
+    if (!clean.startsWith('http://') && !clean.startsWith('https://')) return false;
+    return /\.(jpg|jpeg|png|webp|gif|svg)(\?.*)?$/i.test(clean) || clean.includes('unsplash.com') || clean.includes('firebasestorage.googleapis.com');
+  },
+
+  /**
    * Vérifie la validité d'un token client
    * @param {string} clientId
    * @param {string} token
