@@ -281,74 +281,51 @@ function initAuthModal() {
         btn.disabled = true;
         btn.textContent = 'Connexion avec Google...';
 
-        // Si Firebase Auth est configuré avec Google Provider
-        if (typeof cmfireReady !== 'undefined' && cmfireReady && cmfireAuth) {
-          try {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            const result = await cmfireAuth.signInWithPopup(provider);
+        if (typeof CMFlowBackend !== 'undefined' && CMFlowBackend.loginWithGoogle) {
+          const result = await CMFlowBackend.loginWithGoogle();
+          if (result.success) {
             const fbUser = result.user;
-
-            // Créer/mettre à jour l'utilisateur local
-            let user = CMFlowStore.getUser();
+            let user = (typeof CMFlowStore !== 'undefined') ? CMFlowStore.getUser() : null;
             if (!user) {
+              const nameParts = (fbUser.displayName || '').split(' ');
+              const firstName = nameParts[0] || 'Ami';
+              const lastName = nameParts.slice(1).join(' ') || '';
               user = {
                 id: fbUser.uid,
                 name: fbUser.displayName || 'Utilisateur',
-                firstName: fbUser.displayName ? fbUser.displayName.split(' ')[0] : '',
-                lastName: fbUser.displayName ? fbUser.displayName.split(' ').slice(1).join(' ') : '',
+                firstName: firstName,
+                lastName: lastName,
                 email: fbUser.email,
                 activityName: 'Mon Agence',
               };
-              CMFlowStore.setUser(user);
-              CMFlowStore.setWorkspace({
-                id: 'ws_' + Date.now().toString(36),
-                ownerId: user.id,
-                name: user.activityName,
-                createdAt: new Date().toISOString(),
-              });
+              if (typeof CMFlowStore !== 'undefined') {
+                CMFlowStore.setUser(user);
+                CMFlowStore.setWorkspace({
+                  id: 'ws_' + Date.now().toString(36),
+                  ownerId: user.id,
+                  name: user.activityName,
+                  createdAt: new Date().toISOString(),
+                });
+              }
             }
 
             showToast('Connexion Google réussie ! Redirection...', 'success');
-            const prefs = CMFlowStore.getPrefs();
+            const prefs = (typeof CMFlowStore !== 'undefined') ? CMFlowStore.getPrefs() : null;
             setTimeout(() => {
               window.location.href = (prefs && prefs.onboardingComplete) ? 'dashboard.html' : 'onboarding.html';
             }, 600);
-          } catch (err) {
-            console.error('Erreur Google Auth:', err);
+            return;
+          } else {
             btn.disabled = false;
             btn.textContent = 'Continuer avec Google';
-            showToast('Erreur connexion Google: ' + (err.message || 'Réessayez.'), 'error');
+            showToast(result.error || 'Erreur lors de la connexion Google.', 'error');
+            return;
           }
-          return;
         }
 
-        // Fallback : mode localStorage (Firebase non configuré)
-        setTimeout(() => {
-          let user = CMFlowStore.getUser();
-          if (!user) {
-            user = {
-              id: 'u_' + Date.now().toString(36),
-              name: 'Ami Diop',
-              firstName: 'Ami',
-              lastName: 'Diop',
-              email: 'ami.diop@gmail.com',
-              activityName: 'Teranga Social Media',
-            };
-            CMFlowStore.setUser(user);
-            CMFlowStore.setWorkspace({
-              id: 'ws_' + Date.now().toString(36),
-              ownerId: user.id,
-              name: 'Teranga Social Media',
-              createdAt: new Date().toISOString(),
-            });
-          }
-
-          const prefs = CMFlowStore.getPrefs();
-          showToast('Connexion Google réussie ! Redirection...', 'success');
-          setTimeout(() => {
-            window.location.href = (prefs && prefs.onboardingComplete) ? 'dashboard.html' : 'onboarding.html';
-          }, 600);
-        }, 800);
+        btn.disabled = false;
+        btn.textContent = 'Continuer avec Google';
+        showToast('Le service Google Sign-In n\'est pas accessible actuellement.', 'error');
       });
     }
   });

@@ -215,6 +215,76 @@ const CMFlowBackend = {
   },
 
   // ========================================================================
+  // CONNEXION AVEC GOOGLE (POPUP OAUTH)
+  // ========================================================================
+  async loginWithGoogle() {
+    if (!cmfireReady || !cmfireAuth || typeof firebase === 'undefined') {
+      return { success: false, error: 'Firebase Auth n\'est pas encore disponible.' };
+    }
+
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.addScope('profile');
+      provider.addScope('email');
+      const credential = await cmfireAuth.signInWithPopup(provider);
+      const fbUser = credential.user;
+
+      // Initialiser ou mettre à jour le document Firestore pour le compte Google
+      if (cmfireDb && fbUser) {
+        const userRef = cmfireDb.collection('users').doc(fbUser.uid);
+        const nameParts = (fbUser.displayName || '').split(' ');
+        const firstName = nameParts[0] || 'Ami';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        await userRef.collection('data').doc('profile').set({
+          id: fbUser.uid,
+          name: fbUser.displayName || 'Utilisateur',
+          firstName: firstName,
+          lastName: lastName,
+          email: fbUser.email,
+          activityName: 'Mon Agence',
+          emailVerified: true,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        await userRef.collection('data').doc('workspace').set({
+          id: 'ws_' + Date.now().toString(36),
+          ownerId: fbUser.uid,
+          name: `Espace de ${firstName}`,
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+      }
+
+      console.log('✅ Connexion Google réussie pour:', fbUser.email);
+      return { success: true, user: fbUser };
+    } catch (err) {
+      console.error('❌ Erreur connexion Google:', err);
+      let errorMsg = 'Erreur lors de la connexion avec Google.';
+      switch (err.code) {
+        case 'auth/popup-closed-by-user':
+          errorMsg = 'Connexion annulée : la fenêtre Google a été fermée.';
+          break;
+        case 'auth/cancelled-popup-request':
+          errorMsg = 'Une demande de connexion Google est déjà en cours.';
+          break;
+        case 'auth/popup-blocked':
+          errorMsg = 'La popup Google a été bloquée par votre navigateur. Veuillez autoriser les fenêtres popups.';
+          break;
+        case 'auth/unauthorized-domain':
+          errorMsg = 'Domaine non autorisé dans Firebase Console (Authentication > Paramètres > Domaines autorisés).';
+          break;
+        case 'auth/operation-not-allowed':
+          errorMsg = 'Google Sign-in n\'est pas activé dans votre console Firebase (Authentication > Mode de connexion > Activer Google).';
+          break;
+        default:
+          errorMsg = err.message || 'Erreur lors de la connexion avec Google.';
+          break;
+      }
+      return { success: false, error: errorMsg };
+    }
+  },
+
+  // ========================================================================
   // RÉINITIALISATION MOT DE PASSE
   // ========================================================================
   async resetPassword(email) {
