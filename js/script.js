@@ -384,7 +384,10 @@ function initAuthModal() {
   // -------------------------------------------------------------------------
 
   function isValidEmail(val) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+    if (typeof CMFlowSecurity !== 'undefined') {
+      return CMFlowSecurity.isValidEmail(val);
+    }
+    return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(val.trim());
   }
 
   function setFieldError(input, message) {
@@ -422,11 +425,23 @@ function initAuthModal() {
     }
 
     if (input.type === 'email' && val && !isValidEmail(val)) {
-      setFieldError(input, 'Veuillez entrer une adresse email valide.');
+      setFieldError(input, 'Veuillez entrer une adresse email valide (ex: contact@agence.sn).');
       return false;
     }
 
-    if (input.type === 'password' && val && val.length < 6) {
+    // Validation renforcée pour l'inscription (min 8 carac, Majuscule, Chiffre)
+    if (input.id === 'reg-password' && val) {
+      if (typeof CMFlowSecurity !== 'undefined') {
+        const check = CMFlowSecurity.checkPasswordStrength(val);
+        if (!check.valid) {
+          setFieldError(input, check.message);
+          return false;
+        }
+      } else if (val.length < 8) {
+        setFieldError(input, 'Le mot de passe doit comporter au moins 8 caractères.');
+        return false;
+      }
+    } else if (input.type === 'password' && val && val.length < 6) {
       setFieldError(input, 'Le mot de passe doit contenir au moins 6 caractères.');
       return false;
     }

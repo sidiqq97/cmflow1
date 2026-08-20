@@ -89,6 +89,17 @@ const CMFlowBackend = {
       return { success: false, error: 'Firebase non configuré. Mode localStorage actif.' };
     }
 
+    // Validation de sécurité préliminaire
+    if (typeof CMFlowSecurity !== 'undefined') {
+      if (!CMFlowSecurity.isValidEmail(email)) {
+        return { success: false, error: 'Adresse email invalide ou domaine non reconnu.' };
+      }
+      const passCheck = CMFlowSecurity.checkPasswordStrength(password);
+      if (!passCheck.valid) {
+        return { success: false, error: passCheck.message };
+      }
+    }
+
     try {
       const credential = await cmfireAuth.createUserWithEmailAndPassword(email, password);
       const fbUser = credential.user;
@@ -96,6 +107,16 @@ const CMFlowBackend = {
       // Mettre à jour le displayName Firebase Auth
       if (displayName && fbUser) {
         await fbUser.updateProfile({ displayName: displayName });
+      }
+
+      // Envoyer un email de vérification / confirmation
+      try {
+        if (fbUser && typeof fbUser.sendEmailVerification === 'function') {
+          await fbUser.sendEmailVerification();
+          console.log('📧 Email de vérification envoyé à:', email);
+        }
+      } catch (emailErr) {
+        console.warn('⚠️ Erreur lors de l\'envoi de l\'email de vérification:', emailErr);
       }
 
       // Créer immédiatement le document utilisateur dans Firestore
@@ -113,6 +134,7 @@ const CMFlowBackend = {
           email: email,
           activityName: 'Mon Agence',
           plan: 'trial',
+          emailVerified: false,
           createdAt: new Date().toISOString()
         }, { merge: true });
 
@@ -240,25 +262,33 @@ const CMFlowBackend = {
     return true;
   },
 
-  // Demander une retouche côté client avec commentaire
+  // Demander une retouche côté client avec commentaire désinfecté
   requestRevision(postId, feedbackText) {
+    const cleanFeedback = typeof CMFlowSecurity !== 'undefined' 
+      ? CMFlowSecurity.sanitizeInput(feedbackText) 
+      : feedbackText.trim();
+
     CMFlowStore.updatePost(postId, {
       status: 'pending',
       clientApproved: false,
-      clientFeedback: feedbackText,
+      clientFeedback: cleanFeedback,
       clientFeedbackAt: new Date().toISOString()
     });
 
-    this.notifyPostUpdate(postId, 'pending', feedbackText);
+    this.notifyPostUpdate(postId, 'pending', cleanFeedback);
     return true;
   },
 
-  // Obtenir le lien de partage client
+  // Obtenir le lien de partage client sécurisé avec token de validation
   generateClientPortalUrl(clientId) {
     const origin = window.location.origin;
     const pathname = window.location.pathname;
     const basePath = pathname.substring(0, pathname.lastIndexOf('/'));
-    return `${origin}${basePath}/validation.html?client=${encodeURIComponent(clientId)}`;
+    const token = typeof CMFlowSecurity !== 'undefined' 
+      ? CMFlowSecurity.generateClientToken(clientId) 
+      : '';
+    const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
+    return `${origin}${basePath}/validation.html?client=${encodeURIComponent(clientId)}${tokenParam}`;
   },
 
   // ========================================================================

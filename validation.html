@@ -126,6 +126,7 @@
     function initValidationPortal() {
       const urlParams = new URLSearchParams(window.location.search);
       const clientId = urlParams.get('client');
+      const token = urlParams.get('token');
       const ws = CMFlowStore.getWorkspace();
       const clients = CMFlowStore.getClients();
 
@@ -133,19 +134,32 @@
       const clientTitle = document.getElementById('portal-client-title');
 
       if (agencyLabel && ws?.name) {
-        agencyLabel.textContent = `Géré par ${ws.name}`;
+        agencyLabel.textContent = `Espace de validation • ${escapeHtml(ws.name)}`;
       }
 
+      // Vérification de sécurité : le client doit obligatoirement exister
       let targetClient = null;
       if (clientId) {
         targetClient = clients.find(c => c.id === clientId);
       }
 
-      if (clientTitle) {
-        clientTitle.textContent = targetClient ? targetClient.name : 'Toutes les marques';
+      // Vérification facultative du token si fourni
+      let isTokenValid = true;
+      if (token && typeof CMFlowSecurity !== 'undefined') {
+        isTokenValid = CMFlowSecurity.verifyClientToken(clientId, token);
       }
 
-      renderPortalPosts(clientId);
+      if (!targetClient || !isTokenValid) {
+        if (clientTitle) clientTitle.textContent = 'Accès Restreint';
+        renderAccessDenied();
+        return;
+      }
+
+      if (clientTitle) {
+        clientTitle.textContent = escapeHtml(targetClient.name);
+      }
+
+      renderPortalPosts(targetClient.id);
 
       // Modal de retouche
       const revModal = document.getElementById('revision-modal');
@@ -166,29 +180,55 @@
       if (formRev) {
         formRev.addEventListener('submit', (e) => {
           e.preventDefault();
-          const comment = document.getElementById('revision-comment')?.value.trim();
-          if (!comment || !currentRevisionPostId) return;
+          const commentRaw = document.getElementById('revision-comment')?.value.trim();
+          if (!commentRaw || !currentRevisionPostId) return;
 
-          CMFlowBackend.requestRevision(currentRevisionPostId, comment);
+          const cleanComment = typeof CMFlowSecurity !== 'undefined'
+            ? CMFlowSecurity.sanitizeInput(commentRaw)
+            : commentRaw;
+
+          CMFlowBackend.requestRevision(currentRevisionPostId, cleanComment);
           showAppToast('Votre demande de modification a été transmise à votre CM ! 📝', 'info');
           closeRevModal();
-          renderPortalPosts(clientId);
+          renderPortalPosts(targetClient.id);
         });
       }
 
       // Écouter les mises à jour temps réel
       window.addEventListener('cmflow:post_updated', () => {
-        renderPortalPosts(clientId);
+        renderPortalPosts(targetClient.id);
       });
     }
 
-    function renderPortalPosts(clientId = null) {
+    function renderAccessDenied() {
+      const container = document.getElementById('portal-posts-list');
+      const statsGrid = document.querySelector('.portal-stats-grid');
+      if (statsGrid) statsGrid.style.display = 'none';
+
+      if (container) {
+        container.innerHTML = `
+          <div class="empty-state-card" style="background: white; border: 1.5px solid #fee2e2; padding: 48px 24px; text-align: center; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 16px;">
+              🔒
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: #991b1b; margin-bottom: 8px;">Lien de validation restreint ou expiré</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 460px; margin: 0 auto 20px; line-height: 1.5;">
+              Pour des raisons de confidentialité et de sécurité, vous ne pouvez pas accéder à ce portail sans un lien de partage sécurisé attribué par votre agence.
+            </p>
+            <div style="font-size: 0.82rem; color: var(--text-muted); background: var(--bg-surface-soft); display: inline-block; padding: 6px 14px; border-radius: 20px;">
+              Contactez votre Community Manager pour recevoir un nouveau lien.
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function renderPortalPosts(clientId) {
       const container = document.getElementById('portal-posts-list');
       const allPosts = CMFlowStore.getPosts();
 
-      const posts = clientId 
-        ? allPosts.filter(p => p.clientId === clientId)
-        : allPosts;
+      // STRICT ISOLATION : uniquement les posts du client vérifié
+      const posts = allPosts.filter(p => p.clientId === clientId);
 
       const totalEl = document.getElementById('portal-stat-total');
       const approvedEl = document.getElementById('portal-stat-approved');

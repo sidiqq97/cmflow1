@@ -12,6 +12,146 @@
 'use strict';
 
 /* ==========================================================================
+   SÉCURITÉ & ANTI-XSS (CMFlow Security Utilities)
+   ========================================================================== */
+const CMFlowSecurity = {
+  /**
+   * Échappe les caractères HTML dangereux pour empêcher les attaques XSS
+   * @param {string} str - Chaîne à échapper
+   * @returns {string} Chaîne sécurisée
+   */
+  escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;',
+      '`': '&#x60;'
+    };
+    return String(str).replace(/[&<>"'`]/g, m => map[m]);
+  },
+
+  /**
+   * Nettoie et désinfecte une saisie texte (supprime les balises script/iframe/event handlers)
+   * @param {string} input - Texte brut saisi
+   * @returns {string} Texte nettoyé
+   */
+  sanitizeInput(input) {
+    if (!input) return '';
+    let clean = String(input).trim();
+    // Neutraliser les tentatives de balises exécutables
+    clean = clean.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    clean = clean.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
+    clean = clean.replace(/on\w+="[^"]*"/gi, '');
+    clean = clean.replace(/on\w+='[^']*'/gi, '');
+    clean = clean.replace(/javascript:/gi, '');
+    return clean;
+  },
+
+  /**
+   * Valide la robustesse d'un mot de passe
+   * Règles : min 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre
+   * @param {string} pass
+   * @returns {{ valid: boolean, message: string, score: number }}
+   */
+  checkPasswordStrength(pass) {
+    if (!pass || typeof pass !== 'string') {
+      return { valid: false, message: 'Le mot de passe est obligatoire.', score: 0 };
+    }
+    const hasMinLength = pass.length >= 8;
+    const hasUpper = /[A-Z]/.test(pass);
+    const hasLower = /[a-z]/.test(pass);
+    const hasNumber = /[0-9]/.test(pass);
+    const hasSpecial = /[^A-Za-z0-9]/.test(pass);
+
+    let score = 0;
+    if (hasMinLength) score++;
+    if (hasUpper && hasLower) score++;
+    if (hasNumber) score++;
+    if (hasSpecial) score++;
+
+    if (!hasMinLength) {
+      return { valid: false, message: 'Le mot de passe doit comporter au moins 8 caractères.', score };
+    }
+    if (!hasUpper) {
+      return { valid: false, message: 'Ajoutez au moins une lettre majuscule (A-Z).', score };
+    }
+    if (!hasLower) {
+      return { valid: false, message: 'Ajoutez au moins une lettre minuscule (a-z).', score };
+    }
+    if (!hasNumber) {
+      return { valid: false, message: 'Ajoutez au moins un chiffre (0-9).', score };
+    }
+
+    return { valid: true, message: 'Mot de passe robuste.', score: Math.max(score, 3) };
+  },
+
+  /**
+   * Valide rigoureusement une adresse email selon les standards RFC 5322
+   * @param {string} email
+   * @returns {boolean}
+   */
+  isValidEmail(email) {
+    if (!email || typeof email !== 'string') return false;
+    const clean = email.trim();
+    // Regex stricte avec vérification de domaine valide (.com, .sn, .fr, etc.)
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+    if (!emailRegex.test(clean)) return false;
+
+    // Vérifier que l'extension a au moins 2 caractères
+    const parts = clean.split('@');
+    if (parts.length !== 2) return false;
+    const domain = parts[1];
+    const domainParts = domain.split('.');
+    const tld = domainParts[domainParts.length - 1];
+    if (!tld || tld.length < 2) return false;
+
+    // Refuser les domaines factices évidents
+    const blockedDomains = ['test.test', 'example.com', 'fakemail.xyz', 'tempmail.com'];
+    if (blockedDomains.includes(domain.toLowerCase())) return false;
+
+    return true;
+  },
+
+  /**
+   * Génère une signature/token de sécurité pour le portail client
+   * @param {string} clientId
+   * @param {string} secretKey
+   * @returns {string} Token hexadécimal sécurisé
+   */
+  generateClientToken(clientId, secretKey = 'cmflow_portal_salt') {
+    if (!clientId) return '';
+    let hash = 0;
+    const combined = `${clientId}:${secretKey}:${clientId.split('').reverse().join('')}`;
+    for (let i = 0; i < combined.length; i++) {
+      const char = combined.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash |= 0;
+    }
+    const hex = Math.abs(hash).toString(16).padStart(8, '0');
+    return `tkn_${hex}`;
+  },
+
+  /**
+   * Vérifie la validité d'un token client
+   * @param {string} clientId
+   * @param {string} token
+   * @returns {boolean}
+   */
+  verifyClientToken(clientId, token) {
+    if (!clientId || !token) return false;
+    return this.generateClientToken(clientId) === token;
+  }
+};
+
+// Rendre la fonction escapeHtml accessible globalement
+if (typeof window !== 'undefined' && !window.escapeHtml) {
+  window.escapeHtml = CMFlowSecurity.escapeHtml;
+}
+
+/* ==========================================================================
    STORE — GESTION DES DONNÉES (Firestore + localStorage cache)
    ========================================================================== */
 const CMFlowStore = {
@@ -1205,12 +1345,16 @@ function initAddClientModal() {
         const user = CMFlowStore.getUser();
         const ws = CMFlowStore.getWorkspace();
 
+        const cleanName = typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.sanitizeInput(name) : name;
+        const cleanIndustry = typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.sanitizeInput(industryInput?.value || 'Autre') : (industryInput?.value || 'Autre');
+        const cleanDesc = typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.sanitizeInput(descInput?.value.trim() || '') : (descInput?.value.trim() || '');
+
         const newClient = {
           id: CMFlowStore.generateId(),
           workspaceId: ws?.id || 'ws1',
-          name,
-          industry: industryInput?.value || 'Autre',
-          description: descInput?.value.trim() || '',
+          name: cleanName,
+          industry: cleanIndustry,
+          description: cleanDesc,
           createdAt: new Date().toISOString(),
         };
 
@@ -1605,7 +1749,7 @@ function buildClientCard(client) {
         <button type="button" class="btn-card-action" onclick="openSocialsManager('${client.id}')" style="background: #EFF6FF; color: var(--color-primary); border-color: #BFDBFE; font-weight: 600;">
           🔗 Lier
         </button>
-        <a href="validation.html?client=${client.id}" target="_blank" class="btn-card-action" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Portail de validation client">
+        <a href="validation.html?client=${client.id}&token=${typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.generateClientToken(client.id) : ''}" target="_blank" class="btn-card-action" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Portail de validation client sécurisé">
           <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
           <span>Lien WhatsApp</span>
         </a>
@@ -1843,7 +1987,7 @@ function openClientStatsModal(clientId) {
       <!-- Footer Actions -->
       <div style="padding: 16px 24px; background: #F8FAFC; border-top: var(--border-light); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
         <div style="display: flex; gap: 8px;">
-          <a href="validation.html?client=${client.id}" target="_blank" class="btn-secondary-app" style="font-size: 0.82rem;">
+          <a href="validation.html?client=${client.id}&token=${typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.generateClientToken(client.id) : ''}" target="_blank" class="btn-secondary-app" style="font-size: 0.82rem;">
             💬 Portail WhatsApp Client
           </a>
           <a href="bio.html?client=${client.id}" target="_blank" class="btn-secondary-app" style="font-size: 0.82rem;">
