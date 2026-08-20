@@ -519,21 +519,33 @@
       if (formProfile) {
         formProfile.addEventListener('submit', (e) => {
           e.preventDefault();
-          const firstName = document.getElementById('set-firstname')?.value.trim();
-          const lastName = document.getElementById('set-lastname')?.value.trim();
-          const email = document.getElementById('set-email')?.value.trim();
-          const agency = document.getElementById('set-agency')?.value.trim();
+          const rawFirstName = document.getElementById('set-firstname')?.value.trim() || '';
+          const rawLastName = document.getElementById('set-lastname')?.value.trim() || '';
+          const rawEmail = document.getElementById('set-email')?.value.trim() || '';
+          const rawAgency = document.getElementById('set-agency')?.value.trim() || '';
+
+          // Validation stricte d'email
+          if (rawEmail && typeof CMFlowSecurity !== 'undefined' && !CMFlowSecurity.isValidEmail(rawEmail)) {
+            showAppToast('Veuillez entrer une adresse email valide.', 'error');
+            return;
+          }
+
+          // Désinfection Anti-XSS
+          const firstName = typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.sanitizeInput(rawFirstName) : rawFirstName;
+          const lastName = typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.sanitizeInput(rawLastName) : rawLastName;
+          const email = rawEmail;
+          const agency = typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.sanitizeInput(rawAgency) : rawAgency;
 
           const currentUser = CMFlowStore.getUser() || {};
           currentUser.firstName = firstName;
           currentUser.lastName = lastName;
-          currentUser.name = `${firstName} ${lastName}`.trim();
+          currentUser.name = `${firstName} ${lastName}`.trim() || firstName;
           currentUser.email = email;
           currentUser.activityName = agency;
           CMFlowStore.setUser(currentUser);
 
           const currentWs = CMFlowStore.getWorkspace() || { id: CMFlowStore.generateId(), ownerId: currentUser.id };
-          currentWs.name = agency;
+          currentWs.name = agency || `Espace de ${firstName}`;
           CMFlowStore.setWorkspace(currentWs);
 
           // Actualiser l'interface
@@ -542,7 +554,7 @@
           const initials = CMFlowStore.getInitials(currentUser.name);
           document.querySelectorAll('[data-user-initials]').forEach(el => el.textContent = initials);
 
-          showAppToast('Votre profil et agence ont été mis à jour ! ✅', 'success');
+          showAppToast('Votre profil et votre agence ont été mis à jour ! ✅', 'success');
         });
       }
     }
