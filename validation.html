@@ -137,29 +137,44 @@
         agencyLabel.textContent = `Espace de validation • ${escapeHtml(ws.name)}`;
       }
 
-      // Vérification de sécurité : le client doit obligatoirement exister
+      // 1. Vérification locale (si sur la même machine que le CM)
       let targetClient = null;
       if (clientId) {
         targetClient = clients.find(c => c.id === clientId);
       }
 
-      // Vérification cryptographique du token client
       let isTokenValid = true;
       if (token && typeof CMFlowSecurity !== 'undefined' && targetClient) {
         isTokenValid = CMFlowSecurity.verifyClientToken(targetClient, token);
       }
 
-      if (!targetClient || !isTokenValid) {
+      if (targetClient && isTokenValid) {
+        if (clientTitle) clientTitle.textContent = escapeHtml(targetClient.name);
+        renderPortalPosts(targetClient.id);
+      } else if (token && typeof cmfireDb !== 'undefined' && cmfireDb) {
+        // 2. Vérification distante temps réel (client externe sur smartphone WhatsApp)
+        cmfireDb.collection('public_reviews').doc(token).get().then(docSnap => {
+          if (docSnap.exists) {
+            const reviewData = docSnap.data();
+            if (agencyLabel && reviewData.workspaceName) {
+              agencyLabel.textContent = `Espace de validation • ${escapeHtml(reviewData.workspaceName)}`;
+            }
+            if (clientTitle && reviewData.clientName) {
+              clientTitle.textContent = escapeHtml(reviewData.clientName);
+            }
+            renderPortalPostsFromData(reviewData.posts || [], token);
+          } else {
+            renderAccessDenied();
+          }
+        }).catch(err => {
+          console.warn('Erreur chargement distant:', err);
+          renderAccessDenied();
+        });
+      } else {
         if (clientTitle) clientTitle.textContent = 'Accès Restreint';
         renderAccessDenied();
         return;
       }
-
-      if (clientTitle) {
-        clientTitle.textContent = escapeHtml(targetClient.name);
-      }
-
-      renderPortalPosts(targetClient.id);
 
       // Modal de retouche
       const revModal = document.getElementById('revision-modal');
@@ -223,12 +238,10 @@
       }
     }
 
-    function renderPortalPosts(clientId) {
+    function renderPortalPostsFromData(posts, token) {
+      currentRemotePosts = posts;
+      currentRemoteToken = token;
       const container = document.getElementById('portal-posts-list');
-      const allPosts = CMFlowStore.getPosts();
-
-      // STRICT ISOLATION : uniquement les posts du client vérifié
-      const posts = allPosts.filter(p => p.clientId === clientId);
 
       const totalEl = document.getElementById('portal-stat-total');
       const approvedEl = document.getElementById('portal-stat-approved');
@@ -317,11 +330,30 @@
       });
     }
 
+    let currentRemotePosts = null;
+    let currentRemoteToken = null;
+
+    function renderPortalPosts(clientId) {
+      const allPosts = CMFlowStore.getPosts();
+      const posts = allPosts.filter(p => p.clientId === clientId);
+      renderPortalPostsFromData(posts, null);
+    }
+
     function approvePostFromPortal(postId) {
+      if (currentRemoteToken && typeof cmfireDb !== 'undefined') {
+        const post = (currentRemotePosts || []).find(p => p.id === postId);
+        if (post) post.clientApproved = true;
+        cmfireDb.collection('public_reviews').doc(currentRemoteToken).set({
+          posts: currentRemotePosts,
+          updatedAt: new Date().toISOString()
+        }, { merge: true }).catch(console.warn);
+      }
       CMFlowBackend.approvePost(postId);
       showAppToast('Publication validée avec succès ! 🎉', 'success');
       const urlParams = new URLSearchParams(window.location.search);
-      renderPortalPosts(urlParams.get('client'));
+      const clientId = urlParams.get('client');
+      if (clientId) renderPortalPosts(clientId);
+      else if (currentRemotePosts) renderPortalPostsFromData(currentRemotePosts, currentRemoteToken);
     }
 
     function openRevisionModal(postId) {

@@ -34,18 +34,21 @@ const CMFlowSecurity = {
   },
 
   /**
-   * Nettoie et désinfecte une saisie texte (supprime les balises script/iframe/event handlers)
+   * Nettoie et désinfecte une saisie texte (supprime les balises script/iframe/event handlers et handlers non quotés)
    * @param {string} input - Texte brut saisi
    * @returns {string} Texte nettoyé
    */
   sanitizeInput(input) {
     if (!input) return '';
     let clean = String(input).trim();
-    // Neutraliser les tentatives de balises exécutables
+    // Neutraliser les balises exécutables
     clean = clean.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     clean = clean.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
-    clean = clean.replace(/on\w+="[^"]*"/gi, '');
-    clean = clean.replace(/on\w+='[^']*'/gi, '');
+    clean = clean.replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '');
+    clean = clean.replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '');
+    clean = clean.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+    // Neutraliser les event handlers quotés et NON quotés (ex: onerror=alert(1))
+    clean = clean.replace(/on\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '');
     clean = clean.replace(/javascript:/gi, '');
     return clean;
   },
@@ -100,15 +103,10 @@ const CMFlowSecurity = {
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
     if (!emailRegex.test(clean)) return false;
 
-    // Vérifier que l'extension a au moins 2 caractères
+    // Refuser les domaines factices évidents
     const parts = clean.split('@');
     if (parts.length !== 2) return false;
     const domain = parts[1];
-    const domainParts = domain.split('.');
-    const tld = domainParts[domainParts.length - 1];
-    if (!tld || tld.length < 2) return false;
-
-    // Refuser les domaines factices évidents
     const blockedDomains = ['test.test', 'example.com', 'fakemail.xyz', 'tempmail.com'];
     if (blockedDomains.includes(domain.toLowerCase())) return false;
 
@@ -135,15 +133,17 @@ const CMFlowSecurity = {
   },
 
   /**
-   * Vérifie et sécurise une URL pour bloquer les attaques via javascript: ou data:
+   * Vérifie et sécurise une URL (bloque javascript:, data:, et protocol-relative //)
    * @param {string} url
    * @returns {string} URL nettoyée ou '#'
    */
   sanitizeUrl(url) {
     if (!url || typeof url !== 'string') return '#';
     const clean = url.trim();
-    // Autoriser uniquement http, https, mailto, tel et les chemins relatifs
-    if (/^(https?:\/\/|mailto:|tel:|\/|\.\/|#)/i.test(clean)) {
+    // Interdire les URLs protocol-relative qui causent des Open Redirects
+    if (clean.startsWith('//')) return '#';
+    // Autoriser uniquement http, https, mailto, tel, chemins relatifs et ancres
+    if (/^(https?:\/\/|mailto:|tel:|#|\/(?!\/)|\.\/)/i.test(clean)) {
       return clean;
     }
     return '#';
@@ -157,8 +157,9 @@ const CMFlowSecurity = {
   isValidImageUrl(url) {
     if (!url || typeof url !== 'string') return false;
     const clean = url.trim().toLowerCase();
-    if (!clean.startsWith('http://') && !clean.startsWith('https://')) return false;
-    return /\.(jpg|jpeg|png|webp|gif|svg)(\?.*)?$/i.test(clean) || clean.includes('unsplash.com') || clean.includes('firebasestorage.googleapis.com');
+    if (clean.startsWith('//')) return false;
+    if (!clean.startsWith('http://') && !clean.startsWith('https://') && !clean.startsWith('data:image/')) return false;
+    return /\.(jpg|jpeg|png|webp|gif|svg)(\?.*)?$/i.test(clean) || clean.includes('unsplash.com') || clean.includes('firebasestorage.googleapis.com') || clean.startsWith('data:image/');
   },
 
   /**
@@ -487,17 +488,41 @@ const CMFlowStore = {
     const posts = this.getPosts();
     posts.push(post);
     this._cacheSet('cmflow_posts', posts);
-    if (post.id) this._firestoreSetInCollection('posts', post.id, post);
+    if (post.id) {
+      this._firestoreSetInCollection('posts', post.id, post);
+      this._syncPublicReviewForClient(post.clientId);
+    }
   },
   updatePost(id, updatedData) {
     const posts = this.getPosts().map(p => p.id === id ? { ...p, ...updatedData } : p);
     this._cacheSet('cmflow_posts', posts);
     this._firestoreSetInCollection('posts', id, updatedData);
+    const post = this.getPostById(id);
+    if (post && post.clientId) this._syncPublicReviewForClient(post.clientId);
   },
   deletePost(id) {
+    const post = this.getPostById(id);
     const posts = this.getPosts().filter(p => p.id !== id);
     this._cacheSet('cmflow_posts', posts);
     this._firestoreDeleteInCollection('posts', id);
+    if (post && post.clientId) this._syncPublicReviewForClient(post.clientId);
+  },
+  _syncPublicReviewForClient(clientId) {
+    if (!clientId || !cmfireIsOnline() || typeof cmfireDb === 'undefined' || !cmfireDb) return;
+    try {
+      const client = this.getClientById(clientId);
+      if (!client || !client.portalToken) return;
+      const ws = this.getWorkspace();
+      const clientPosts = this.getPosts().filter(p => p.clientId === clientId);
+      cmfireDb.collection('public_reviews').doc(client.portalToken).set({
+        clientId: client.id,
+        clientName: client.name,
+        workspaceName: ws?.name || 'Votre Agence',
+        portalToken: client.portalToken,
+        posts: clientPosts,
+        updatedAt: new Date().toISOString()
+      }, { merge: true }).catch(err => console.warn('Sync public_review error:', err));
+    } catch(e) { console.warn('Sync public_review error:', e); }
   },
   getPostById(id) {
     return this.getPosts().find(p => p.id === id) || null;
@@ -2902,12 +2927,18 @@ function initPostModal() {
     });
   });
 
-  // Upload image personnalisé
+  // Upload image personnalisé avec contrôle de taille anti-crash Firestore (max 800 Ko)
   const customFileInput = document.getElementById('post-image-file');
   if (customFileInput) {
     customFileInput.addEventListener('change', (e) => {
       const file = e.target.files?.[0];
       if (file) {
+        if (file.size > 800 * 1024) {
+          showAppToast('Image trop volumineuse (max 800 Ko pour le stockage direct). Veuillez compresser votre image.', 'error');
+          customFileInput.value = '';
+          return;
+        }
+
         const reader = new FileReader();
         reader.onload = (event) => {
           planningState.selectedImageUrl = event.target.result;

@@ -814,11 +814,43 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadMerchants();
+      // Contrôle de sécurité Super-Admin côté serveur
+      if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().onAuthStateChanged((user) => {
+          if (!user) {
+            window.location.href = 'index.html';
+            return;
+          }
 
-      // Toujours exiger le code PIN à l'arrivée (Sécurité Maximale)
-      logoutAdmin();
-      renderAdminUsers();
+          const ADMIN_EMAILS = ['admin@cmflow.sn', 'sidiqq97@gmail.com'];
+          const userEmail = (user.email || '').toLowerCase().trim();
+
+          user.getIdTokenResult().then((idTokenResult) => {
+            const isSuperAdmin = idTokenResult.claims.admin === true || ADMIN_EMAILS.includes(userEmail);
+            if (!isSuperAdmin) {
+              window.location.href = 'dashboard.html';
+              return;
+            }
+
+            // Accès autorisé
+            loadMerchants();
+            logoutAdmin();
+            renderAdminUsers();
+          }).catch(() => {
+            if (ADMIN_EMAILS.includes(userEmail)) {
+              loadMerchants();
+              logoutAdmin();
+              renderAdminUsers();
+            } else {
+              window.location.href = 'dashboard.html';
+            }
+          });
+        });
+      } else {
+        loadMerchants();
+        logoutAdmin();
+        renderAdminUsers();
+      }
     });
 
     function setAdminFilter(filter) {

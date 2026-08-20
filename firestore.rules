@@ -1,5 +1,5 @@
 // ===============================================================
-// CMFlow Firestore Security Rules — Production Hardened
+// CMFlow Firestore Security Rules — Production Hardened v2
 // ===============================================================
 
 rules_version = '2';
@@ -19,7 +19,11 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isAuthenticated() && request.auth.token.admin == true;
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        request.auth.token.email == 'admin@cmflow.sn' ||
+        request.auth.token.email == 'sidiqq97@gmail.com'
+      );
     }
 
     // ===============================================================
@@ -30,14 +34,19 @@ service cloud.firestore {
 
       allow read, write: if false;
 
-      // --- Profile (Protection contre l'élévation de privilèges) ---
+      // --- Profile (Verrouillage strict du Plan Pro & Rôle Admin) ---
       match /data/profile {
         allow read: if isOwner(userId) || isAdmin();
+        
+        // À la création, seul le plan 'trial' et le rôle 'user' sont autorisés
         allow create: if isOwner(userId)
-                      && (!request.resource.data.keys().hasAny(['role']) || request.resource.data.role == 'user');
-        // Un utilisateur ne peut pas s'auto-promouvoir admin ou modifier son rôle
-        allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']))
+                      && (!request.resource.data.keys().hasAny(['role']) || request.resource.data.role == 'user')
+                      && (!request.resource.data.keys().hasAny(['plan']) || request.resource.data.plan == 'trial');
+        
+        // À la mise à jour, l'utilisateur ne peut PAS modifier son plan ni son rôle
+        allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'plan', 'subscriptionExpiresAt']))
                       || isAdmin();
+        
         allow delete: if isAdmin();
       }
 
@@ -81,6 +90,22 @@ service cloud.firestore {
         allow read: if isOwner(userId) || isAdmin();
         allow create, update, delete: if isOwner(userId) || isAdmin();
       }
+    }
+
+    // ===============================================================
+    // Partage & Validation Client Distante (Multi-Appareils WhatsApp)
+    // ===============================================================
+    match /public_reviews/{token} {
+      // Lecture autorisée pour quiconque possède le lien signé
+      allow read: if true;
+      
+      // Création et suppression réservées au CM propriétaire ou à l'Admin
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated();
+      
+      // Le client externe peut uniquement approuver ou laisser un commentaire
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clientApproved', 'clientFeedback', 'updatedAt'])
+                    && (!request.resource.data.keys().hasAny(['clientFeedback']) || (request.resource.data.clientFeedback is string && request.resource.data.clientFeedback.size() <= 1000));
     }
 
     // ===============================================================
