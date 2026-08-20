@@ -482,18 +482,24 @@ function initAuthModal() {
     const passInput = document.getElementById('login-password');
     if (!submitBtn) return;
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Connexion...';
-
-    const email = emailInput?.value.trim() || 'cm@cmflow.com';
+    const email = emailInput?.value.trim() || '';
     const password = passInput?.value || '';
 
-    // ===== FIREBASE AUTH =====
+    // Validation stricte du format email
+    if (typeof CMFlowSecurity !== 'undefined' && !CMFlowSecurity.isValidEmail(email)) {
+      setFieldError(emailInput, 'Veuillez entrer une adresse email valide.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Connexion en cours...';
+
+    // ===== VÉRIFICATION STRICTE FIREBASE AUTH =====
     if (typeof CMFlowBackend !== 'undefined' && CMFlowBackend.useFirebase) {
       const result = await CMFlowBackend.login(email, password);
 
       if (result.success) {
-        // Mettre à jour le profil local si nécessaire
+        // Mettre à jour le profil local
         let user = CMFlowStore.getUser();
         if (!user || user.email !== email) {
           const namePart = email.split('@')[0];
@@ -518,7 +524,7 @@ function initAuthModal() {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Se connecter';
         closeModal();
-        showToast('Connexion réussie ! Redirection...', 'success');
+        showToast('Connexion réussie ! Bienvenue sur votre cockpit 👋', 'success');
 
         const prefs = CMFlowStore.getPrefs();
         setTimeout(() => {
@@ -527,44 +533,15 @@ function initAuthModal() {
       } else {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Se connecter';
-        showToast(result.error, 'error');
+        showToast(result.error || 'Email ou mot de passe incorrect.', 'error');
       }
       return;
     }
 
-    // ===== FALLBACK localStorage =====
-    setTimeout(() => {
-      let user = CMFlowStore.getUser();
-      if (!user || user.email !== email) {
-        const namePart = email.split('@')[0];
-        const firstName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
-        user = {
-          id: 'u_' + Date.now().toString(36),
-          name: firstName,
-          firstName: firstName,
-          lastName: '',
-          email: email,
-          activityName: 'Agence ' + firstName,
-        };
-        CMFlowStore.setUser(user);
-        CMFlowStore.setWorkspace({
-          id: 'ws_' + Date.now().toString(36),
-          ownerId: user.id,
-          name: user.activityName,
-          createdAt: new Date().toISOString(),
-        });
-      }
-
-      const prefs = CMFlowStore.getPrefs();
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Se connecter';
-      closeModal();
-      showToast('Connexion réussie ! Redirection...', 'success');
-
-      setTimeout(() => {
-        window.location.href = (prefs && prefs.onboardingComplete) ? 'dashboard.html' : 'onboarding.html';
-      }, 500);
-    }, 600);
+    // Si Firebase n'est pas encore prêt
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Se connecter';
+    showToast('Le service d\'authentification n\'est pas accessible. Assurez-vous d\'ouvrir CMFlow via http://localhost:8080.', 'error');
   }
 
   async function simulateRegister() {

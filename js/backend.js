@@ -194,17 +194,20 @@ const CMFlowBackend = {
       let errorMsg = 'Erreur lors de la connexion.';
       switch (err.code) {
         case 'auth/user-not-found':
-          errorMsg = 'Aucun compte trouvé avec cet email.';
+          errorMsg = 'Aucun compte n\'existe avec cette adresse email. Veuillez vous inscrire.';
           break;
-        case 'auth/wrong-password':
         case 'auth/invalid-credential':
-          errorMsg = 'Mot de passe incorrect.';
+        case 'auth/wrong-password':
+          errorMsg = 'Adresse email introuvable ou mot de passe incorrect.';
           break;
         case 'auth/invalid-email':
-          errorMsg = 'Adresse email invalide.';
+          errorMsg = 'Format d\'adresse email invalide.';
           break;
         case 'auth/too-many-requests':
-          errorMsg = 'Trop de tentatives. Réessayez plus tard.';
+          errorMsg = 'Trop de tentatives infructueuses. Veuillez patienter quelques instants.';
+          break;
+        default:
+          errorMsg = err.message || 'Erreur lors de la connexion.';
           break;
       }
       return { success: false, error: errorMsg };
