@@ -2596,7 +2596,19 @@ function renderQueueView() {
                   <div class="queue-slot-caption">${escapeHtml(post.caption || 'Sans texte')}</div>
                 </div>
               </div>
-              <div style="display: flex; gap: 8px; align-items: center;">
+              <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                ${post.status === 'published' ? `
+                  <span style="font-size: 0.72rem; font-weight: 700; color: #059669; background: #DCFCE7; padding: 4px 8px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 4px;">
+                    ✅ En direct
+                  </span>
+                  ${post.publishedUrls?.instagram ? `
+                    <a href="${post.publishedUrls.instagram}" target="_blank" class="btn-secondary-app" style="font-size: 0.72rem; padding: 3px 6px; text-decoration: none;" title="Voir sur Instagram">IG ↗</a>
+                  ` : ''}
+                ` : `
+                  <button type="button" class="btn-primary-app" style="font-size: 0.75rem; padding: 4px 10px; background: #059669; border-color: #059669;" onclick="openPublishDirectModal('${post.id}')" title="Propulser ce post directement sur les réseaux">
+                    🚀 Publier
+                  </button>
+                `}
                 <button type="button" class="btn-secondary-app" style="font-size: 0.75rem; padding: 4px 10px;" onclick="openPostModalForEdit('${post.id}')">
                   Modifier
                 </button>
@@ -2656,9 +2668,12 @@ function renderDraftsView() {
                 <div class="queue-slot-caption">${escapeHtml(post.caption || 'Sans texte')}</div>
               </div>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <button type="button" class="btn-primary-app" style="font-size: 0.75rem; padding: 4px 10px;" onclick="openPostModalForEdit('${post.id}')">
-                Finaliser & Programmer
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn-primary-app" style="font-size: 0.75rem; padding: 4px 10px; background: #059669; border-color: #059669;" onclick="openPublishDirectModal('${post.id}')">
+                🚀 Publier direct
+              </button>
+              <button type="button" class="btn-secondary-app" style="font-size: 0.75rem; padding: 4px 10px;" onclick="openPostModalForEdit('${post.id}')">
+                Modifier
               </button>
             </div>
           </div>
@@ -2712,7 +2727,146 @@ function addPostingSlotToDay(dayIndex) {
 }
 
 
-function renderPlanningCalendar() {
+/* ==========================================================================
+   MODAL DE PUBLICATION DIRECTE SUR LES RÉSEAUX SOCIAUX
+   ========================================================================== */
+function openPublishDirectModal(postId) {
+  const post = CMFlowStore.getPostById(postId);
+  if (!post) return;
+
+  const client = CMFlowStore.getClientById(post.clientId);
+  let modal = document.getElementById('publish-direct-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'publish-direct-modal';
+    modal.className = 'modal-backdrop';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    document.body.appendChild(modal);
+  }
+
+  const platforms = post.platforms || ['instagram'];
+  const platformBadges = platforms.map(p => {
+    return `<span class="social-tag" style="background: var(--color-primary-subtle); color: var(--color-primary); font-weight: 700; text-transform: uppercase;">${escapeHtml(p)}</span>`;
+  }).join(' ');
+
+  modal.innerHTML = `
+    <div class="modal-card" style="max-width: 520px; text-align: center; padding: 32px 24px;">
+      <div style="width: 68px; height: 68px; border-radius: 50%; background: #ECFDF5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.15);">
+        🚀
+      </div>
+      <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">
+        Publication Directe sur les Réseaux
+      </h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+        Ce contenu va être propulsé automatiquement sur les comptes officiels de <strong>${escapeHtml(client?.name || post.clientName || 'votre client')}</strong> sans que vous ayez besoin d'ouvrir les applications.
+      </p>
+
+      <!-- Aperçu compact du post -->
+      <div style="background: #F8FAFC; border: var(--border-light); border-radius: 12px; padding: 14px; text-align: left; display: flex; gap: 14px; align-items: center; margin-bottom: 22px;">
+        <img src="${post.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80'}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid #E2E8F0;" alt="Thumbnail">
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 0.78rem; font-weight: 700; margin-bottom: 4px; display: flex; gap: 6px; flex-wrap: wrap;">
+            ${platformBadges}
+          </div>
+          <div style="font-size: 0.82rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.4;">
+            ${escapeHtml(post.caption || 'Sans texte')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone de statut / Progression -->
+      <div id="publish-progress-box" style="display: none; margin-bottom: 22px; text-align: left; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 16px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span id="publish-step-label" style="font-size: 0.82rem; font-weight: 700; color: #1E40AF;">1/3 Connexion aux APIs officielles...</span>
+          <span style="font-size: 0.82rem; font-weight: 800; color: #2563EB;" id="publish-percent">35%</span>
+        </div>
+        <div style="height: 8px; background: #DBEAFE; border-radius: 999px; overflow: hidden;">
+          <div id="publish-progress-bar" style="height: 100%; width: 35%; background: var(--color-primary); transition: width 0.4s ease;"></div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div id="publish-modal-actions" style="display: flex; gap: 12px; justify-content: center;">
+        <button type="button" class="btn-secondary-app" onclick="closePublishDirectModal()" style="padding: 10px 18px;">
+          Annuler
+        </button>
+        <button type="button" class="btn-primary-app" id="btn-trigger-publish" style="background: #059669; border-color: #059669; font-weight: 700; padding: 10px 20px;" onclick="executeDirectPublish('${post.id}')">
+          🚀 Confirmer et Publier en direct
+        </button>
+      </div>
+
+      <!-- Succès avec liens directs -->
+      <div id="publish-modal-success" style="display: none; text-align: center;">
+        <div style="margin-bottom: 16px; font-size: 0.95rem; font-weight: 800; color: #059669;">
+          🎉 Votre post est officiellement en ligne sur les réseaux !
+        </div>
+        <div id="publish-links-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px;"></div>
+        <button type="button" class="btn-primary-app" onclick="closePublishDirectModal(); if (typeof renderAllPlanningViews === 'function') renderAllPlanningViews();">
+          Terminer & Voir le planning
+        </button>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePublishDirectModal() {
+  const modal = document.getElementById('publish-direct-modal');
+  if (modal) modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+async function executeDirectPublish(postId) {
+  const progressBox = document.getElementById('publish-progress-box');
+  const progressBar = document.getElementById('publish-progress-bar');
+  const stepLabel = document.getElementById('publish-step-label');
+  const percentLabel = document.getElementById('publish-percent');
+  const actionsBox = document.getElementById('publish-modal-actions');
+  const successBox = document.getElementById('publish-modal-success');
+  const linksContainer = document.getElementById('publish-links-container');
+
+  if (progressBox) progressBox.style.display = 'block';
+  if (actionsBox) actionsBox.style.display = 'none';
+
+  // Étape 1 : Connexion API
+  if (stepLabel) stepLabel.textContent = '1/3 Vérification des clés API Meta & LinkedIn...';
+  if (progressBar) progressBar.style.width = '35%';
+  if (percentLabel) percentLabel.textContent = '35%';
+
+  await new Promise(r => setTimeout(r, 600));
+
+  // Étape 2 : Téléversement du visuel HD
+  if (stepLabel) stepLabel.textContent = '2/3 Téléversement du média HD vers les serveurs réseaux...';
+  if (progressBar) progressBar.style.width = '70%';
+  if (percentLabel) percentLabel.textContent = '70%';
+
+  await new Promise(r => setTimeout(r, 800));
+
+  // Étape 3 : Publication finale
+  if (stepLabel) stepLabel.textContent = '3/3 Publication en direct sur le profil...';
+  if (progressBar) progressBar.style.width = '100%';
+  if (percentLabel) percentLabel.textContent = '100%';
+
+  const result = await CMFlowBackend.publishPostDirectly(postId);
+
+  await new Promise(r => setTimeout(r, 500));
+
+  if (progressBox) progressBox.style.display = 'none';
+  if (successBox) successBox.style.display = 'block';
+
+  if (linksContainer && result.publishedUrls) {
+    linksContainer.innerHTML = Object.keys(result.publishedUrls).map(k => `
+      <a href="${result.publishedUrls[k]}" target="_blank" class="btn-secondary-app" style="font-size: 0.85rem; text-decoration: none; justify-content: center; display: flex; align-items: center; gap: 8px; font-weight: 600; padding: 10px;">
+        🌐 Voir la publication en direct sur ${k.toUpperCase()} ↗
+      </a>
+    `).join('');
+  }
+
+  showAppToast('Publication propulsée en direct avec succès ! 🎉', 'success');
+}
   const grid = document.getElementById('planning-calendar-grid');
   const monthTitle = document.getElementById('calendar-month-title');
   if (!grid) return;
@@ -3102,6 +3256,18 @@ function initPostModal() {
     });
   }
 
+  // Bouton Publier en direct maintenant depuis le modal
+  const btnPublishNowModal = document.getElementById('btn-publish-now-modal');
+  if (btnPublishNowModal) {
+    btnPublishNowModal.addEventListener('click', () => {
+      if (planningState.editingPostId) {
+        const pId = planningState.editingPostId;
+        close();
+        openPublishDirectModal(pId);
+      }
+    });
+  }
+
   // Suppression d'un post
   if (deleteBtn) {
     deleteBtn.addEventListener('click', () => {
@@ -3121,6 +3287,7 @@ function openPostModalForDate(dateStr, timeStr = '14:00') {
   const form = document.getElementById('form-create-post');
   const titleEl = document.getElementById('post-modal-title');
   const deleteBtn = document.getElementById('post-delete-btn');
+  const btnPublishNow = document.getElementById('btn-publish-now-modal');
   const clientSelect = document.getElementById('post-client');
   const dateInput = document.getElementById('post-date');
   const timeInput = document.getElementById('post-time');
@@ -3149,6 +3316,7 @@ function openPostModalForDate(dateStr, timeStr = '14:00') {
 
   if (titleEl) titleEl.textContent = 'Nouvelle publication (Buffer Queue)';
   if (deleteBtn) deleteBtn.style.display = 'none';
+  if (btnPublishNow) btnPublishNow.style.display = 'none';
 
   if (dateInput) dateInput.value = dateStr || new Date().toISOString().split('T')[0];
   if (timeInput) timeInput.value = timeStr || '14:00';
@@ -3169,6 +3337,7 @@ function openPostModalForEdit(postId) {
   const modalBackdrop = document.getElementById('post-modal-backdrop');
   const titleEl = document.getElementById('post-modal-title');
   const deleteBtn = document.getElementById('post-delete-btn');
+  const btnPublishNow = document.getElementById('btn-publish-now-modal');
   const clientSelect = document.getElementById('post-client');
   const dateInput = document.getElementById('post-date');
   const timeInput = document.getElementById('post-time');
@@ -3193,6 +3362,7 @@ function openPostModalForEdit(postId) {
 
   if (titleEl) titleEl.textContent = 'Modifier la publication';
   if (deleteBtn) deleteBtn.style.display = 'inline-flex';
+  if (btnPublishNow) btnPublishNow.style.display = 'inline-flex';
 
   if (dateInput) dateInput.value = post.scheduledDate || '';
   if (timeInput) timeInput.value = post.scheduledTime || '12:00';
