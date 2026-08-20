@@ -162,14 +162,32 @@ const CMFlowSecurity = {
   },
 
   /**
+   * Génère un jeton cryptographique aléatoire haute entropie (128-bit)
+   * @param {number} length
+   * @returns {string}
+   */
+  generateRandomToken(length = 16) {
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      const bytes = new Uint8Array(length);
+      crypto.getRandomValues(bytes);
+      return 'tkn_' + Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+    }
+    return 'tkn_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+  },
+
+  /**
    * Vérifie la validité d'un token client
-   * @param {string} clientId
+   * @param {string|object} clientOrId
    * @param {string} token
    * @returns {boolean}
    */
-  verifyClientToken(clientId, token) {
-    if (!clientId || !token) return false;
-    return this.generateClientToken(clientId) === token;
+  verifyClientToken(clientOrId, token) {
+    if (!clientOrId || !token) return false;
+    if (typeof clientOrId === 'object') {
+      if (clientOrId.portalToken && clientOrId.portalToken === token) return true;
+      return this.generateClientToken(clientOrId.id) === token;
+    }
+    return this.generateClientToken(clientOrId) === token;
   }
 };
 
@@ -1382,6 +1400,7 @@ function initAddClientModal() {
           name: cleanName,
           industry: cleanIndustry,
           description: cleanDesc,
+          portalToken: typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.generateRandomToken() : `tkn_${Date.now().toString(36)}`,
           createdAt: new Date().toISOString(),
         };
 
@@ -1776,7 +1795,7 @@ function buildClientCard(client) {
         <button type="button" class="btn-card-action" onclick="openSocialsManager('${client.id}')" style="background: #EFF6FF; color: var(--color-primary); border-color: #BFDBFE; font-weight: 600;">
           🔗 Lier
         </button>
-        <a href="validation.html?client=${client.id}&token=${typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.generateClientToken(client.id) : ''}" target="_blank" class="btn-card-action" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Portail de validation client sécurisé">
+        <a href="validation.html?client=${client.id}&token=${client.portalToken || (typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.generateClientToken(client.id) : '')}" target="_blank" class="btn-card-action" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Portail de validation client sécurisé">
           <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
           <span>Lien WhatsApp</span>
         </a>
@@ -2014,7 +2033,7 @@ function openClientStatsModal(clientId) {
       <!-- Footer Actions -->
       <div style="padding: 16px 24px; background: #F8FAFC; border-top: var(--border-light); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
         <div style="display: flex; gap: 8px;">
-          <a href="validation.html?client=${client.id}&token=${typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.generateClientToken(client.id) : ''}" target="_blank" class="btn-secondary-app" style="font-size: 0.82rem;">
+          <a href="validation.html?client=${client.id}&token=${client.portalToken || (typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.generateClientToken(client.id) : '')}" target="_blank" class="btn-secondary-app" style="font-size: 0.82rem;">
             💬 Portail WhatsApp Client
           </a>
           <a href="bio.html?client=${client.id}" target="_blank" class="btn-secondary-app" style="font-size: 0.82rem;">

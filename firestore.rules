@@ -1,43 +1,5 @@
 // ===============================================================
-// CMFlow Firestore Security Rules — Prototype
-// ===============================================================
-//
-// Assumed Data Model:
-//
-// Collection: users/{userId}
-//   Subcollection: data/
-//     Documents: profile, workspace, prefs
-//       - profile: { name, firstName, lastName, email, activityName, plan, createdAt }
-//       - workspace: { id, ownerId, name, createdAt }
-//       - prefs: { onboardingComplete, theme, ... }
-//
-//   Subcollection: clients/{clientId}
-//     Fields:
-//       - id: string (required) — matches document ID
-//       - name: string (required)
-//       - sector: string (optional)
-//       - socialAccounts: map (optional)
-//       - createdAt: string (optional)
-//
-//   Subcollection: posts/{postId}
-//     Fields:
-//       - id: string (required) — matches document ID
-//       - clientId: string (required)
-//       - clientName: string (optional)
-//       - platforms: list of strings (required)
-//       - caption: string (required)
-//       - imageUrl: string (optional)
-//       - scheduledDate: string (required, YYYY-MM-DD)
-//       - scheduledTime: string (required, HH:MM)
-//       - status: string (required, one of: draft, pending, scheduled, published)
-//       - clientApproved: bool (optional)
-//       - clientFeedback: string (optional)
-//       - createdAt: string (optional)
-//
-//   Subcollection: settings/
-//     Document: schedule
-//       - days: list of maps (required)
-//
+// CMFlow Firestore Security Rules — Production Hardened
 // ===============================================================
 
 rules_version = '2';
@@ -48,39 +10,47 @@ service cloud.firestore {
     // Helper Functions
     // ===============================================================
 
-    // Check if the user is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Check if the authenticated user owns this user-scoped path
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+
     // ===============================================================
-    // User-scoped data: each user can ONLY access their own data
+    // User-scoped data: Isolation étanche par utilisateur
     // ===============================================================
 
     match /users/{userId} {
 
-      // Deny direct read/write to the user document itself
-      // All data lives in subcollections
       allow read, write: if false;
 
-      // --- Profile, Workspace, Preferences (data/{docId}) ---
-      match /data/{docId} {
-        allow read: if isOwner(userId);
+      // --- Profile (Protection contre l'élévation de privilèges) ---
+      match /data/profile {
+        allow read: if isOwner(userId) || isAdmin();
         allow create: if isOwner(userId)
-                      && docId in ['profile', 'workspace', 'prefs'];
-        allow update: if isOwner(userId)
-                      && docId in ['profile', 'workspace', 'prefs'];
-        allow delete: if isOwner(userId);
+                      && (!request.resource.data.keys().hasAny(['role']) || request.resource.data.role == 'user');
+        // Un utilisateur ne peut pas s'auto-promouvoir admin ou modifier son rôle
+        allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']))
+                      || isAdmin();
+        allow delete: if isAdmin();
+      }
+
+      // --- Workspace & Préférences ---
+      match /data/{docId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if (isOwner(userId) && docId in ['workspace', 'prefs']) || isAdmin();
+        allow delete: if isOwner(userId) || isAdmin();
       }
 
       // --- Clients ---
       match /clients/{clientId} {
-        allow read: if isOwner(userId);
+        allow read: if isOwner(userId) || isAdmin();
         allow create: if isOwner(userId)
                       && request.resource.data.keys().hasAll(['name'])
                       && request.resource.data.name is string
@@ -90,12 +60,12 @@ service cloud.firestore {
                       && request.resource.data.name is string
                       && request.resource.data.name.size() > 0
                       && request.resource.data.name.size() <= 200;
-        allow delete: if isOwner(userId);
+        allow delete: if isOwner(userId) || isAdmin();
       }
 
       // --- Posts ---
       match /posts/{postId} {
-        allow read: if isOwner(userId);
+        allow read: if isOwner(userId) || isAdmin();
         allow create: if isOwner(userId)
                       && request.resource.data.keys().hasAll(['caption', 'status'])
                       && request.resource.data.caption is string
@@ -103,14 +73,13 @@ service cloud.firestore {
                       && request.resource.data.status in ['draft', 'pending', 'scheduled', 'published'];
         allow update: if isOwner(userId)
                       && request.resource.data.status in ['draft', 'pending', 'scheduled', 'published'];
-        allow delete: if isOwner(userId);
+        allow delete: if isOwner(userId) || isAdmin();
       }
 
-      // --- Settings (schedule, etc.) ---
+      // --- Settings ---
       match /settings/{settingId} {
-        allow read: if isOwner(userId);
-        allow create, update: if isOwner(userId);
-        allow delete: if isOwner(userId);
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update, delete: if isOwner(userId) || isAdmin();
       }
     }
 

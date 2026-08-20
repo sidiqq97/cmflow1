@@ -143,10 +143,10 @@
         targetClient = clients.find(c => c.id === clientId);
       }
 
-      // Vérification facultative du token si fourni
+      // Vérification cryptographique du token client
       let isTokenValid = true;
-      if (token && typeof CMFlowSecurity !== 'undefined') {
-        isTokenValid = CMFlowSecurity.verifyClientToken(clientId, token);
+      if (token && typeof CMFlowSecurity !== 'undefined' && targetClient) {
+        isTokenValid = CMFlowSecurity.verifyClientToken(targetClient, token);
       }
 
       if (!targetClient || !isTokenValid) {

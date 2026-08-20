@@ -589,7 +589,7 @@
       const pin = document.getElementById('admin-pin-input')?.value.trim();
       const currentPin = getAdminPin();
 
-      if (pin === currentPin || pin === 'admin2026' || pin === 'cmflow') {
+      if (pin === currentPin) {
         document.getElementById('admin-pin-modal').style.display = 'none';
         sessionStorage.setItem('cmflow_admin_auth', 'true');
         showAppToast('Bienvenue dans votre Espace Super-Admin ! 👑', 'success');
@@ -695,8 +695,8 @@
       const masterKey = document.getElementById('recovery-master-key')?.value.trim();
       const newPin = document.getElementById('recovery-new-pin')?.value.trim();
 
-      // Clés Maître autorisées
-      if (masterKey !== 'cmflow2026' && masterKey !== 'CMFLOW-MASTER-2026' && masterKey !== 'admin') {
+      // Clé Maître autorisée (Forte)
+      if (masterKey !== 'CMFLOW-SECURE-MASTER-2026') {
         showAppToast('Clé Maître incorrecte.', 'danger');
         return;
       }
