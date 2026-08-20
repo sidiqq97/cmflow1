@@ -16,12 +16,13 @@
 // CONFIGURATION FIREBASE — À REMPLACER AVEC VOS PROPRES VALEURS
 // ========================================================================
 const firebaseConfig = {
-  apiKey: "VOTRE_API_KEY",
-  authDomain: "VOTRE_PROJET.firebaseapp.com",
-  projectId: "VOTRE_PROJECT_ID",
-  storageBucket: "VOTRE_PROJET.firebasestorage.app",
-  messagingSenderId: "VOTRE_SENDER_ID",
-  appId: "VOTRE_APP_ID"
+  apiKey: "AIzaSyD3Bje7pVeHPCP41pF9PLgnXlBxXBok7Fc",
+  authDomain: "cmflow-dc0d6.firebaseapp.com",
+  projectId: "cmflow-dc0d6",
+  storageBucket: "cmflow-dc0d6.firebasestorage.app",
+  messagingSenderId: "133931483094",
+  appId: "1:133931483094:web:e2678150c3b8155f06ae77",
+  measurementId: "G-Z93LLXE0QK"
 };
 
 // ========================================================================
