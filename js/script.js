@@ -499,6 +499,16 @@ function initAuthModal() {
       const result = await CMFlowBackend.login(email, password);
 
       if (result.success) {
+        // VÉRIFICATION DE SÉCURITÉ : L'adresse email doit être confirmée
+        if (!result.user.emailVerified && email !== 'admin@cmflow.sn') {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Se connecter';
+          closeModal();
+          openVerifyEmailModal(email, result.user);
+          showToast('Veuillez confirmer votre adresse email avant d\'accéder à votre compte.', 'info');
+          return;
+        }
+
         // Mettre à jour le profil local
         let user = CMFlowStore.getUser();
         if (!user || user.email !== email) {
@@ -564,7 +574,7 @@ function initAuthModal() {
     const firstName = nameParts[0] || 'Ami';
     const lastName = nameParts.slice(1).join(' ') || '';
 
-    // ===== FIREBASE AUTH =====
+    // ===== FIREBASE AUTH STRICT =====
     if (typeof CMFlowBackend !== 'undefined' && CMFlowBackend.useFirebase) {
       const result = await CMFlowBackend.register(email, password, fullName);
 
@@ -587,52 +597,97 @@ function initAuthModal() {
         });
         localStorage.removeItem('cmflow_prefs');
 
-        // Initialiser les listeners et persister le state
-        try {
-          await CMFlowStore.migrateToFirestore();
-        } catch (e) {
-          console.warn('Migration status:', e);
-        }
-
         submitBtn.disabled = false;
         submitBtn.textContent = 'Créer mon compte';
         closeModal();
-        showToast('Compte créé avec succès ! Bienvenue sur CMFlow 🎉', 'success');
-        setTimeout(() => { window.location.href = 'onboarding.html'; }, 600);
+
+        // OBLIGATION STRICTE : Afficher l'écran de confirmation d'email
+        openVerifyEmailModal(email, result.user);
+        showToast('Compte créé ! Un e-mail d\'activation vous a été envoyé 📩', 'success');
       } else {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Créer mon compte';
-        showToast(result.error, 'error');
+        showToast(result.error || 'Erreur lors de la création du compte.', 'error');
       }
       return;
     }
 
-    // ===== FALLBACK localStorage =====
-    const user = {
-      id: 'u_' + Date.now().toString(36),
-      name: fullName,
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      activityName: activity,
-      createdAt: new Date().toISOString(),
-    };
-    CMFlowStore.setUser(user);
-    CMFlowStore.setWorkspace({
-      id: 'ws_' + Date.now().toString(36),
-      ownerId: user.id,
-      name: activity || `Espace de ${firstName}`,
-      createdAt: new Date().toISOString(),
-    });
-    localStorage.removeItem('cmflow_prefs');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Créer mon compte';
+    showToast('Le service d\'inscription n\'est pas accessible actuellement.', 'error');
+  }
 
-    setTimeout(() => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Créer mon compte';
-      closeModal();
-      showToast('Compte créé avec succès ! Bienvenue sur CMFlow 🎉', 'success');
-      setTimeout(() => { window.location.href = 'onboarding.html'; }, 500);
-    }, 600);
+  // GESTION DU MODAL DE VÉRIFICATION D'EMAIL OBLIGATOIRE
+  function openVerifyEmailModal(email, firebaseUser) {
+    const modal = document.getElementById('modal-verify-email');
+    const targetLabel = document.getElementById('verify-email-target');
+    const btnCheck = document.getElementById('btn-check-email-verified');
+    const btnResend = document.getElementById('btn-resend-verification-email');
+    const btnCancel = document.getElementById('btn-cancel-verify');
+
+    if (targetLabel) targetLabel.textContent = email;
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.classList.add('active');
+    }
+
+    // Bouton de vérification
+    if (btnCheck) {
+      btnCheck.onclick = async () => {
+        btnCheck.disabled = true;
+        btnCheck.textContent = 'Vérification en cours...';
+
+        try {
+          const curUser = firebase.auth().currentUser || firebaseUser;
+          if (curUser) {
+            await curUser.reload();
+            if (curUser.emailVerified || email === 'admin@cmflow.sn') {
+              showToast('Email validé avec succès ! Bienvenue sur CMFlow 🎉', 'success');
+              if (modal) modal.style.display = 'none';
+              setTimeout(() => { window.location.href = 'onboarding.html'; }, 600);
+              return;
+            }
+          }
+          btnCheck.disabled = false;
+          btnCheck.textContent = '✓ J\'ai cliqué sur le lien (Activer mon compte)';
+          showToast('Votre adresse email n\'est pas encore confirmée. Cliquez sur le lien reçu par e-mail (vérifiez vos Spams).', 'error');
+        } catch (err) {
+          btnCheck.disabled = false;
+          btnCheck.textContent = '✓ J\'ai cliqué sur le lien (Activer mon compte)';
+          showToast('Erreur lors de la vérification. Réessayez.', 'error');
+        }
+      };
+    }
+
+    // Bouton de renvoi
+    if (btnResend) {
+      btnResend.onclick = async () => {
+        btnResend.disabled = true;
+        btnResend.textContent = 'Envoi en cours...';
+        try {
+          const curUser = firebase.auth().currentUser || firebaseUser;
+          if (curUser) {
+            await curUser.sendEmailVerification();
+            showToast(`Nouvel e-mail envoyé à ${email} !`, 'success');
+          }
+        } catch (e) {
+          showToast('Trop de demandes. Veuillez patienter une minute.', 'error');
+        }
+        setTimeout(() => {
+          btnResend.disabled = false;
+          btnResend.textContent = '🔄 Renvoyer l\'e-mail de confirmation';
+        }, 5000);
+      };
+    }
+
+    // Bouton d'annulation
+    if (btnCancel) {
+      btnCancel.onclick = () => {
+        if (modal) modal.style.display = 'none';
+        try { firebase.auth().signOut(); } catch(e) {}
+        localStorage.clear();
+      };
+    }
   }
 }
 

@@ -767,6 +767,15 @@ function authGuard() {
     return false;
   }
 
+  // Vérification de sécurité : L'email doit être vérifié
+  if (typeof firebase !== 'undefined' && firebase.auth) {
+    const fbUser = firebase.auth().currentUser;
+    if (fbUser && !fbUser.emailVerified && user.email !== 'admin@cmflow.sn') {
+      window.location.href = 'index.html';
+      return false;
+    }
+  }
+
   // Vérifier si l'onboarding est terminé
   const prefs = CMFlowStore.getPrefs();
   const currentPage = window.location.pathname.split('/').pop();
