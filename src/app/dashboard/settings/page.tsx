@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   Building,
@@ -29,6 +29,7 @@ import {
   Send
 } from 'lucide-react';
 import { useClient } from '../../../context/ClientContext';
+import ConnectMetaButton from '../../../components/ConnectMetaButton';
 
 // Types
 export interface TeamMember {
@@ -99,8 +100,29 @@ export default function SettingsPage() {
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
   };
+
+  // Détection du retour Meta OAuth Callback
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const status = urlParams.get('status');
+      const tab = urlParams.get('tab');
+      const igUser = urlParams.get('ig');
+
+      if (tab === 'social' || tab === 'api') {
+        setActiveTab('api');
+      }
+
+      if (status === 'connected') {
+        showToast(`🎉 Comptes Meta (${igUser ? `@${igUser}` : 'Instagram & Facebook'}) connectés avec succès !`);
+      } else if (status === 'error') {
+        const reason = urlParams.get('reason') || 'Erreur inconnue';
+        showToast(`⚠️ Échec de la connexion Meta : ${reason}`);
+      }
+    }
+  }, []);
 
   const handleSaveSettings = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -395,36 +417,8 @@ export default function SettingsPage() {
 
             <div className="space-y-3">
               
-              {/* Meta Graph API */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0066FF] to-blue-500 text-white flex items-center justify-center font-black text-base shadow-sm">
-                    M
-                  </div>
-                  <div>
-                    <div className="text-xs font-black text-[#0F172A] flex items-center gap-2">
-                      <span>Meta Graph API (Instagram Pro & Facebook Pages)</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                        ✓ Connecté
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-slate-500">
-                      Token officiel valide (Expire dans 58 jours) · 4 pages associées
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => showToast('🔄 Token Meta rafraîchi avec succès !')}
-                    className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 shadow-2xs flex items-center gap-1.5"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5 text-[#0066FF]" />
-                    <span>Rafraîchir</span>
-                  </button>
-                </div>
-              </div>
+              {/* Meta Graph API (Instagram Pro & Facebook Pages) */}
+              <ConnectMetaButton variant="card" />
 
               {/* TikTok Business API */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
