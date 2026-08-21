@@ -206,13 +206,16 @@
         <div class="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#0F172A]">
           <span class="text-slate-400 font-medium">CMFlow</span>
           <span class="text-slate-300">/</span>
-          <span>Paramètres Généraux de l'Agence</span>
+          <span>Paramètres Agence</span>
         </div>
       </div>
 
-      <button type="button" onclick="showToast('💾 Paramètres sauvegardés avec succès !')" class="px-4 py-2 bg-[#F94F06] hover:bg-[#e04605] text-white text-xs font-black rounded-xl shadow-lg shadow-[#F94F06]/25">
-        Enregistrer les modifications
-      </button>
+      <div class="flex items-center gap-3">
+        <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200 hidden sm:inline-flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Workspace Agence</span>
+        </span>
+      </div>
     </header>
 
     <!-- Corps de Page -->
@@ -238,7 +241,7 @@
           </p>
         </div>
 
-        {/* Bouton Enregistrer Principal */}
+        <!-- Bouton Enregistrer Principal -->
         <div class="flex items-center gap-3 shrink-0">
           <button
             type="button"
@@ -665,14 +668,20 @@
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-white', 'text-[#0F172A]', 'shadow-xs');
-        btn.classList.add('text-slate-500');
+        btn.classList.remove('bg-white', 'text-[#0F172A]', 'shadow-sm', 'border', 'border-slate-200/60', 'font-bold');
+        btn.classList.add('font-semibold', 'text-slate-600');
       });
-      document.getElementById('tab-btn-' + tabId).classList.add('bg-white', 'text-[#0F172A]', 'shadow-xs');
-      document.getElementById('tab-btn-' + tabId).classList.remove('text-slate-500');
+      const activeBtn = document.getElementById('tab-btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-white', 'text-[#0F172A]', 'shadow-sm', 'border', 'border-slate-200/60', 'font-bold');
+        activeBtn.classList.remove('font-semibold', 'text-slate-600');
+      }
 
       document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
-      document.getElementById('tab-pane-' + tabId).classList.remove('hidden');
+      const activePane = document.getElementById('tab-pane-' + tabId);
+      if (activePane) {
+        activePane.classList.remove('hidden');
+      }
     }
 
     function triggerMetaConnect() {
