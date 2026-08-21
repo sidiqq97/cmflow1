@@ -18,7 +18,8 @@ import {
   Sparkles,
   Plus
 } from 'lucide-react';
-import { useClient } from '../context/ClientContext';
+import { useWorkspace } from '../context/WorkspaceContext';
+import WorkspaceSelector from './WorkspaceSelector';
 
 export interface NavItem {
   name: string;
@@ -113,70 +114,8 @@ export default function Sidebar() {
         </div>
 
         {/* Sélecteur d'Espace Client Actif */}
-        <div className="p-3.5 relative">
-          <div className="text-[9px] font-extrabold uppercase text-slate-400 px-2 mb-1.5 flex items-center justify-between tracking-wider">
-            <span>Espace Client Actif</span>
-            <span className="text-emerald-400 flex items-center gap-1 font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsClientDropdownOpen(!isClientDropdownOpen)}
-            className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 hover:border-slate-600 transition-all text-left group shadow-xs"
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <img
-                src={activeClient?.avatar || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80'}
-                alt={activeClient?.name || 'Client'}
-                className="w-8 h-8 rounded-xl object-cover ring-2 ring-[#0066FF]/40 shrink-0"
-              />
-              <div className="min-w-0">
-                <div className="text-xs font-bold text-white truncate group-hover:text-sky-300 transition-colors flex items-center gap-1">
-                  <span className="truncate">{activeClient?.name || 'Teranga Gourmet'}</span>
-                  <span className="text-[10px] shrink-0">{activeClient?.flag || '🇸🇳'}</span>
-                </div>
-                <div className="text-[10px] text-slate-400 truncate">
-                  {activeClient?.category || 'Haute Gastronomie'}
-                </div>
-              </div>
-            </div>
-            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${isClientDropdownOpen ? 'rotate-180 text-white' : ''}`} />
-          </button>
-
-          {/* Menu Déroulant Workspaces */}
-          {isClientDropdownOpen && (
-            <div className="absolute top-full left-3.5 right-3.5 mt-2 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl py-2 z-50 animate-fadeIn">
-              <div className="text-[9px] font-bold text-slate-400 px-3 py-1 uppercase tracking-wider">
-                Changer de Workspace
-              </div>
-              <div className="max-h-48 overflow-y-auto space-y-1 px-1">
-                {clients.map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => {
-                      setActiveClient(c);
-                      setIsClientDropdownOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition-all ${
-                      activeClient?.id === c.id
-                        ? 'bg-gradient-to-r from-orange-500/20 to-orange-500/5 text-[#F94F06] border border-orange-500/30'
-                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <img src={c.avatar} alt={c.name} className="w-5 h-5 rounded-md object-cover shrink-0" />
-                      <span className="truncate">{c.name}</span>
-                      <span className="text-[10px] shrink-0">{c.flag}</span>
-                    </div>
-                    {activeClient?.id === c.id && <span className="text-[10px]">✓</span>}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+        <div className="p-3.5">
+          <WorkspaceSelector variant="sidebar" />
         </div>
 
         {/* 9 Modules de Navigation Strictes */}
