@@ -6,8 +6,8 @@
   <title>Super-Administrateur — CMFlow SaaS Backoffice</title>
   <meta name="description" content="Espace Super-Administrateur pour gérer les revenus, abonnements et utilisateurs de CMFlow.">
 
-  <!-- Favicon SVG -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e1b4b'/%3E%3Cpath d='M8 12l4 8 4-8 4 8 4-8' fill='none' stroke='%23fde047' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
   <!-- Google Fonts: Plus Jakarta Sans & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,8 +25,8 @@
        ======================================================================= -->
   <div class="admin-pin-backdrop" id="admin-pin-modal">
     <div class="admin-pin-card" style="background: #111827; border: 1px solid #374151; color: white;">
-      <div style="width: 56px; height: 56px; border-radius: 50%; background: #1E1B4B; color: #FDE047; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <div style="margin-bottom: 20px; text-align: center;">
+        <img src="images/logo-white.svg" alt="CMFlow" style="height: 36px; width: auto; margin: 0 auto 12px; display: block;">
       </div>
       <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 8px;">Espace Super-Administrateur</h3>
       <p style="font-size: 0.85rem; color: #9CA3AF; margin-bottom: 20px;">Veuillez entrer votre code PIN administrateur pour déverrouiller le backoffice CMFlow.</p>
@@ -49,96 +49,84 @@
   <!-- =======================================================================
        MODAL: RÉCUPÉRATION DU CODE PIN (WHATSAPP + EMAIL OU CLÉ MAÎTRE)
        ======================================================================= -->
-  <div class="app-modal-backdrop" id="admin-recovery-modal">
-    <div class="app-modal" style="background: #111827; border: 1px solid #374151; color: white; max-width: 490px;">
-      <div class="app-modal-header" style="border-bottom-color: #1F2937;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.3rem;">🛡️</span>
-          <div>
-            <h3 class="app-modal-title" style="color: white; margin: 0;">Récupération du Code PIN</h3>
-            <p style="font-size: 0.8rem; color: #9CA3AF; margin: 0;">Recevez votre code de sécurité par WhatsApp & Email ou utilisez votre Clé Maître.</p>
-          </div>
-        </div>
-        <button type="button" class="app-modal-close" style="color: #9CA3AF;" onclick="closeRecoveryModal()">✕</button>
+  <div class="admin-pin-backdrop" id="admin-recovery-modal" style="display: none;">
+    <div class="admin-pin-card" style="background: #111827; border: 1px solid #374151; color: white; max-width: 480px; text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #1F2937; padding-bottom: 12px;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: #FDE047; margin: 0;">Récupération du Code PIN</h3>
+        <button type="button" onclick="closeRecoveryModal()" style="background: none; border: none; color: #9CA3AF; font-size: 1.2rem; cursor: pointer;">&times;</button>
       </div>
 
-      <div style="padding: 20px;">
-        <!-- Choix de la méthode -->
-        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-          <button type="button" class="composer-net-tab-btn active" id="tab-btn-whatsapp" onclick="switchRecoveryTab('whatsapp')" style="flex: 1.2; text-align: center; padding: 8px; font-size: 0.8rem;">
-            📲 WhatsApp & Email
-          </button>
-          <button type="button" class="composer-net-tab-btn" id="tab-btn-masterkey" onclick="switchRecoveryTab('masterkey')" style="flex: 0.8; text-align: center; padding: 8px; font-size: 0.8rem;">
-            🔑 Clé Maître
+      <p style="font-size: 0.85rem; color: #9CA3AF; margin-bottom: 16px;">
+        Choisissez votre méthode de récupération pour définir un nouveau code PIN.
+      </p>
+
+      <!-- Tabs de récupération -->
+      <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #374151; padding-bottom: 8px;">
+        <button type="button" id="tab-btn-recovery-wa" class="admin-tab-btn active" onclick="switchRecoveryTab('wa')" style="font-size: 0.82rem; padding: 6px 12px; border-radius: 6px; border: 1px solid #25D366; background: rgba(37, 211, 102, 0.1); color: #86EFAC; font-weight: 700; cursor: pointer;">
+          📱 WhatsApp + Email
+        </button>
+        <button type="button" id="tab-btn-recovery-master" class="admin-tab-btn" onclick="switchRecoveryTab('master')" style="font-size: 0.82rem; padding: 6px 12px; border-radius: 6px; border: 1px solid #374151; background: transparent; color: #9CA3AF; font-weight: 600; cursor: pointer;">
+          🔑 Clé Maître
+        </button>
+      </div>
+
+      <!-- Formulaire Option 1: WhatsApp + Email OTP -->
+      <form id="recovery-form-whatsapp" onsubmit="handleRecoveryWithWhatsapp(event)">
+        <div style="background: rgba(37, 211, 102, 0.08); border: 1px solid rgba(37, 211, 102, 0.2); padding: 12px; border-radius: 8px; font-size: 0.8rem; color: #D1FAE5; margin-bottom: 16px; line-height: 1.5;">
+          Un code de vérification temporaire à 6 chiffres sera généré et envoyé à :
+          <div style="font-weight: 800; color: #34D399; margin-top: 4px;">
+            📞 WhatsApp : +221 77 000 00 00<br>
+            📧 Email : admin@cmflow.sn
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <button type="button" class="btn-primary-app" style="width: 100%; justify-content: center; background: linear-gradient(135deg, #25D366 0%, #059669 100%); color: black; font-weight: 800; font-size: 0.88rem; padding: 10px;" onclick="sendWhatsappAndEmailOTP()">
+            <span>🚀 Envoyer le Code (WhatsApp & Email)</span>
           </button>
         </div>
 
-        <!-- Formulaire Option 1: WhatsApp & Email (Par Défaut) -->
-        <form id="recovery-form-whatsapp" onsubmit="handleWhatsappRecoverySubmit(event)">
-          <div style="background: rgba(37, 211, 102, 0.1); border: 1px solid rgba(37, 211, 102, 0.2); padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; color: #86EFAC; margin-bottom: 14px;">
-            📲 <strong>Double Réception :</strong> Votre code de sécurité à 6 chiffres vous sera envoyé simultanément sur votre <strong>WhatsApp</strong> et par <strong>Email</strong>.
-          </div>
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Code de Sécurité Reçu (6 chiffres) *</label>
+          <input type="text" id="recovery-whatsapp-code" placeholder="Entrez le code reçu (ex: 849201)" maxlength="6" required style="width: 100%; padding: 12px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white; letter-spacing: 0.25em; text-align: center; font-size: 1.15rem; font-weight: 800;">
+        </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-            <div class="form-field">
-              <label style="color: #60A5FA; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; display: block;">💬 Numéro WhatsApp</label>
-              <input type="tel" id="recovery-whatsapp-phone" value="+221 77 842 19 02" required style="width: 100%; padding: 10px 12px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white; font-size: 0.85rem;">
-            </div>
-            <div class="form-field">
-              <label style="color: #A78BFA; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; display: block;">📧 Adresse Email</label>
-              <input type="email" id="recovery-email-input" value="admin@cmflow.sn" required style="width: 100%; padding: 10px 12px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white; font-size: 0.85rem;">
-            </div>
-          </div>
+        <div class="form-field" style="margin-bottom: 18px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Nouveau Code PIN à définir *</label>
+          <input type="password" id="recovery-whatsapp-new-pin" placeholder="Ex: 1234 ou 5678" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
 
-          <div style="margin-bottom: 16px;">
-            <button type="button" class="btn-primary-app" style="width: 100%; justify-content: center; background: linear-gradient(135deg, #25D366 0%, #059669 100%); color: black; font-weight: 800; font-size: 0.88rem; padding: 10px;" onclick="sendWhatsappAndEmailOTP()">
-              <span>🚀 Envoyer le Code (WhatsApp & Email)</span>
-            </button>
-          </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
+          <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeRecoveryModal()">Annuler</button>
+          <button type="submit" class="btn-primary-app" style="background: #25D366; color: black; font-weight: 800;">
+            <span>Valider & Déverrouiller 🔓</span>
+          </button>
+        </div>
+      </form>
 
-          <div class="form-field" style="margin-bottom: 14px;">
-            <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Code de Sécurité Reçu (6 chiffres) *</label>
-            <input type="text" id="recovery-whatsapp-code" placeholder="Entrez le code reçu (ex: 849201)" maxlength="6" required style="width: 100%; padding: 12px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white; letter-spacing: 0.25em; text-align: center; font-size: 1.15rem; font-weight: 800;">
-          </div>
+      <!-- Formulaire Option 2: Clé Maître -->
+      <form id="recovery-form-masterkey" style="display: none;" onsubmit="handleRecoverySubmit(event)">
+        <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.2); padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; color: #FDE68A; margin-bottom: 14px;">
+          💡 <strong>Clé Maître par défaut :</strong> <code>cmflow2026</code>
+        </div>
 
-          <div class="form-field" style="margin-bottom: 18px;">
-            <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Nouveau Code PIN à définir *</label>
-            <input type="password" id="recovery-whatsapp-new-pin" placeholder="Ex: 1234 ou 5678" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
-          </div>
+        <div class="form-field" style="margin-bottom: 14px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Clé Maître Fondateur *</label>
+          <input type="password" id="recovery-master-key" placeholder="Entrez la clé maître (cmflow2026)" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
-            <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeRecoveryModal()">Annuler</button>
-            <button type="submit" class="btn-primary-app" style="background: #25D366; color: black; font-weight: 800;">
-              <span>Valider & Déverrouiller 🔓</span>
-            </button>
-          </div>
-        </form>
+        <div class="form-field" style="margin-bottom: 18px;">
+          <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Nouveau Code PIN à définir *</label>
+          <input type="password" id="recovery-new-pin" placeholder="Ex: 1234 ou 5678" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
+        </div>
 
-        <!-- Formulaire Option 2: Clé Maître -->
-        <form id="recovery-form-masterkey" style="display: none;" onsubmit="handleRecoverySubmit(event)">
-          <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.2); padding: 10px 14px; border-radius: 8px; font-size: 0.78rem; color: #FDE68A; margin-bottom: 14px;">
-            💡 <strong>Clé Maître par défaut :</strong> <code>cmflow2026</code>
-          </div>
-
-          <div class="form-field" style="margin-bottom: 14px;">
-            <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Clé Maître Fondateur *</label>
-            <input type="password" id="recovery-master-key" placeholder="Entrez la clé maître (cmflow2026)" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
-          </div>
-
-          <div class="form-field" style="margin-bottom: 18px;">
-            <label style="color: #D1D5DB; font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; display: block;">Nouveau Code PIN à définir *</label>
-            <input type="password" id="recovery-new-pin" placeholder="Ex: 1234 ou 5678" required style="width: 100%; padding: 10px 14px; border: 1px solid #374151; border-radius: var(--radius-md); background: #1F2937; color: white;">
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
-            <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeRecoveryModal()">Annuler</button>
-            <button type="submit" class="btn-primary-app" style="background: #F59E0B; color: #111827; font-weight: 800;">
-              <span>Réinitialiser & Entrer 🔓</span>
-            </button>
-          </div>
-        </form>
-      </div>
-
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #1F2937; padding-top: 16px;">
+          <button type="button" class="btn-secondary-app" style="background: #1F2937; color: #D1D5DB; border-color: #374151;" onclick="closeRecoveryModal()">Annuler</button>
+          <button type="submit" class="btn-primary-app" style="background: #F59E0B; color: #111827; font-weight: 800;">
+            <span>Réinitialiser & Entrer 🔓</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -149,13 +137,11 @@
     
     <!-- Top Admin Bar -->
     <header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #1F2937;">
-      <div style="display: flex; align-items: center; gap: 14px;">
-        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 1.2rem;">
-          👑
-        </div>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <img src="images/logo-white.svg" alt="CMFlow" style="height: 36px; width: auto; display: block;">
         <div>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <h1 style="font-size: 1.4rem; font-weight: 800; margin: 0; color: white;">CMFlow Super-Admin</h1>
+            <h1 style="font-size: 1.3rem; font-weight: 800; margin: 0; color: white;">Backoffice Administrateur</h1>
             <span class="admin-badge">FONDATEUR</span>
           </div>
           <span style="font-size: 0.8rem; color: #9CA3AF;">Supervision globale des revenus, abonnements Wave/OM et des Community Managers</span>
