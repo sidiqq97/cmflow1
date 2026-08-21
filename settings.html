@@ -1,805 +1,437 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paramètres & Profil — CMFlow</title>
-  <meta name="description" content="Paramètres de votre profil Community Manager, gestion de l'agence et abonnement sur CMFlow.">
-
+  <title>Paramètres Agence & Profil — CMFlow</title>
+  <meta name="description" content="Paramètres de profil, gestion de votre agence et forfaits sur CMFlow.">
+  
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+  </style>
 </head>
-<body>
+<body class="min-h-full bg-[#F8FAFC] text-[#0F172A] antialiased flex selection:bg-[#F94F06]/20 selection:text-[#F94F06]">
 
-  <div class="app-layout">
-    
-    <!-- =======================================================================
-         SIDEBAR NAVIGATION
-         ======================================================================= -->
-    <aside class="app-sidebar" id="app-sidebar">
-      <!-- Sidebar Brand -->
-      <a href="dashboard.html" class="sidebar-brand" style="text-decoration: none; display: flex; align-items: center; padding: 20px 18px 16px;">
-        <img src="images/logo.svg" alt="CMFlow" style="height: 32px; width: auto; display: block;">
-      </a>
+  <!-- Texture de lumière d'arrière-plan (Vercel / Linear Glow) -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute top-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-blue-100/40 via-purple-50/20 to-transparent rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-gradient-to-tr from-orange-100/30 via-amber-50/20 to-transparent rounded-full blur-3xl"></div>
+  </div>
 
-      <!-- Sidebar Navigation -->
-      <nav class="sidebar-nav" aria-label="Menu principal">
-        <span class="sidebar-nav-section-label">Général</span>
-        
-        <a href="dashboard.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="9" rx="1"/>
-            <rect x="14" y="3" width="7" height="5" rx="1"/>
-            <rect x="14" y="12" width="7" height="9" rx="1"/>
-            <rect x="3" y="16" width="7" height="5" rx="1"/>
+  <!-- Toast Notification Flottante -->
+  <div id="app-toast" class="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+    <svg class="w-4 h-4 text-[#F94F06]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
+    <span id="toast-text">Message</span>
+  </div>
+
+  <!-- =========================================================================
+      A. SIDEBAR ÉLÉGANTE (#0F172A - Style Linear / Raycast)
+      ========================================================================= -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-[#0F172A] text-white flex flex-col justify-between transition-transform duration-300 ease-out border-r border-slate-800/80 -translate-x-full lg:translate-x-0">
+    <div class="overflow-y-auto">
+      
+      <!-- En-tête : Logo & Badge Pro -->
+      <div class="p-5 border-b border-slate-800/60 flex items-center justify-between">
+        <a href="dashboard.html" class="inline-flex items-center gap-2.5 transition-opacity hover:opacity-90">
+          <img src="images/logo-white.svg" alt="CMFlow" class="h-6 w-auto object-contain">
+          <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#F94F06]/20 text-[#F94F06] border border-[#F94F06]/30 tracking-wider">
+            PRO
+          </span>
+        </a>
+        <button id="close-sidebar-btn" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <!-- Sélecteur de Marque & Workspace (Mini-carte Premium) -->
+      <div class="p-3.5 relative">
+        <div class="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 px-2 block mb-1.5 flex items-center justify-between">
+          <span>Espace Client</span>
+          <span class="text-emerald-400 flex items-center gap-1 font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            Actif
+          </span>
+        </div>
+
+        <button
+          type="button"
+          id="client-dropdown-btn"
+          class="w-full flex items-center justify-between p-2.5 rounded-2xl bg-gradient-to-b from-slate-800/90 to-slate-800/50 hover:from-slate-800 hover:to-slate-800/80 border border-slate-700/70 hover:border-slate-600 transition-all text-left group shadow-sm"
+        >
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="relative shrink-0">
+              <img
+                src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80"
+                alt="Client Avatar"
+                class="w-8 h-8 rounded-xl object-cover ring-2 ring-[#0066FF]/40"
+              >
+              <span class="absolute -bottom-1 -right-1 text-[10px] bg-slate-900 rounded-full px-0.5">
+                🇸🇳
+              </span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-xs font-bold text-white truncate group-hover:text-sky-300 transition-colors">
+                Teranga Gourmet
+              </div>
+              <div class="text-[10px] text-slate-400 truncate">
+                Haute Gastronomie & Traiteur
+              </div>
+            </div>
+          </div>
+          <svg class="w-4 h-4 text-slate-400 group-hover:text-white shrink-0 ml-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
+        </button>
+      </div>
+
+      <!-- Navigation Latérale (9 Modules) -->
+      <nav class="px-3 space-y-1 mt-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
           <span>Tableau de bord</span>
         </a>
 
-        <a href="clients.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-          <span>Clients</span>
+        <a href="clients.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Espaces Clients</span>
         </a>
 
-        <a href="planning.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
+        <a href="planning.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>Planning & Queue</span>
         </a>
 
-        <a href="inbox.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          <span>Messagerie (Inbox)</span>
+        <a href="inbox.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <div class="flex items-center gap-3">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Inbox Unifiée</span>
+          </div>
+          <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
         </a>
 
-        <a href="startpage.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
-            <line x1="12" y1="18" x2="12.01" y2="18"/>
-          </svg>
-          <span>Start Page (Lien Bio)</span>
+        <a href="startpage.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>Start Page (Bio)</span>
         </a>
 
-        <a href="analytics.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10"/>
-            <line x1="12" y1="20" x2="12" y2="4"/>
-            <line x1="6" y1="20" x2="6" y2="14"/>
-          </svg>
+        <a href="analytics.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           <span>Analytics & Rapports</span>
         </a>
 
-        <span class="sidebar-nav-section-label">Collaboration</span>
-
-        <a href="validation.html" target="_blank" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
+        <a href="validation.html" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <span>Portail Validation</span>
         </a>
 
-        <a href="settings.html" class="sidebar-nav-item active">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
+        <a href="settings.html#billing" class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <div class="flex items-center gap-3">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <span>Facturation & Forfaits</span>
+          </div>
+          <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+            Wave
+          </span>
+        </a>
+
+        <a href="settings.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold bg-[#F94F06] text-white shadow-lg shadow-[#F94F06]/25 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>Paramètres</span>
         </a>
-
-        <span class="sidebar-nav-section-label">Administration</span>
-
-        <a href="admin.html" class="sidebar-nav-item" style="color: #D97706; font-weight: 700;">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
-          <span>👑 Super-Admin</span>
-        </a>
       </nav>
+    </div>
 
-      <!-- Sidebar Footer (User Menu) -->
-      <div class="sidebar-footer">
-        <div class="sidebar-user-avatar" data-user-initials>CM</div>
-        <div class="sidebar-user-info">
-          <span class="sidebar-user-name" data-user-name>Utilisateur</span>
-          <span class="sidebar-user-role" data-workspace-name>Mon espace</span>
+    <!-- Profil CM connecté -->
+    <div class="p-3.5 border-t border-slate-800/70 bg-slate-900/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="relative">
+            <div id="user-avatar-badge" class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0066FF] to-sky-400 flex items-center justify-center font-black text-xs text-white shadow-sm">
+              AD
+            </div>
+            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#10B981] border-2 border-[#0F172A] rounded-full"></span>
+          </div>
+          <div class="min-w-0">
+            <div id="user-display-name" class="text-xs font-bold text-white truncate">Awa Diop</div>
+            <div id="user-display-role" class="text-[10px] text-slate-400 truncate">Lead CM · Dakar 🇸🇳</div>
+          </div>
         </div>
-        <button type="button" class="sidebar-user-menu-btn" id="user-menu-btn" aria-label="Menu options utilisateur">
-          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-          </svg>
+
+        <button
+          type="button"
+          id="btn-logout"
+          title="Déconnexion"
+          class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800/80 transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Fond sombre Mobile -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 z-30 hidden backdrop-blur-xs"></div>
+
+  <!-- =========================================================================
+      ZONE PRINCIPALE (Top Section + Paramètres)
+      ========================================================================= -->
+  <div class="flex-1 flex flex-col min-w-0 lg:pl-64 z-10">
+    
+    <!-- Top Bar Aérée (Floating Glassmorphism) -->
+    <header class="sticky top-0 z-30 backdrop-blur-xl bg-white/80 border-b border-slate-200/60 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3 transition-all">
+      
+      <!-- Fil d'Ariane & Hamburger -->
+      <div class="flex items-center gap-3">
+        <button id="open-sidebar-btn" class="lg:hidden p-2 rounded-xl text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
         </button>
 
-        <!-- Dropdown Menu -->
-        <div class="user-dropdown" id="user-dropdown">
-          <a href="settings.html" class="dropdown-item" style="text-decoration: none;">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
-            <span>Mon profil</span>
-          </a>
-          <a href="settings.html#billing" class="dropdown-item" style="text-decoration: none;">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
-            <span>Mon abonnement</span>
-          </a>
-          <a href="admin.html" class="dropdown-item" style="text-decoration: none; color: #B45309; font-weight: 700;">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-1L10 2z"/></svg>
-            <span>👑 Super-Admin SaaS</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <button type="button" class="dropdown-item danger" id="logout-btn">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
-            <span>Se déconnecter</span>
-          </button>
+        <div>
+          <div class="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#0F172A] tracking-tight">
+            <span class="text-slate-400 font-medium">CMFlow</span>
+            <span class="text-slate-300">/</span>
+            <span class="text-slate-700 font-bold">Paramètres Agence & Profil</span>
+          </div>
         </div>
       </div>
-    </aside>
 
-    <!-- Overlay Mobile -->
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+      <button
+        type="button"
+        id="btn-save-all"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold bg-[#F94F06] hover:bg-[#e04605] text-white shadow-lg shadow-[#F94F06]/25 transition-all"
+      >
+        <span>Enregistrer les modifications</span>
+      </button>
+    </header>
 
-    <!-- =======================================================================
-         MAIN CONTENT AREA
-         ======================================================================= -->
-    <main class="app-main">
-      <!-- Header -->
-      <header class="app-header">
-        <button type="button" class="app-hamburger" id="app-hamburger" aria-label="Menu mobile">
-          <span></span>
-          <span></span>
-          <span></span>
+    <!-- Corps de Page -->
+    <main class="p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl">
+      
+      <!-- En-tête -->
+      <div class="bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200/70 shadow-xs flex items-center justify-between">
+        <div>
+          <h1 class="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
+            Réglages & Configuration
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+            Personnalisez votre agence, vos coordonnées WhatsApp et votre forfait CMFlow.
+          </p>
+        </div>
+      </div>
+
+      <!-- Navigation par Onglets -->
+      <div class="flex items-center gap-2 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/70 overflow-x-auto text-xs font-bold text-slate-600">
+        <button type="button" class="tab-nav-btn active px-4 py-2 rounded-xl bg-white text-[#0F172A] shadow-xs transition-all" data-tab="profile">
+          1. Mon Profil CM
         </button>
-
-        <div class="header-greeting">
-          <h1>Paramètres & Configuration</h1>
-          <p>Personnalisez votre profil Community Manager, votre marque et votre abonnement</p>
-        </div>
-
-        <div class="header-actions">
-        </div>
-      </header>
-
-      <!-- Page Content -->
-      <div class="app-page">
-
-        <!-- Navigation par Onglets -->
-        <div class="settings-tabs-nav">
-          <button type="button" class="settings-tab-btn active" data-tab="tab-profile">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
-            <span>Profil & Agence</span>
-          </button>
-          <button type="button" class="settings-tab-btn" data-tab="tab-networks">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
-            <span>Réseaux par défaut</span>
-          </button>
-          <button type="button" class="settings-tab-btn" data-tab="tab-billing">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
-            <span>Abonnement & Facturation</span>
-          </button>
-          <button type="button" class="settings-tab-btn" data-tab="tab-api-tester">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-            <span>Testeur Instagram API</span>
-          </button>
-          <button type="button" class="settings-tab-btn" data-tab="tab-security">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            <span>Sécurité & Données</span>
-          </button>
-        </div>
-
-        <!-- ===================================================================
-             ONGLET 1 : PROFIL & AGENCE
-             =================================================================== -->
-        <div class="settings-tab-pane active" id="tab-profile">
-          <div class="settings-card">
-            <div class="settings-card-header">
-              <h2 class="settings-card-title">Informations de votre Profil & Marque</h2>
-              <p class="settings-card-subtitle">Ces informations apparaissent sur vos liens de validation client et vos rapports de performance.</p>
-            </div>
-
-            <div class="profile-avatar-uploader">
-              <div class="profile-avatar-preview" id="settings-avatar-preview" data-user-initials>CM</div>
-              <div>
-                <h4 style="margin: 0 0 4px; font-size: 0.95rem; font-weight: 700; color: var(--text-main);" data-user-name>Utilisateur</h4>
-                <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);" data-workspace-name>Mon espace agence</p>
-              </div>
-            </div>
-
-            <form id="form-settings-profile">
-              <div class="onb-field-row">
-                <div class="form-field">
-                  <label for="set-firstname">Prénom *</label>
-                  <input type="text" id="set-firstname" placeholder="Ex: Awa, Moussa..." required>
-                </div>
-                <div class="form-field">
-                  <label for="set-lastname">Nom de famille</label>
-                  <input type="text" id="set-lastname" placeholder="Ex: Diop, Ndiaye...">
-                </div>
-              </div>
-
-              <div class="onb-field-row">
-                <div class="form-field">
-                  <label for="set-email">Adresse Email *</label>
-                  <input type="email" id="set-email" placeholder="contact@votreagence.com" required>
-                </div>
-                <div class="form-field">
-                  <label for="set-agency">Nom de votre Agence / Activité *</label>
-                  <input type="text" id="set-agency" placeholder="Ex: Teranga Digital Agency" required>
-                </div>
-              </div>
-
-              <div class="form-field">
-                <label for="set-bio">Description de votre activité (optionnel)</label>
-                <textarea id="set-bio" placeholder="Ex: Agence spécialisée en social media management, création de contenu et stratégie digitale à Dakar..." style="min-height: 85px;"></textarea>
-              </div>
-
-              <div style="margin-top: 20px;">
-                <button type="submit" class="btn-primary-app">
-                  <span>Enregistrer les modifications</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <!-- ===================================================================
-             ONGLET 2 : RÉSEAUX PAR DÉFAUT
-             =================================================================== -->
-        <div class="settings-tab-pane" id="tab-networks">
-          <div class="settings-card">
-            <div class="settings-card-header">
-              <h2 class="settings-card-title">Réseaux Sociaux Actifs par Défaut</h2>
-              <p class="settings-card-subtitle">Sélectionnez les plateformes que vous gérez le plus fréquemment pour vos clients.</p>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 14px; max-width: 480px;">
-              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border: var(--border-light); border-radius: var(--radius-md); background: white;">
-                <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
-                <span style="font-weight: 600; color: #E1306C;">Instagram</span>
-              </label>
-
-              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border: var(--border-light); border-radius: var(--radius-md); background: white;">
-                <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
-                <span style="font-weight: 600; color: #1877F2;">Facebook</span>
-              </label>
-
-              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border: var(--border-light); border-radius: var(--radius-md); background: white;">
-                <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
-                <span style="font-weight: 600; color: #010101;">TikTok</span>
-              </label>
-
-              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border: var(--border-light); border-radius: var(--radius-md); background: white;">
-                <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--color-primary);">
-                <span style="font-weight: 600; color: #0A66C2;">LinkedIn</span>
-              </label>
-
-              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px; border: var(--border-light); border-radius: var(--radius-md); background: white;">
-                <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--color-primary);">
-                <span style="font-weight: 600; color: #0F172A;">X (Twitter)</span>
-              </label>
-            </div>
-
-            <div style="margin-top: 24px;">
-              <button type="button" class="btn-primary-app" onclick="showAppToast('Préférences des réseaux enregistrées !', 'success')">
-                <span>Enregistrer les préférences</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===================================================================
-             ONGLET 3 : ABONNEMENT & FACTURATION
-             =================================================================== -->
-        <div class="settings-tab-pane" id="tab-billing">
-          <div class="settings-card">
-            <div class="settings-card-header">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <div>
-                  <h2 class="settings-card-title">Formule Actuelle & Facturation</h2>
-                  <p class="settings-card-subtitle">Gérez votre abonnement et vos modes de paiement locaux.</p>
-                </div>
-                <span class="plan-badge-active">● Plan Pro Actif (9 900 F / mois)</span>
-              </div>
-            </div>
-
-            <!-- Formule Active Actuelle -->
-            <div style="background: linear-gradient(135deg, #F8FAFC, #EFF6FF); border: 1.5px solid #BFDBFE; border-radius: var(--radius-lg); padding: 24px; margin-bottom: 28px;">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-                <div>
-                  <span style="font-size: 0.78rem; font-weight: 700; color: var(--color-primary); text-transform: uppercase;">Votre Formule Actuelle</span>
-                  <h3 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 4px 0 8px;">Plan Pro Illimité <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">(9 900 FCFA / mois)</span></h3>
-                  <p style="font-size: 0.85rem; color: var(--text-body); margin: 0;">Prochain renouvellement automatique le <strong>18 Septembre 2026</strong></p>
-                </div>
-
-                <div style="display: flex; gap: 8px;">
-                  <button type="button" class="btn-primary-app" onclick="openCheckoutModal('Plan Pro Illimité', '9 900 FCFA', '/ mois')">
-                    💳 Payer / Renouveler sur Wave
-                  </button>
-                </div>
-              </div>
-
-              <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid #DBEAFE; display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.82rem; color: var(--text-body);">
-                <span>✓ Clients & Marques <strong>Illimités</strong></span>
-                <span>✓ Calendrier & Assistant IA Illimité</span>
-                <span>✓ Social Inbox unifiée WhatsApp</span>
-                <span>✓ Rapports PDF & Liens de validation</span>
-              </div>
-            </div>
-
-            <!-- Grille de Changement d'Abonnement -->
-            <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin: 0 0 14px;">Changer de formule ou s'abonner :</h3>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px;">
-              
-              <!-- Carte Starter -->
-              <div style="border: 1.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 18px; background: white; display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                  <h4 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0 0 4px;">Starter Solo</h4>
-                  <div style="font-size: 1.3rem; font-weight: 900; color: #1E3A8A; margin-bottom: 10px;">4 900 F <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">/ mois</span></div>
-                  <ul style="font-size: 0.78rem; color: var(--text-muted); padding-left: 18px; margin: 0 0 16px; line-height: 1.6;">
-                    <li>Jusqu'à 3 clients</li>
-                    <li>Tous les réseaux sociaux</li>
-                    <li>Assistant IA (20 posts)</li>
-                  </ul>
-                </div>
-                <button type="button" class="btn-secondary-app" style="width: 100%; justify-content: center; font-size: 0.82rem;" onclick="openCheckoutModal('Starter Solo', '4 900 FCFA', '/ mois')">
-                  Choisir Starter (4 900 F)
-                </button>
-              </div>
-
-              <!-- Carte Pro (Populaire) -->
-              <div style="border: 2px solid var(--color-primary); border-radius: var(--radius-lg); padding: 18px; background: #F8FAFC; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
-                <div>
-                  <div style="font-size: 0.7rem; font-weight: 800; color: var(--color-primary); text-transform: uppercase; margin-bottom: 2px;">★ Best-Seller</div>
-                  <h4 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0 0 4px;">Plan Pro</h4>
-                  <div style="font-size: 1.3rem; font-weight: 900; color: var(--color-primary); margin-bottom: 10px;">9 900 F <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">/ mois</span></div>
-                  <ul style="font-size: 0.78rem; color: var(--text-body); padding-left: 18px; margin: 0 0 16px; line-height: 1.6;">
-                    <li><strong>Clients ILLIMITÉS</strong></li>
-                    <li>Assistant IA Illimité</li>
-                    <li>Social Inbox WhatsApp</li>
-                  </ul>
-                </div>
-                <button type="button" class="btn-primary-app" style="width: 100%; justify-content: center; font-size: 0.82rem;" onclick="openCheckoutModal('Plan Pro Illimité', '9 900 FCFA', '/ mois')">
-                  Choisir Pro (9 900 F) 🚀
-                </button>
-              </div>
-
-              <!-- Carte Agence -->
-              <div style="border: 1.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 18px; background: white; display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                  <h4 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0 0 4px;">Agence & Studio</h4>
-                  <div style="font-size: 1.3rem; font-weight: 900; color: #4338CA; margin-bottom: 10px;">19 900 F <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">/ mois</span></div>
-                  <ul style="font-size: 0.78rem; color: var(--text-muted); padding-left: 18px; margin: 0 0 16px; line-height: 1.6;">
-                    <li>Jusqu'à 5 CMs / Équipe</li>
-                    <li>Marque Blanche (Logo)</li>
-                    <li>Support VIP 7j/7</li>
-                  </ul>
-                </div>
-                <button type="button" class="btn-secondary-app" style="width: 100%; justify-content: center; font-size: 0.82rem;" onclick="openCheckoutModal('Agence & Studio', '19 900 FCFA', '/ mois')">
-                  Choisir Agence (19 900 F)
-                </button>
-              </div>
-
-            </div>
-
-            <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin: 20px 0 12px;">Moyens de paiement acceptés</h3>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-              <div style="padding: 10px 16px; border: var(--border-light); border-radius: var(--radius-md); background: white; font-size: 0.85rem; font-weight: 600; color: #1E3A8A; display: flex; align-items: center; gap: 6px;">
-                🌊 Wave Sénégal / CI
-              </div>
-              <div style="padding: 10px 16px; border: var(--border-light); border-radius: var(--radius-md); background: white; font-size: 0.85rem; font-weight: 600; color: #EA580C; display: flex; align-items: center; gap: 6px;">
-                🟠 Orange Money
-              </div>
-              <div style="padding: 10px 16px; border: var(--border-light); border-radius: var(--radius-md); background: white; font-size: 0.85rem; font-weight: 600; color: #047857; display: flex; align-items: center; gap: 6px;">
-                💳 Carte Bancaire Visa / Mastercard
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===================================================================
-             ONGLET 4 : TESTEUR INSTAGRAM GRAPH API (META)
-             =================================================================== -->
-        <div class="settings-tab-pane" id="tab-api-tester">
-          <div class="settings-card">
-            <div class="settings-card-header">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <div>
-                  <h2 class="settings-card-title">🧪 Testeur Direct Instagram Graph API</h2>
-                  <p class="settings-card-subtitle">Vérifiez la connexion, inspectez votre compte Instagram Pro et testez la publication réelle en direct.</p>
-                </div>
-                <span class="plan-badge-active" style="background: #FDF2F8; color: #DB2777; border-color: #FBCFE8;">Meta App ID: 4528780004104334</span>
-              </div>
-            </div>
-
-            <!-- Guide rapide pour générer un jeton -->
-            <div style="background: linear-gradient(135deg, #FAF5FF, #EFF6FF); border: 1.5px solid #E9D5FF; border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 24px;">
-              <h4 style="margin: 0 0 6px; font-size: 0.95rem; font-weight: 800; color: #581C87; display: flex; align-items: center; gap: 8px;">
-                <span>💡 Comment obtenir un Jeton de Test en 30 secondes ?</span>
-              </h4>
-              <p style="font-size: 0.85rem; color: #374151; margin: 0 0 10px; line-height: 1.5;">
-                1. Ouvrez l'<a href="https://developers.facebook.com/tools/explorer/?app_id=4528780004104334" target="_blank" rel="noopener noreferrer" style="font-weight: 700; color: #7C3AED; text-decoration: underline;">Explorateur Graph API de Meta</a>.<br>
-                2. Vérifiez que votre application <strong>(4528780004104334)</strong> est sélectionnée.<br>
-                3. Cliquez sur <strong>« Obtenir un jeton » (Generate Access Token)</strong> et cochez <code>pages_show_list</code>, <code>pages_read_engagement</code>, <code>instagram_basic</code>, <code>instagram_content_publish</code>.<br>
-                4. Copiez le jeton généré et collez-le ci-dessous.
-              </p>
-              <a href="https://developers.facebook.com/tools/explorer/?app_id=4528780004104334" target="_blank" rel="noopener noreferrer" class="btn-secondary-app" style="display: inline-flex; font-size: 0.8rem; padding: 6px 12px; text-decoration: none; background: white;">
-                🔗 Ouvrir l'Explorateur Meta Graph API
-              </a>
-            </div>
-
-            <!-- Formulaire de Test de Connexion -->
-            <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
-              <div class="form-field">
-                <label for="ig-access-token">Jeton d'Accès Utilisateur / Page (User / Page Access Token) *</label>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <input type="text" id="ig-access-token" placeholder="EAAb..." style="flex: 1; min-width: 260px; font-family: monospace; font-size: 0.82rem;" value="">
-                  <button type="button" class="btn-primary-app" id="btn-test-ig-conn" onclick="runInstagramApiTest()" style="background: #E1306C; border-color: #E1306C;">
-                    <span>🔍 Tester la Connexion</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Résultat du compte Instagram détecté -->
-            <div id="ig-account-card" style="display: none; background: white; border: 1.5px solid #E5E7EB; border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px; box-shadow: var(--shadow-sm);">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
-                <div style="display: flex; gap: 16px; align-items: center;">
-                  <img id="ig-res-avatar" src="" alt="Avatar" style="width: 56px; height: 56px; border-radius: 50%; border: 2px solid #E1306C; object-fit: cover; display: none;">
-                  <div id="ig-res-avatar-fallback" style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(45deg, #F58529, #DD2A7B, #8134AF); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem;">IG</div>
-                  <div>
-                    <h3 id="ig-res-name" style="margin: 0 0 4px; font-size: 1.1rem; font-weight: 800; color: var(--text-main);">Compte Instagram</h3>
-                    <div style="display: flex; gap: 10px; align-items: center; font-size: 0.85rem; color: var(--text-muted);">
-                      <span id="ig-res-username" style="font-weight: 700; color: #E1306C;">@username</span>
-                      <span>•</span>
-                      <span id="ig-res-id" style="font-family: monospace; font-size: 0.78rem;">ID: -</span>
-                    </div>
-                  </div>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                  <div style="text-align: center; padding: 8px 14px; background: #F9FAFB; border-radius: var(--radius-md); border: var(--border-light);">
-                    <div id="ig-res-followers" style="font-size: 1.1rem; font-weight: 800; color: var(--text-main);">-</div>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Abonnés</div>
-                  </div>
-                  <div style="text-align: center; padding: 8px 14px; background: #F9FAFB; border-radius: var(--radius-md); border: var(--border-light);">
-                    <div id="ig-res-media" style="font-size: 1.1rem; font-weight: 800; color: var(--text-main);">-</div>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Posts</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Bloc de Test de Publication Réelle -->
-              <div style="margin-top: 20px; padding-top: 18px; border-top: 1px solid #F3F4F6;">
-                <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--text-main); margin: 0 0 12px;">📸 Tester une publication directe sur ce compte</h4>
-                <div style="display: grid; grid-template-columns: 1fr; gap: 12px; max-width: 600px;">
-                  <div class="form-field">
-                    <label for="ig-test-image-url">URL de l'image publique (HTTPS) *</label>
-                    <input type="url" id="ig-test-image-url" value="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80">
-                  </div>
-                  <div class="form-field">
-                    <label for="ig-test-caption">Légende / Caption du post</label>
-                    <textarea id="ig-test-caption" style="min-height: 60px;">🚀 Test de publication automatique via CMFlow x Meta Instagram Graph API ! ✨ #CMFlow #InstagramAPI #Test</textarea>
-                  </div>
-                  <div>
-                    <button type="button" class="btn-primary-app" id="btn-publish-ig-test" onclick="runInstagramPublishTest()" style="background: #1877F2; border-color: #1877F2;">
-                      <span>🚀 Publier en direct sur Instagram</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Console de Logs & Réponses JSON -->
-            <div style="margin-top: 20px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-main);">Terminal & Réponses JSON de l'API :</label>
-                <button type="button" class="btn-secondary-app" style="font-size: 0.72rem; padding: 2px 8px;" onclick="document.getElementById('ig-api-terminal').textContent='// En attente d\'un test...';">Effacer</button>
-              </div>
-              <pre id="ig-api-terminal" style="background: #0F172A; color: #38BDF8; padding: 14px 16px; border-radius: var(--radius-md); font-family: monospace; font-size: 0.8rem; overflow-x: auto; max-height: 250px; line-height: 1.4; border: 1px solid #1E293B;">// En attente d'un test...</pre>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- ===================================================================
-             ONGLET 5 : SÉCURITÉ & DONNÉES
-             =================================================================== -->
-        <div class="settings-tab-pane" id="tab-security">
-          <div class="settings-card">
-            <div class="settings-card-header">
-              <h2 class="settings-card-title">Sécurité du Compte</h2>
-              <p class="settings-card-subtitle">Modifiez votre mot de passe et gérez la sécurité de votre session.</p>
-            </div>
-
-            <form id="form-settings-password" onsubmit="event.preventDefault(); showAppToast('Mot de passe mis à jour avec succès !', 'success'); this.reset();" style="max-width: 440px;">
-              <div class="form-field">
-                <label for="pwd-current">Mot de passe actuel</label>
-                <input type="password" id="pwd-current" placeholder="••••••••" required>
-              </div>
-
-              <div class="form-field">
-                <label for="pwd-new">Nouveau mot de passe</label>
-                <input type="password" id="pwd-new" placeholder="8 caractères minimum" minlength="8" required>
-              </div>
-
-              <div style="margin-top: 16px;">
-                <button type="submit" class="btn-primary-app">
-                  <span>Mettre à jour le mot de passe</span>
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div class="settings-card" style="border-color: #FECACA;">
-            <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--color-danger); margin: 0 0 6px;">Zone de Danger</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 16px;">Réinitialiser les données locales de démonstration de votre navigateur.</p>
-            
-            <button type="button" class="btn-secondary-app" style="color: var(--color-danger); border-color: #FCA5A5;" onclick="if(confirm('Êtes-vous sûr de vouloir réinitialiser les données ?')){ CMFlowStore.logout(); window.location.href='index.html'; }">
-              Effacer les données et se déconnecter
-            </button>
-          </div>
-        </div>
-
+        <button type="button" class="tab-nav-btn px-4 py-2 rounded-xl hover:text-slate-900 transition-all" data-tab="agency">
+          2. Agence & Workspaces
+        </button>
+        <button type="button" class="tab-nav-btn px-4 py-2 rounded-xl hover:text-slate-900 transition-all" data-tab="billing">
+          3. Abonnement & Forfaits
+        </button>
+        <button type="button" class="tab-nav-btn px-4 py-2 rounded-xl hover:text-slate-900 transition-all" data-tab="notifications">
+          4. WhatsApp & Notifications
+        </button>
       </div>
+
+      <!-- Onglet 1 : Profil CM -->
+      <section id="tab-profile" class="tab-content bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
+        <h2 class="text-base font-extrabold text-[#0F172A] pb-3 border-b border-slate-100">
+          Informations du Community Manager
+        </h2>
+
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#0066FF] to-sky-400 flex items-center justify-center font-black text-lg text-white shadow-md">
+            AD
+          </div>
+          <div>
+            <div class="text-sm font-extrabold text-[#0F172A]">Awa Diop</div>
+            <div class="text-xs text-slate-500">Lead Community Manager · Dakar 🇸🇳</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Prénom & Nom</label>
+            <input type="text" value="Awa Diop" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Email Professionnel</label>
+            <input type="email" value="awa.diop@cmflow.sn" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Numéro WhatsApp Professionnel</label>
+            <input type="tel" value="+221 77 800 12 34" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#10B981]">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Spécialité & Marché</label>
+            <input type="text" value="Gastronomie, Beauté & Mode Afrique de l'Ouest" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]">
+          </div>
+        </div>
+      </section>
+
+      <!-- Onglet 2 : Agence & Workspace -->
+      <section id="tab-agency" class="tab-content hidden bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
+        <h2 class="text-base font-extrabold text-[#0F172A] pb-3 border-b border-slate-100">
+          Configuration de l'Agence
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Nom de l'Agence</label>
+            <input type="text" value="Dakar Social Media Studio" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Devise Principale</label>
+            <select class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium">
+              <option value="FCFA">Franc CFA (XOF/XAF)</option>
+              <option value="EUR">Euro (€)</option>
+              <option value="USD">Dollar ($)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Onglet 3 : Facturation & Forfaits -->
+      <section id="tab-billing" class="tab-content hidden bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h2 class="text-base font-extrabold text-[#0F172A]">Abonnement & Forfait Actif</h2>
+            <p class="text-xs text-slate-500">Plan Starter avec paiement Wave & Orange Money</p>
+          </div>
+          <span class="px-3 py-1 bg-emerald-50 text-emerald-700 font-extrabold text-xs rounded-full border border-emerald-200">
+            ✓ Actif
+          </span>
+        </div>
+
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-700">Forfait Starter (5 Marques)</span>
+            <span class="font-extrabold text-[#F94F06]">19 000 FCFA / mois</span>
+          </div>
+          <div class="text-[11px] text-slate-500">
+            Prochain renouvellement automatique le 24 Septembre 2026 via Wave.
+          </div>
+        </div>
+      </section>
+
+      <!-- Onglet 4 : WhatsApp & Notifications -->
+      <section id="tab-notifications" class="tab-content hidden bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
+        <h2 class="text-base font-extrabold text-[#0F172A] pb-3 border-b border-slate-100">
+          Alertes WhatsApp & Notifications
+        </h2>
+
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer">
+            <input type="checkbox" checked class="w-4 h-4 text-[#F94F06] rounded focus:ring-0">
+            <div class="text-xs">
+              <span class="font-bold block text-slate-800">Notification WhatsApp dès qu'un client valide</span>
+              <span class="text-slate-500">Recevez un message instantané lorsqu'un planning est approuvé.</span>
+            </div>
+          </label>
+
+          <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer">
+            <input type="checkbox" checked class="w-4 h-4 text-[#F94F06] rounded focus:ring-0">
+            <div class="text-xs">
+              <span class="font-bold block text-slate-800">Rappel automatique aux clients sans réponse</span>
+              <span class="text-slate-500">Envoie un rappel doux sur WhatsApp 24h avant la date de publication.</span>
+            </div>
+          </label>
+        </div>
+      </section>
+
     </main>
   </div>
 
-  <!-- Firebase SDK (CDN compat) -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js"></script>
-
-  <!-- Scripts applicatifs -->
-  <script src="js/app.js"></script>
-  <script src="js/backend.js"></script>
   <script>
+    function showToast(msg) {
+      const toast = document.getElementById('app-toast');
+      const text = document.getElementById('toast-text');
+      text.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-      initSettingsPage();
-    });
+      // Onglets
+      document.querySelectorAll('.tab-nav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = btn.getAttribute('data-tab');
 
-    function initSettingsPage() {
-      // Gestion des onglets
-      const tabBtns = document.querySelectorAll('.settings-tab-btn');
-      const tabPanes = document.querySelectorAll('.settings-tab-pane');
+          document.querySelectorAll('.tab-nav-btn').forEach(b => {
+            b.className = 'tab-nav-btn px-4 py-2 rounded-xl hover:text-slate-900 transition-all';
+          });
+          btn.className = 'tab-nav-btn active px-4 py-2 rounded-xl bg-white text-[#0F172A] shadow-xs transition-all';
 
-      tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const targetId = btn.dataset.tab;
-          tabBtns.forEach(b => b.classList.remove('active'));
-          tabPanes.forEach(p => p.classList.remove('active'));
-
-          btn.classList.add('active');
-          const targetPane = document.getElementById(targetId);
-          if (targetPane) targetPane.classList.add('active');
+          document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+          });
+          document.getElementById(`tab-${target}`).classList.remove('hidden');
         });
       });
 
-      // Si ancre dans l'URL (ex: #billing)
-      if (window.location.hash === '#billing') {
-        const billingBtn = document.querySelector('[data-tab="tab-billing"]');
-        if (billingBtn) billingBtn.click();
-      }
+      // Save
+      document.getElementById('btn-save-all').addEventListener('click', (e) => {
+        e.preventDefault();
+        showToast('💾 Modifications des paramètres enregistrées avec succès !');
+      });
 
-      // Remplissage du formulaire de profil
-      const user = CMFlowStore.getUser();
-      const ws = CMFlowStore.getWorkspace();
+      // Sidebar Mobile
+      const openSide = document.getElementById('open-sidebar-btn');
+      const closeSide = document.getElementById('close-sidebar-btn');
+      const side = document.getElementById('sidebar');
+      const sideBack = document.getElementById('sidebar-backdrop');
 
-      if (user) {
-        const fnInput = document.getElementById('set-firstname');
-        const lnInput = document.getElementById('set-lastname');
-        const emailInput = document.getElementById('set-email');
-        const agencyInput = document.getElementById('set-agency');
-
-        if (fnInput) fnInput.value = user.firstName || '';
-        if (lnInput) lnInput.value = user.lastName || '';
-        if (emailInput) emailInput.value = user.email || '';
-        if (agencyInput) agencyInput.value = ws?.name || user.activityName || '';
-      }
-
-      // Enregistrement du profil
-      const formProfile = document.getElementById('form-settings-profile');
-      if (formProfile) {
-        formProfile.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const rawFirstName = document.getElementById('set-firstname')?.value.trim() || '';
-          const rawLastName = document.getElementById('set-lastname')?.value.trim() || '';
-          const rawEmail = document.getElementById('set-email')?.value.trim() || '';
-          const rawAgency = document.getElementById('set-agency')?.value.trim() || '';
-
-          // Validation stricte d'email
-          if (rawEmail && typeof CMFlowSecurity !== 'undefined' && !CMFlowSecurity.isValidEmail(rawEmail)) {
-            showAppToast('Veuillez entrer une adresse email valide.', 'error');
-            return;
-          }
-
-          // Désinfection Anti-XSS
-          const firstName = typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.sanitizeInput(rawFirstName) : rawFirstName;
-          const lastName = typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.sanitizeInput(rawLastName) : rawLastName;
-          const email = rawEmail;
-          const agency = typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.sanitizeInput(rawAgency) : rawAgency;
-
-          const currentUser = CMFlowStore.getUser() || {};
-          currentUser.firstName = firstName;
-          currentUser.lastName = lastName;
-          currentUser.name = `${firstName} ${lastName}`.trim() || firstName;
-          currentUser.email = email;
-          currentUser.activityName = agency;
-          CMFlowStore.setUser(currentUser);
-
-          const currentWs = CMFlowStore.getWorkspace() || { id: CMFlowStore.generateId(), ownerId: currentUser.id };
-          currentWs.name = agency || `Espace de ${firstName}`;
-          CMFlowStore.setWorkspace(currentWs);
-
-          // Actualiser l'interface
-          document.querySelectorAll('[data-user-name]').forEach(el => el.textContent = currentUser.name);
-          document.querySelectorAll('[data-workspace-name]').forEach(el => el.textContent = agency);
-          const initials = CMFlowStore.getInitials(currentUser.name);
-          document.querySelectorAll('[data-user-initials]').forEach(el => el.textContent = initials);
-
-          showAppToast('Votre profil et votre agence ont été mis à jour ! ✅', 'success');
-        });
-      }
-    }
-
-    // ========================================================================
-    // LOGIQUE DU TESTEUR INSTAGRAM GRAPH API
-    // ========================================================================
-    let currentInstagramTestContext = null;
-
-    function logToIgTerminal(message, obj = null) {
-      const term = document.getElementById('ig-api-terminal');
-      if (!term) return;
-      const timestamp = new Date().toLocaleTimeString();
-      let formatted = `[${timestamp}] ${message}\n`;
-      if (obj) {
-        try {
-          formatted += JSON.stringify(obj, null, 2) + '\n\n';
-        } catch (e) {
-          formatted += String(obj) + '\n\n';
-        }
-      }
-      term.textContent = formatted + (term.textContent === '// En attente d\'un test...' ? '' : term.textContent);
-    }
-
-    async function runInstagramApiTest() {
-      const tokenInput = document.getElementById('ig-access-token');
-      const token = tokenInput?.value.trim();
-      const btn = document.getElementById('btn-test-ig-conn');
-      const card = document.getElementById('ig-account-card');
-
-      if (!token) {
-        showAppToast('Veuillez entrer un Access Token (Jeton d\'accès Meta).', 'error');
-        if (tokenInput) tokenInput.focus();
-        return;
-      }
-
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<span>⏳ Test en cours...</span>';
-      }
-
-      logToIgTerminal('🚀 Envoi de la requête à Meta Graph API (v19.0/me/accounts)...');
-
-      try {
-        const result = await CMFlowBackend.testInstagramGraphApi(token);
-        logToIgTerminal(result.success ? '✅ Réponse reçue de Meta :' : '❌ Erreur Meta API :', result);
-
-        if (result.success && result.hasInstagram && result.primaryAccount) {
-          const ig = result.primaryAccount.instagram;
-          currentInstagramTestContext = {
-            igUserId: ig.id,
-            pageAccessToken: result.primaryAccount.pageAccessToken || token,
-            userAccessToken: token,
-            username: ig.username
-          };
-
-          // Afficher la carte résultat
-          if (card) card.style.display = 'block';
-          const nameEl = document.getElementById('ig-res-name');
-          const userEl = document.getElementById('ig-res-username');
-          const idEl = document.getElementById('ig-res-id');
-          const folEl = document.getElementById('ig-res-followers');
-          const medEl = document.getElementById('ig-res-media');
-          const imgEl = document.getElementById('ig-res-avatar');
-          const fallbackEl = document.getElementById('ig-res-avatar-fallback');
-
-          if (nameEl) nameEl.textContent = ig.name || result.primaryAccount.pageName || 'Compte Instagram Pro';
-          if (userEl) userEl.textContent = `@${ig.username || 'compte'}`;
-          if (idEl) idEl.textContent = `ID IG: ${ig.id}`;
-          if (folEl) folEl.textContent = (ig.followers_count || 0).toLocaleString();
-          if (medEl) medEl.textContent = (ig.media_count || 0).toLocaleString();
-
-          if (ig.profile_picture_url && imgEl && fallbackEl) {
-            imgEl.src = ig.profile_picture_url;
-            imgEl.style.display = 'block';
-            fallbackEl.style.display = 'none';
-          }
-
-          showAppToast(`Compte Instagram @${ig.username} connecté avec succès ! 🎉`, 'success');
-        } else if (result.success && !result.hasInstagram) {
-          if (card) card.style.display = 'none';
-          showAppToast(result.message, 'warning');
-        } else {
-          if (card) card.style.display = 'none';
-          showAppToast(result.error || 'Échec de la connexion à Meta API.', 'error');
-        }
-      } catch (err) {
-        logToIgTerminal(`❌ Exception JavaScript : ${err.message}`);
-        showAppToast(`Erreur réseau : ${err.message}`, 'error');
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<span>🔍 Tester la Connexion</span>';
-        }
-      }
-    }
-
-    async function runInstagramPublishTest() {
-      if (!currentInstagramTestContext) {
-        showAppToast('Veuillez d\'abord tester et valider la connexion Instagram.', 'error');
-        return;
-      }
-
-      const imgInput = document.getElementById('ig-test-image-url');
-      const capInput = document.getElementById('ig-test-caption');
-      const btn = document.getElementById('btn-publish-ig-test');
-
-      const imageUrl = imgInput?.value.trim();
-      const caption = capInput?.value.trim();
-
-      if (!imageUrl) {
-        showAppToast('Veuillez spécifier l\'URL d\'une image publique en HTTPS.', 'error');
-        return;
-      }
-
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<span>⏳ Envoi du média sur Instagram...</span>';
-      }
-
-      logToIgTerminal(`📸 Étape 1/2 : Création du conteneur média sur Instagram (ID: ${currentInstagramTestContext.igUserId})...`);
-
-      try {
-        const tokenToUse = currentInstagramTestContext.pageAccessToken || currentInstagramTestContext.userAccessToken;
-        const res = await CMFlowBackend.publishRealInstagramPost(
-          currentInstagramTestContext.igUserId,
-          tokenToUse,
-          imageUrl,
-          caption
-        );
-
-        logToIgTerminal(res.success ? '🎉 Post publié avec succès !' : '❌ Erreur de publication Instagram :', res);
-
-        if (res.success) {
-          showAppToast('Post publié avec succès sur Instagram ! 📸✨', 'success');
-        } else {
-          showAppToast(res.error || 'Erreur lors de la publication.', 'error');
-        }
-      } catch (err) {
-        logToIgTerminal(`❌ Erreur : ${err.message}`);
-        showAppToast(`Erreur : ${err.message}`, 'error');
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<span>🚀 Publier en direct sur Instagram</span>';
-        }
-      }
-    }
+      openSide.addEventListener('click', () => {
+        side.classList.remove('-translate-x-full');
+        sideBack.classList.remove('hidden');
+      });
+      closeSide.addEventListener('click', () => {
+        side.classList.add('-translate-x-full');
+        sideBack.classList.add('hidden');
+      });
+      sideBack.addEventListener('click', () => {
+        side.classList.add('-translate-x-full');
+        sideBack.classList.add('hidden');
+      });
+    });
   </script>
 </body>
 </html>
