@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Start Page (Lien Bio & WhatsApp) — CMFlow</title>
-  <meta name="description" content="Créez des mini-sites mobiles Lien en Bio avec bouton WhatsApp pour vos clients.">
+  <title>Start Page • Lien en Bio — CMFlow</title>
+  <meta name="description" content="Créez et personnalisez le microsite de redirection pour vos bios Instagram, TikTok et WhatsApp.">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -20,6 +20,17 @@
   <style>
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 999px;
     }
   </style>
 </head>
@@ -59,6 +70,7 @@
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Actif
           </span>
         </div>
+
         <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-800/80 border border-slate-700/70">
           <div class="flex items-center gap-3 min-w-0">
             <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-xl object-cover ring-2 ring-[#0066FF]/40">
@@ -128,71 +140,126 @@
 
   <!-- MAIN WRAPPER -->
   <div class="flex-1 flex flex-col min-w-0 lg:pl-64 z-10">
+    
+    <!-- Topbar -->
     <header class="sticky top-0 z-30 backdrop-blur-xl bg-white/80 border-b border-slate-200/60 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <button id="open-sidebar-btn" class="lg:hidden p-2 rounded-xl text-slate-700 bg-slate-100"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
         <div class="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#0F172A]">
           <span class="text-slate-400 font-medium">CMFlow</span>
           <span class="text-slate-300">/</span>
-          <span>Start Page & Mini-Site Bio</span>
+          <span>Start Page • Lien en Bio</span>
         </div>
       </div>
-      <button type="button" onclick="showToast('🔗 Lien public copié : cmflow.me/teranga')" class="px-3.5 py-2 bg-[#10B981] hover:bg-[#059669] text-white text-xs font-extrabold rounded-xl shadow-md flex items-center gap-1.5">
-        <span>Copier le Lien Bio</span>
-      </button>
+
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="copyLink()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold rounded-xl border border-slate-200 flex items-center gap-1.5">
+          <span>cmflow.sn/bio/teranga</span>
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+        <button type="button" onclick="showToast('🚀 Modifications publiées en direct !')" class="px-4 py-2 bg-[#F94F06] hover:bg-[#e04605] text-white text-xs font-black rounded-xl shadow-lg shadow-[#F94F06]/25">
+          Publier
+        </button>
+      </div>
     </header>
 
+    <!-- Corps 2 Volets -->
     <main class="p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl">
+      
+      <!-- En-tête -->
+      <div class="bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200/70 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 class="text-xl sm:text-2xl font-black text-[#0F172A]">Start Page & Mini-Site Bio</h1>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">🟢 Page Active</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">Personnalisez vos boutons WhatsApp, cartes menus et réseaux sociaux.</p>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Éditeur Bio (Gauche) -->
-        <div class="lg:col-span-7 bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <h2 class="text-base font-extrabold text-[#0F172A] pb-3 border-b border-slate-100">Personnalisation du Lien en Bio</h2>
+        <!-- ÉDITEUR GAUCHE (7 Cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+            <h2 class="text-sm font-black text-[#0F172A] pb-2 border-b border-slate-100">1. Identité du Profil</h2>
 
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Titre de la page</label>
-            <input type="text" value="Teranga Gourmet — Restaurant & Traiteur Dakar" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Nom Affiché</label>
+              <input type="text" id="input-name" value="Teranga Gourmet Dakar 🇸🇳" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Bio Courte</label>
+              <textarea id="input-bio" rows="2" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none">Haute Gastronomie sénégalaise aux Almadies. Ouvert 7j/7 midi & soir.</textarea>
+            </div>
           </div>
 
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Description courte (Bio)</label>
-            <textarea rows="2" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">Le goût authentique de la Teranga revisité par nos chefs étoilés à Dakar. Ouvert 7j/7.</textarea>
+          <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h2 class="text-sm font-black text-[#0F172A]">2. Blocs de Liens Redirections</h2>
+              <button type="button" onclick="showToast('✨ Nouveau bloc ajouté !')" class="text-xs font-bold text-[#F94F06]">+ Ajouter un lien</button>
+            </div>
+
+            <div class="space-y-2.5">
+              <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+                <div class="text-xs font-bold text-slate-800">💬 Commander sur WhatsApp (+221 77 800 12 34)</div>
+                <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md">Actif</span>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+                <div class="text-xs font-bold text-slate-800">📋 Découvrir la Carte & Menu du Soir (PDF)</div>
+                <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md">Actif</span>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+                <div class="text-xs font-bold text-slate-800">📍 Nous Trouver & Réserver aux Almadies</div>
+                <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md">Actif</span>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Bouton WhatsApp Direct (Commande / Réservation)</label>
-            <input type="text" value="Commander sur WhatsApp (+221 77 800 12 34)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
-          </div>
-
-          <div class="pt-3">
-            <button type="button" onclick="showToast('💾 Modifications du lien bio enregistrées !')" class="px-5 py-2.5 bg-[#F94F06] hover:bg-[#e04605] text-white font-extrabold text-xs rounded-xl shadow-lg shadow-[#F94F06]/25">Publier les modifications</button>
-          </div>
         </div>
 
-        <!-- Aperçu Smartphone Réel (Droite) -->
-        <div class="lg:col-span-5 flex justify-center">
-          <div class="w-72 bg-[#0F172A] p-3.5 rounded-[40px] shadow-2xl border-4 border-slate-700">
-            <div class="bg-gradient-to-b from-slate-900 to-slate-950 rounded-[32px] p-5 text-white text-center space-y-4">
-              <div class="w-16 h-16 rounded-full mx-auto overflow-hidden ring-2 ring-[#F94F06]">
-                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-full h-full object-cover">
-              </div>
-              <div>
-                <div class="text-sm font-extrabold">Teranga Gourmet 🇸🇳</div>
-                <div class="text-[11px] text-slate-400 mt-1">Gastronomie sénégalaise haut de gamme.</div>
+        <!-- MOCKUP IPHONE DROITE (5 Cols) -->
+        <div class="lg:col-span-5 flex justify-center sticky top-24">
+          <div class="w-[300px] bg-[#0F172A] p-3.5 rounded-[46px] shadow-2xl border-4 border-slate-700 ring-1 ring-white/10">
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 rounded-[36px] p-5 text-white flex flex-col justify-between min-h-[540px]">
+              
+              <!-- Dynamic Island -->
+              <div class="w-20 h-4 bg-black rounded-full mx-auto mb-4"></div>
+
+              <div class="text-center space-y-3.5">
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-16 h-16 rounded-full mx-auto object-cover ring-2 ring-[#F94F06]">
+                <div>
+                  <div class="text-xs font-extrabold" id="preview-name">Teranga Gourmet Dakar 🇸🇳</div>
+                  <div class="text-[10px] text-slate-400 mt-1" id="preview-bio">Haute Gastronomie sénégalaise aux Almadies. Ouvert 7j/7 midi & soir.</div>
+                </div>
+
+                <div class="flex justify-center gap-2 pt-1">
+                  <span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">📸</span>
+                  <span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">🎵</span>
+                  <span class="w-7 h-7 rounded-full bg-[#10B981] text-white flex items-center justify-center text-xs">💬</span>
+                </div>
+
+                <div class="space-y-2 pt-2 text-xs font-bold">
+                  <a href="https://wa.me/221778001234" target="_blank" class="block w-full py-2.5 px-3 bg-[#10B981] hover:bg-[#059669] text-white rounded-2xl shadow-md transition-all">
+                    💬 Commander sur WhatsApp
+                  </a>
+                  <a href="#" class="block w-full py-2.5 px-3 bg-white/15 hover:bg-white/25 text-white rounded-2xl border border-white/20 backdrop-blur-md">
+                    📋 Découvrir la Carte (PDF)
+                  </a>
+                  <a href="#" class="block w-full py-2.5 px-3 bg-white/15 hover:bg-white/25 text-white rounded-2xl border border-white/20 backdrop-blur-md">
+                    📍 Nous Trouver aux Almadies
+                  </a>
+                </div>
               </div>
 
-              <!-- Boutons Liens -->
-              <div class="space-y-2.5 text-xs font-bold pt-2">
-                <a href="https://wa.me/221778001234" target="_blank" class="block w-full py-2.5 px-4 bg-[#10B981] hover:bg-[#059669] text-white rounded-2xl shadow-lg transition-all">
-                  💬 Réserver sur WhatsApp
-                </a>
-                <a href="#" class="block w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl border border-slate-700">
-                  🍽️ Découvrir la Carte du Soir
-                </a>
-                <a href="#" class="block w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl border border-slate-700">
-                  📍 Nous Trouver aux Almadies
-                </a>
+              <div class="text-center pt-3 text-[9px] text-slate-500 font-semibold">
+                Propulsé par <span class="font-bold text-[#F94F06]">CMFlow ⚡</span>
               </div>
+
             </div>
           </div>
         </div>
@@ -211,6 +278,19 @@
         toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
       }, 3000);
     }
+
+    function copyLink() {
+      navigator.clipboard.writeText('https://cmflow.sn/bio/teranga-gourmet');
+      showToast('🔗 Lien Bio public copié dans le presse-papiers !');
+    }
+
+    document.getElementById('input-name').addEventListener('input', (e) => {
+      document.getElementById('preview-name').textContent = e.target.value;
+    });
+
+    document.getElementById('input-bio').addEventListener('input', (e) => {
+      document.getElementById('preview-bio').textContent = e.target.value;
+    });
   </script>
 </body>
 </html>
