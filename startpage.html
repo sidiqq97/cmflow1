@@ -1,400 +1,215 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Start Page (Lien en Bio) — CMFlow</title>
+  <title>Start Page (Lien Bio & WhatsApp) — CMFlow</title>
   <meta name="description" content="Créez des mini-sites mobiles Lien en Bio avec bouton WhatsApp pour vos clients.">
-
+  
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+  </style>
 </head>
-<body>
+<body class="min-h-full bg-[#F8FAFC] text-[#0F172A] antialiased flex selection:bg-[#F94F06]/20 selection:text-[#F94F06]">
 
-  <div class="app-layout">
-    
-    <!-- =======================================================================
-         SIDEBAR NAVIGATION
-         ======================================================================= -->
-    <aside class="app-sidebar" id="app-sidebar">
-      <!-- Sidebar Brand -->
-      <a href="dashboard.html" class="sidebar-brand" style="text-decoration: none; display: flex; align-items: center; padding: 20px 18px 16px;">
-        <img src="images/logo.svg" alt="CMFlow" style="height: 32px; width: auto; display: block;">
-      </a>
+  <!-- Texture de lumière d'arrière-plan -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute top-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-blue-100/40 via-purple-50/20 to-transparent rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-gradient-to-tr from-orange-100/30 via-amber-50/20 to-transparent rounded-full blur-3xl"></div>
+  </div>
 
-      <!-- Sidebar Navigation -->
-      <nav class="sidebar-nav" aria-label="Menu principal">
-        <span class="sidebar-nav-section-label">Général</span>
-        
-        <a href="dashboard.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="9" rx="1"/>
-            <rect x="14" y="3" width="7" height="5" rx="1"/>
-            <rect x="14" y="12" width="7" height="9" rx="1"/>
-            <rect x="3" y="16" width="7" height="5" rx="1"/>
-          </svg>
+  <!-- Toast Notification -->
+  <div id="app-toast" class="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+    <svg class="w-4 h-4 text-[#F94F06]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
+    <span id="toast-text">Message</span>
+  </div>
+
+  <!-- SIDEBAR (#0F172A) -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-[#0F172A] text-white flex flex-col justify-between transition-transform duration-300 ease-out border-r border-slate-800/80 -translate-x-full lg:translate-x-0">
+    <div class="overflow-y-auto">
+      <div class="p-5 border-b border-slate-800/60 flex items-center justify-between">
+        <a href="dashboard.html" class="inline-flex items-center gap-2.5">
+          <img src="images/logo-white.svg" alt="CMFlow" class="h-6 w-auto object-contain">
+          <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#F94F06]/20 text-[#F94F06] border border-[#F94F06]/30">PRO</span>
+        </a>
+        <button id="close-sidebar-btn" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="p-3.5">
+        <div class="text-[9px] font-extrabold uppercase text-slate-400 px-2 mb-1.5 flex items-center justify-between">
+          <span>Espace Client</span>
+          <span class="text-emerald-400 flex items-center gap-1 font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Actif
+          </span>
+        </div>
+        <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-800/80 border border-slate-700/70">
+          <div class="flex items-center gap-3 min-w-0">
+            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-xl object-cover ring-2 ring-[#0066FF]/40">
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-white truncate">Teranga Gourmet</div>
+              <div class="text-[10px] text-slate-400 truncate">Haute Gastronomie 🇸🇳</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="px-3 space-y-1 mt-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
           <span>Tableau de bord</span>
         </a>
-
-        <a href="clients.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-          <span>Clients</span>
+        <a href="clients.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Espaces Clients</span>
         </a>
-
-        <a href="planning.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
+        <a href="planning.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>Planning & Queue</span>
         </a>
-
-        <a href="inbox.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          <span>Messagerie (Inbox)</span>
+        <a href="media.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Médiathèque Assets</span>
         </a>
-
-        <a href="startpage.html" class="sidebar-nav-item active">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
-            <line x1="12" y1="18" x2="12.01" y2="18"/>
-          </svg>
-          <span>Start Page (Lien Bio)</span>
+        <a href="inbox.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <div class="flex items-center gap-3">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Inbox Unifiée</span>
+          </div>
+          <span class="w-2 h-2 rounded-full bg-emerald-300"></span>
         </a>
-
-        <a href="analytics.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10"/>
-            <line x1="12" y1="20" x2="12" y2="4"/>
-            <line x1="6" y1="20" x2="6" y2="14"/>
-          </svg>
+        <a href="startpage.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold bg-[#F94F06] text-white shadow-lg shadow-[#F94F06]/25 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>Start Page (Bio)</span>
+        </a>
+        <a href="analytics.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           <span>Analytics & Rapports</span>
         </a>
-
-        <span class="sidebar-nav-section-label">Collaboration</span>
-
-        <a href="validation.html" target="_blank" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
+        <a href="validation.html" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <span>Portail Validation</span>
         </a>
-
-        <a href="settings.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
+        <a href="settings.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>Paramètres</span>
         </a>
       </nav>
+    </div>
 
-      <!-- Sidebar Footer (User Menu) -->
-      <div class="sidebar-footer">
-        <div class="sidebar-user-avatar" data-user-initials>CM</div>
-        <div class="sidebar-user-info">
-          <span class="sidebar-user-name" data-user-name>Utilisateur</span>
-          <span class="sidebar-user-role" data-workspace-name>Mon espace</span>
-        </div>
-        <button type="button" class="sidebar-user-menu-btn" id="user-menu-btn" aria-label="Menu options utilisateur">
-          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-          </svg>
-        </button>
-
-        <!-- Dropdown Menu -->
-        <div class="user-dropdown" id="user-dropdown">
-          <a href="settings.html" class="dropdown-item" style="text-decoration: none;">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
-            <span>Mon profil</span>
-          </a>
-          <a href="settings.html#billing" class="dropdown-item" style="text-decoration: none;">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
-            <span>Mon abonnement</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <button type="button" class="dropdown-item danger" id="logout-btn">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
-            <span>Se déconnecter</span>
-          </button>
+    <div class="p-3.5 border-t border-slate-800/70 bg-slate-900/60">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0066FF] to-sky-400 flex items-center justify-center font-black text-xs text-white">AD</div>
+        <div>
+          <div class="text-xs font-bold text-white">Awa Diop</div>
+          <div class="text-[10px] text-slate-400">Lead CM · Dakar 🇸🇳</div>
         </div>
       </div>
-    </aside>
+    </div>
+  </aside>
 
-    <!-- Overlay Mobile -->
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 z-30 hidden backdrop-blur-xs"></div>
 
-    <!-- =======================================================================
-         MAIN CONTENT AREA
-         ======================================================================= -->
-    <main class="app-main">
-      <!-- Header -->
-      <header class="app-header">
-        <button type="button" class="app-hamburger" id="app-hamburger" aria-label="Menu mobile">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <div class="header-greeting">
-          <h1>Start Page — Créateur de Lien en Bio</h1>
-          <p>Créez et personnalisez un mini-site mobile de conversion pour vos clients (Style Buffer Start Page)</p>
+  <!-- MAIN WRAPPER -->
+  <div class="flex-1 flex flex-col min-w-0 lg:pl-64 z-10">
+    <header class="sticky top-0 z-30 backdrop-blur-xl bg-white/80 border-b border-slate-200/60 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <button id="open-sidebar-btn" class="lg:hidden p-2 rounded-xl text-slate-700 bg-slate-100"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+        <div class="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#0F172A]">
+          <span class="text-slate-400 font-medium">CMFlow</span>
+          <span class="text-slate-300">/</span>
+          <span>Start Page & Mini-Site Bio</span>
         </div>
+      </div>
+      <button type="button" onclick="showToast('🔗 Lien public copié : cmflow.me/teranga')" class="px-3.5 py-2 bg-[#10B981] hover:bg-[#059669] text-white text-xs font-extrabold rounded-xl shadow-md flex items-center gap-1.5">
+        <span>Copier le Lien Bio</span>
+      </button>
+    </header>
 
-        <div class="header-actions">
-          <a href="bio.html" id="btn-view-live-bio" target="_blank" class="btn-secondary-app" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
-            <span>Ouvrir la page publique</span>
-          </a>
-        </div>
-      </header>
+    <main class="p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Éditeur Bio (Gauche) -->
+        <div class="lg:col-span-7 bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+          <h2 class="text-base font-extrabold text-[#0F172A] pb-3 border-b border-slate-100">Personnalisation du Lien en Bio</h2>
 
-      <!-- Page Content -->
-      <div class="app-page">
-
-        <div class="startpage-layout-builder">
-          
-          <!-- Colonne Éditeur de gauche -->
-          <div class="settings-card">
-            <div class="settings-card-header">
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-                <div>
-                  <h3 class="settings-card-title">Configuration de la Start Page</h3>
-                  <p class="settings-card-subtitle">Personnalisez les informations qui s'affichent lorsque les abonnés cliquent sur le lien en bio Instagram/TikTok.</p>
-                </div>
-                <div>
-                  <select class="filter-select" id="startpage-client-select">
-                    <!-- Rempli dynamiquement avec les clients -->
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <form id="form-startpage-builder">
-              
-              <div class="onb-field-row">
-                <div class="form-field">
-                  <label for="bio-brand-name">Nom de la Marque / Titre *</label>
-                  <input type="text" id="bio-brand-name" value="Teranga Gourmet Dakar" required>
-                </div>
-                <div class="form-field">
-                  <label for="bio-brand-avatar">Image / Logo Avatar URL</label>
-                  <input type="url" id="bio-brand-avatar" value="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80">
-                </div>
-              </div>
-
-              <div class="form-field">
-                <label for="bio-brand-slogan">Biographie / Description courte</label>
-                <input type="text" id="bio-brand-slogan" value="Restaurant gastronomique & saveurs locales à Dakar. Ouvert du mardi au dimanche. 🍽️✨">
-              </div>
-
-              <!-- Bouton WhatsApp Principal -->
-              <div style="background: #F0FDF4; border: 1.5px solid #BBF7D0; border-radius: var(--radius-lg); padding: 16px; margin-bottom: 20px;">
-                <h4 style="font-size: 0.92rem; font-weight: 700; color: #166534; margin: 0 0 10px; display: flex; align-items: center; gap: 6px;">
-                  💬 Bouton WhatsApp Direct (Call-to-Action)
-                </h4>
-                <div class="onb-field-row">
-                  <div class="form-field">
-                    <label for="bio-whatsapp-num" style="color: #166534;">Numéro WhatsApp (+ Indicatif)</label>
-                    <input type="text" id="bio-whatsapp-num" value="+221 77 123 45 67">
-                  </div>
-                  <div class="form-field">
-                    <label for="bio-whatsapp-label" style="color: #166534;">Texte du bouton</label>
-                    <input type="text" id="bio-whatsapp-label" value="💬 Commander sur WhatsApp">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Liens personnalisés -->
-              <div style="margin-bottom: 20px;">
-                <label style="font-weight: 700; font-size: 0.9rem; color: var(--text-main); margin-bottom: 8px; display: block;">
-                  🔗 Liens du Menu & Offres
-                </label>
-                
-                <div id="bio-links-editor-list" style="display: flex; flex-direction: column; gap: 10px;">
-                  <div class="onb-field-row" style="background: #F8FAFC; padding: 10px; border-radius: var(--radius-md); border: var(--border-light);">
-                    <input type="text" class="link-label-input" placeholder="Libellé du lien" value="📖 Consulter la Carte & Menu de Saison">
-                    <input type="text" class="link-url-input" placeholder="https://..." value="https://terangagourmet.sn/menu">
-                  </div>
-                  <div class="onb-field-row" style="background: #F8FAFC; padding: 10px; border-radius: var(--radius-md); border: var(--border-light);">
-                    <input type="text" class="link-label-input" placeholder="Libellé du lien" value="📍 Nous trouver sur Google Maps (Almadies)">
-                    <input type="text" class="link-url-input" placeholder="https://..." value="https://maps.google.com">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Réseaux Sociaux en bas -->
-              <div class="onb-field-row">
-                <div class="form-field">
-                  <label for="bio-ig-handle">Instagram Handle</label>
-                  <input type="text" id="bio-ig-handle" value="teranga_gourmet">
-                </div>
-                <div class="form-field">
-                  <label for="bio-tiktok-handle">TikTok Handle</label>
-                  <input type="text" id="bio-tiktok-handle" value="teranga_dakar">
-                </div>
-              </div>
-
-              <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
-                <button type="submit" class="btn-primary-app">
-                  <span>Enregistrer la Start Page</span>
-                </button>
-                <button type="button" class="btn-secondary-app" onclick="copyBioPublicUrl()">
-                  📋 Copier le lien Bio
-                </button>
-              </div>
-
-            </form>
-          </div>
-
-          <!-- Colonne Aperçu Mobile en direct -->
           <div>
-            <span class="preview-column-title" style="display: block; text-align: center; margin-bottom: 12px;">Aperçu Mobile en direct (Start Page)</span>
-            
-            <div class="startpage-preview-phone">
-              <div class="bio-public-page" style="min-height: 560px; padding: 30px 16px;">
-                <div class="bio-container-card">
-                  
-                  <img id="preview-bio-avatar" class="bio-avatar-img" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80" alt="Avatar">
-                  <h3 id="preview-bio-name" class="bio-title-name">Teranga Gourmet Dakar</h3>
-                  <p id="preview-bio-slogan" class="bio-subtitle-text">Restaurant gastronomique & saveurs locales à Dakar. Ouvert du mardi au dimanche. 🍽️✨</p>
-
-                  <div class="bio-links-list">
-                    <a href="#" id="preview-bio-whatsapp" class="bio-btn-link whatsapp-cta">
-                      💬 Commander sur WhatsApp
-                    </a>
-                    <a href="#" id="preview-bio-link1" class="bio-btn-link">
-                      📖 Consulter la Carte & Menu
-                    </a>
-                    <a href="#" id="preview-bio-link2" class="bio-btn-link">
-                      📍 Nous trouver sur Google Maps
-                    </a>
-                  </div>
-
-                  <div class="bio-social-icons-row">
-                    <div class="bio-social-icon-circle">
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                    </div>
-                    <div class="bio-social-icon-circle">
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                    </div>
-                    <div class="bio-social-icon-circle">
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-1.01v8.86c-.03 2.1-.85 4.19-2.3 5.75-1.74 1.9-4.28 2.87-6.81 2.6-2.54-.26-4.88-1.74-6.22-3.92-1.35-2.18-1.5-4.94-.41-7.24 1.09-2.3 3.29-3.9 5.8-4.22.84-.11 1.7-.06 2.53.15v4.19c-.43-.16-.9-.23-1.36-.2-1.12.06-2.19.63-2.83 1.55-.65.92-.78 2.11-.35 3.16.42 1.04 1.41 1.77 2.53 1.86 1.13.1 2.26-.41 2.88-1.37.28-.43.43-.94.43-1.46V.02h-2.18z"/></svg>
-                    </div>
-                  </div>
-
-                  <div style="margin-top: 24px; font-size: 0.72rem; color: #64748B;">
-                    Propulsé par <strong>CMFlow</strong>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Titre de la page</label>
+            <input type="text" value="Teranga Gourmet — Restaurant & Traiteur Dakar" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
           </div>
 
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Description courte (Bio)</label>
+            <textarea rows="2" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">Le goût authentique de la Teranga revisité par nos chefs étoilés à Dakar. Ouvert 7j/7.</textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Bouton WhatsApp Direct (Commande / Réservation)</label>
+            <input type="text" value="Commander sur WhatsApp (+221 77 800 12 34)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+          </div>
+
+          <div class="pt-3">
+            <button type="button" onclick="showToast('💾 Modifications du lien bio enregistrées !')" class="px-5 py-2.5 bg-[#F94F06] hover:bg-[#e04605] text-white font-extrabold text-xs rounded-xl shadow-lg shadow-[#F94F06]/25">Publier les modifications</button>
+          </div>
+        </div>
+
+        <!-- Aperçu Smartphone Réel (Droite) -->
+        <div class="lg:col-span-5 flex justify-center">
+          <div class="w-72 bg-[#0F172A] p-3.5 rounded-[40px] shadow-2xl border-4 border-slate-700">
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 rounded-[32px] p-5 text-white text-center space-y-4">
+              <div class="w-16 h-16 rounded-full mx-auto overflow-hidden ring-2 ring-[#F94F06]">
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <div class="text-sm font-extrabold">Teranga Gourmet 🇸🇳</div>
+                <div class="text-[11px] text-slate-400 mt-1">Gastronomie sénégalaise haut de gamme.</div>
+              </div>
+
+              <!-- Boutons Liens -->
+              <div class="space-y-2.5 text-xs font-bold pt-2">
+                <a href="https://wa.me/221778001234" target="_blank" class="block w-full py-2.5 px-4 bg-[#10B981] hover:bg-[#059669] text-white rounded-2xl shadow-lg transition-all">
+                  💬 Réserver sur WhatsApp
+                </a>
+                <a href="#" class="block w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl border border-slate-700">
+                  🍽️ Découvrir la Carte du Soir
+                </a>
+                <a href="#" class="block w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl border border-slate-700">
+                  📍 Nous Trouver aux Almadies
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
     </main>
   </div>
 
-  <!-- Firebase SDK (CDN compat) -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js"></script>
-
-  <!-- Scripts applicatifs -->
-  <script src="js/app.js"></script>
-  <script src="js/backend.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      initStartPageBuilder();
-    });
-
-    function initStartPageBuilder() {
-      const clientSelect = document.getElementById('startpage-client-select');
-      const clients = CMFlowStore.getClients();
-
-      if (clientSelect) {
-        clients.forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c.id;
-          opt.textContent = c.name;
-          clientSelect.appendChild(opt);
-        });
-
-        clientSelect.addEventListener('change', () => {
-          const c = clients.find(cl => cl.id === clientSelect.value);
-          if (c) {
-            document.getElementById('bio-brand-name').value = c.name;
-            document.getElementById('bio-brand-slogan').value = `${c.industry} à Dakar. Contactez-nous pour toute information ! ✨`;
-            updateBioLivePreview();
-          }
-        });
-      }
-
-      // Live updates
-      const nameInput = document.getElementById('bio-brand-name');
-      const sloganInput = document.getElementById('bio-brand-slogan');
-      const avatarInput = document.getElementById('bio-brand-avatar');
-      const waLabelInput = document.getElementById('bio-whatsapp-label');
-
-      function updateBioLivePreview() {
-        const name = nameInput?.value.trim() || 'Votre Marque';
-        const slogan = sloganInput?.value.trim() || 'Description';
-        const avatar = avatarInput?.value.trim() || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80';
-        const waLabel = waLabelInput?.value.trim() || '💬 Discuter sur WhatsApp';
-
-        document.getElementById('preview-bio-name').textContent = name;
-        document.getElementById('preview-bio-slogan').textContent = slogan;
-        document.getElementById('preview-bio-avatar').src = avatar;
-        document.getElementById('preview-bio-whatsapp').textContent = waLabel;
-      }
-
-      nameInput?.addEventListener('input', updateBioLivePreview);
-      sloganInput?.addEventListener('input', updateBioLivePreview);
-      avatarInput?.addEventListener('input', updateBioLivePreview);
-      waLabelInput?.addEventListener('input', updateBioLivePreview);
-
-      // Form submit
-      const form = document.getElementById('form-startpage-builder');
-      if (form) {
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
-          showAppToast('Start Page enregistrée et publiée avec succès ! 🎉', 'success');
-        });
-      }
-    }
-
-    function copyBioPublicUrl() {
-      const clientSelect = document.getElementById('startpage-client-select');
-      const clientId = clientSelect?.value || '1';
-      const origin = window.location.origin;
-      const pathname = window.location.pathname;
-      const basePath = pathname.substring(0, pathname.lastIndexOf('/'));
-      const url = `${origin}${basePath}/bio.html?client=${encodeURIComponent(clientId)}`;
-      
-      navigator.clipboard.writeText(url).then(() => {
-        showAppToast('Lien public copié dans le presse-papier ! 📋', 'success');
-      });
+    function showToast(msg) {
+      const toast = document.getElementById('app-toast');
+      const text = document.getElementById('toast-text');
+      text.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3000);
     }
   </script>
 </body>

@@ -1,515 +1,268 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Boîte de Réception (Inbox) — CMFlow</title>
-  <meta name="description" content="Centralisez et répondez aux messages et commentaires de tous les réseaux sociaux de vos clients.">
-
+  <title>Messagerie Unifiée (Inbox) — CMFlow</title>
+  <meta name="description" content="Centralisez et répondez aux messages et commentaires WhatsApp, Instagram, Facebook et TikTok.">
+  
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 999px;
+    }
+  </style>
 </head>
-<body>
+<body class="min-h-full bg-[#F8FAFC] text-[#0F172A] antialiased flex selection:bg-[#F94F06]/20 selection:text-[#F94F06]">
 
-  <div class="app-layout">
-    
-    <!-- =======================================================================
-         SIDEBAR NAVIGATION
-         ======================================================================= -->
-    <aside class="app-sidebar" id="app-sidebar">
-      <!-- Sidebar Brand -->
-      <a href="dashboard.html" class="sidebar-brand" style="text-decoration: none; display: flex; align-items: center; padding: 20px 18px 16px;">
-        <img src="images/logo.svg" alt="CMFlow" style="height: 32px; width: auto; display: block;">
-      </a>
+  <!-- Texture de lumière d'arrière-plan -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute top-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-blue-100/40 via-purple-50/20 to-transparent rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-gradient-to-tr from-orange-100/30 via-amber-50/20 to-transparent rounded-full blur-3xl"></div>
+  </div>
 
-      <!-- Sidebar Navigation -->
-      <nav class="sidebar-nav" aria-label="Menu principal">
-        <span class="sidebar-nav-section-label">Général</span>
-        
-        <a href="dashboard.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="9" rx="1"/>
-            <rect x="14" y="3" width="7" height="5" rx="1"/>
-            <rect x="14" y="12" width="7" height="9" rx="1"/>
-            <rect x="3" y="16" width="7" height="5" rx="1"/>
-          </svg>
+  <!-- Toast Notification -->
+  <div id="app-toast" class="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+    <svg class="w-4 h-4 text-[#F94F06]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
+    <span id="toast-text">Message</span>
+  </div>
+
+  <!-- SIDEBAR (#0F172A) -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-[#0F172A] text-white flex flex-col justify-between transition-transform duration-300 ease-out border-r border-slate-800/80 -translate-x-full lg:translate-x-0">
+    <div class="overflow-y-auto">
+      <div class="p-5 border-b border-slate-800/60 flex items-center justify-between">
+        <a href="dashboard.html" class="inline-flex items-center gap-2.5">
+          <img src="images/logo-white.svg" alt="CMFlow" class="h-6 w-auto object-contain">
+          <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#F94F06]/20 text-[#F94F06] border border-[#F94F06]/30">PRO</span>
+        </a>
+        <button id="close-sidebar-btn" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="p-3.5">
+        <div class="text-[9px] font-extrabold uppercase text-slate-400 px-2 mb-1.5 flex items-center justify-between">
+          <span>Espace Client</span>
+          <span class="text-emerald-400 flex items-center gap-1 font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Actif
+          </span>
+        </div>
+
+        <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-800/80 border border-slate-700/70">
+          <div class="flex items-center gap-3 min-w-0">
+            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-xl object-cover ring-2 ring-[#0066FF]/40">
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-white truncate">Teranga Gourmet</div>
+              <div class="text-[10px] text-slate-400 truncate">Haute Gastronomie 🇸🇳</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="px-3 space-y-1 mt-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
           <span>Tableau de bord</span>
         </a>
-
-        <a href="clients.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-          <span>Clients</span>
+        <a href="clients.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Espaces Clients</span>
         </a>
-
-        <a href="planning.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
+        <a href="planning.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>Planning & Queue</span>
         </a>
-
-        <a href="inbox.html" class="sidebar-nav-item active">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          <span>Messagerie (Inbox)</span>
+        <a href="media.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Médiathèque Assets</span>
         </a>
-
-        <a href="startpage.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
-            <line x1="12" y1="18" x2="12.01" y2="18"/>
-          </svg>
-          <span>Start Page (Lien Bio)</span>
+        <a href="inbox.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold bg-[#F94F06] text-white shadow-lg shadow-[#F94F06]/25 transition-all">
+          <div class="flex items-center gap-3">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Inbox Unifiée</span>
+          </div>
+          <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
         </a>
-
-        <a href="analytics.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10"/>
-            <line x1="12" y1="20" x2="12" y2="4"/>
-            <line x1="6" y1="20" x2="6" y2="14"/>
-          </svg>
+        <a href="startpage.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>Start Page (Bio)</span>
+        </a>
+        <a href="analytics.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           <span>Analytics & Rapports</span>
         </a>
-
-        <span class="sidebar-nav-section-label">Collaboration</span>
-
-        <a href="validation.html" target="_blank" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
+        <a href="validation.html" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <span>Portail Validation</span>
         </a>
-
-        <a href="settings.html" class="sidebar-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
+        <a href="settings.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>Paramètres</span>
         </a>
       </nav>
+    </div>
 
-      <!-- Sidebar Footer (User Menu) -->
-      <div class="sidebar-footer">
-        <div class="sidebar-user-avatar" data-user-initials>CM</div>
-        <div class="sidebar-user-info">
-          <span class="sidebar-user-name" data-user-name>Utilisateur</span>
-          <span class="sidebar-user-role" data-workspace-name>Mon espace</span>
-        </div>
-        <button type="button" class="sidebar-user-menu-btn" id="user-menu-btn" aria-label="Menu options utilisateur">
-          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-          </svg>
-        </button>
-
-        <!-- Dropdown Menu -->
-        <div class="user-dropdown" id="user-dropdown">
-          <a href="settings.html" class="dropdown-item" style="text-decoration: none;">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
-            <span>Mon profil</span>
-          </a>
-          <a href="settings.html#billing" class="dropdown-item" style="text-decoration: none;">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
-            <span>Mon abonnement</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <button type="button" class="dropdown-item danger" id="logout-btn">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
-            <span>Se déconnecter</span>
-          </button>
+    <div class="p-3.5 border-t border-slate-800/70 bg-slate-900/60">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0066FF] to-sky-400 flex items-center justify-center font-black text-xs text-white">AD</div>
+        <div>
+          <div class="text-xs font-bold text-white">Awa Diop</div>
+          <div class="text-[10px] text-slate-400">Lead CM · Dakar 🇸🇳</div>
         </div>
       </div>
-    </aside>
+    </div>
+  </aside>
 
-    <!-- Overlay Mobile -->
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 z-30 hidden backdrop-blur-xs"></div>
 
-    <!-- =======================================================================
-         MAIN CONTENT AREA
-         ======================================================================= -->
-    <main class="app-main">
-      <!-- Header -->
-      <header class="app-header">
-        <button type="button" class="app-hamburger" id="app-hamburger" aria-label="Menu mobile">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+  <!-- MAIN WRAPPER -->
+  <div class="flex-1 flex flex-col min-w-0 lg:pl-64 z-10 h-screen overflow-hidden">
+    
+    <!-- Topbar -->
+    <header class="sticky top-0 z-30 backdrop-blur-xl bg-white/80 border-b border-slate-200/60 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <button id="open-sidebar-btn" class="lg:hidden p-2 rounded-xl text-slate-700 bg-slate-100"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+        <div class="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#0F172A]">
+          <span class="text-slate-400 font-medium">CMFlow</span>
+          <span class="text-slate-300">/</span>
+          <span>Inbox & Messagerie Sociale</span>
+        </div>
+      </div>
+      <span class="px-3 py-1 bg-emerald-50 text-emerald-700 font-extrabold text-xs rounded-full border border-emerald-200 flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        3 Non-lus
+      </span>
+    </header>
 
-        <div class="header-greeting">
-          <h1>Boîte de Réception — Social Inbox</h1>
-          <p>Répondez aux commentaires et messages Instagram, Facebook et TikTok de tous vos clients en 1 seul endroit</p>
+    <!-- INBOX LAYOUT (Split View) -->
+    <div class="flex-1 flex min-h-0 overflow-hidden">
+      
+      <!-- Liste des Conversations -->
+      <div class="w-full md:w-80 lg:w-96 border-r border-slate-200 bg-white/80 flex flex-col min-h-0">
+        <div class="p-3.5 border-b border-slate-100 space-y-2">
+          <input type="text" placeholder="Rechercher une conversation..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
+          <div class="flex gap-1 text-[11px] font-bold">
+            <button class="px-2.5 py-1 bg-[#0F172A] text-white rounded-lg">Tous (12)</button>
+            <button class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">Instagram (7)</button>
+            <button class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">WhatsApp (3)</button>
+          </div>
         </div>
 
-        <div class="header-actions">
-          <span style="background: #DCFCE7; color: #15803D; padding: 6px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #15803D; display: inline-block;"></span>
-            <span id="unread-count-badge">4 conversations</span>
-          </span>
+        <div class="flex-1 overflow-y-auto divide-y divide-slate-100">
+          <div class="p-3.5 bg-orange-50/40 hover:bg-orange-50/60 cursor-pointer border-l-4 border-[#F94F06] transition-all">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-extrabold text-[#0F172A]">Mamadou Fall</span>
+              <span class="text-[10px] text-slate-400">14:22</span>
+            </div>
+            <div class="text-[11px] text-slate-600 truncate font-medium">Bonjour, avez-vous des tables disponibles pour le dîner ce soir ?</div>
+            <div class="flex items-center gap-1.5 mt-2">
+              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-purple-100 text-purple-700 font-bold">Instagram DM</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-orange-100 text-[#F94F06] font-bold">Teranga Gourmet</span>
+            </div>
+          </div>
+
+          <div class="p-3.5 hover:bg-slate-50 cursor-pointer transition-all">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-extrabold text-[#0F172A]">Khadija Ndiaye</span>
+              <span class="text-[10px] text-slate-400">11:05</span>
+            </div>
+            <div class="text-[11px] text-slate-500 truncate">Le Thiéboudienne était incroyable hier, bravo au Chef ! ❤️</div>
+            <div class="flex items-center gap-1.5 mt-2">
+              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-700 font-bold">Facebook Post</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-orange-100 text-[#F94F06] font-bold">Teranga Gourmet</span>
+            </div>
+          </div>
+
+          <div class="p-3.5 hover:bg-slate-50 cursor-pointer transition-all">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-extrabold text-[#0F172A]">Sira Cosmétiques Client</span>
+              <span class="text-[10px] text-slate-400">Hier</span>
+            </div>
+            <div class="text-[11px] text-slate-500 truncate">Est-ce que le sérum à l'hibiscus est disponible à Abidjan ?</div>
+            <div class="flex items-center gap-1.5 mt-2">
+              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-700 font-bold">WhatsApp Direct</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-purple-100 text-purple-700 font-bold">Sira 🇨🇮</span>
+            </div>
+          </div>
         </div>
-      </header>
+      </div>
 
-      <!-- Page Content -->
-      <div class="app-page">
-
-        <div class="inbox-main-layout">
-          
-          <!-- Colonne Liste des Conversations -->
-          <div class="inbox-sidebar-threads">
-            
-            <div class="inbox-sidebar-header">
-              <input type="text" id="inbox-search" placeholder="Rechercher par nom ou message..." style="width: 100%; padding: 8px 12px; font-size: 0.82rem; border: var(--border-light); border-radius: var(--radius-md); background: #F8FAFC; margin-bottom: 10px;">
-              
-              <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;" id="platform-filters-row">
-                <button type="button" class="composer-net-tab-btn active" data-platform="all" style="font-size: 0.7rem; padding: 4px 10px; cursor: pointer;">Tous (<span id="count-all">4</span>)</button>
-                <button type="button" class="composer-net-tab-btn" data-platform="instagram" style="font-size: 0.7rem; padding: 4px 10px; cursor: pointer;">Instagram (<span id="count-instagram">2</span>)</button>
-                <button type="button" class="composer-net-tab-btn" data-platform="facebook" style="font-size: 0.7rem; padding: 4px 10px; cursor: pointer;">Facebook (<span id="count-facebook">1</span>)</button>
-                <button type="button" class="composer-net-tab-btn" data-platform="tiktok" style="font-size: 0.7rem; padding: 4px 10px; cursor: pointer;">TikTok (<span id="count-tiktok">1</span>)</button>
-              </div>
+      <!-- Zone de Conversation Active -->
+      <div class="hidden md:flex flex-1 flex-col bg-slate-50/50 min-h-0">
+        
+        <!-- En-tête Message -->
+        <div class="p-4 bg-white border-b border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 text-white font-black text-xs flex items-center justify-center">MF</div>
+            <div>
+              <div class="text-xs font-extrabold text-[#0F172A]">Mamadou Fall (@mamadou_fall_dk)</div>
+              <div class="text-[10px] text-slate-400">Instagram Direct · Teranga Gourmet</div>
             </div>
+          </div>
+          <button type="button" onclick="showToast('✅ Conversation marquée comme traitée')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Marquer comme traité</button>
+        </div>
 
-            <div class="inbox-threads-scroll" id="inbox-threads-container">
-              <!-- Rendu dynamiquement via JavaScript -->
+        <!-- Corps Discussion -->
+        <div class="flex-1 p-5 overflow-y-auto space-y-4">
+          <div class="flex gap-2.5 max-w-md">
+            <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center shrink-0">MF</div>
+            <div class="bg-white p-3 rounded-2xl rounded-tl-xs border border-slate-200 shadow-xs text-xs text-slate-800">
+              Bonjour, avez-vous des tables disponibles pour le dîner ce soir pour 4 personnes vers 20h30 ?
             </div>
-
           </div>
 
-          <!-- Colonne Vue Chat / Conversation -->
-          <div class="inbox-chat-view">
-            
-            <div class="inbox-chat-header">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <img id="chat-header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover;" alt="Author">
-                <div>
-                  <h3 id="chat-header-name" style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0 0 2px;">Awa Ndiaye</h3>
-                  <div style="display: flex; align-items: center; gap: 6px;">
-                    <span class="social-tag" id="chat-header-platform" style="font-size: 0.68rem; padding: 1px 6px;">Instagram Direct</span>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">Client : <strong id="chat-header-client">Teranga Gourmet Dakar</strong></span>
-                  </div>
-                </div>
-              </div>
-              <a href="https://instagram.com" target="_blank" id="chat-header-link" class="btn-card-action" style="text-decoration: none;">
-                Ouvrir sur le réseau
-              </a>
+          <div class="flex gap-2.5 max-w-md ml-auto justify-end">
+            <div class="bg-[#F94F06] text-white p-3 rounded-2xl rounded-tr-xs shadow-md shadow-[#F94F06]/20 text-xs">
+              Bonjour Mamadou ! Oui, il nous reste 2 tables en terrasse feutrée pour 20h30. Souhaitez-vous que je vous réserve celle avec vue sur le jardin ? ✨
             </div>
-
-            <!-- Messages -->
-            <div class="inbox-messages-body" id="inbox-messages-list">
-              <!-- Rendu dynamiquement via JavaScript -->
-            </div>
-
-            <!-- Barre de Réponse & Réponses Rapides -->
-            <div class="inbox-reply-bar">
-              
-              <div class="inbox-quick-replies-row">
-                <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); align-self: center;">Réponses rapides :</span>
-                <button type="button" class="inbox-quick-reply-btn" onclick="insertQuickReply('Bonjour ! Oui tout à fait, nous livrons partout à Dakar (y compris Almadies). Vous pouvez commander directement sur WhatsApp : https://wa.me/221771234567')">
-                  🛵 Livraison & WhatsApp
-                </button>
-                <button type="button" class="inbox-quick-reply-btn" onclick="insertQuickReply('Bonjour ! Notre carte et nos tarifs complets sont disponibles sur notre lien : https://terangagourmet.sn/menu')">
-                  📖 Carte & Prix
-                </button>
-                <button type="button" class="inbox-quick-reply-btn" onclick="insertQuickReply('Bonjour ! Nous sommes ouverts du Mardi au Dimanche de 12h à 23h30. Au plaisir de vous accueillir ! ✨')">
-                  ⏰ Horaires & Adresse
-                </button>
-              </div>
-
-              <div style="display: flex; gap: 10px;">
-                <input type="text" id="inbox-reply-input" placeholder="Rédigez votre réponse au nom de la marque..." style="flex: 1; padding: 10px 14px; font-size: 0.85rem; border: var(--border-light); border-radius: var(--radius-lg); background: white;">
-                <button type="button" class="btn-primary-app" id="btn-send-reply" onclick="sendInboxReply()">
-                  <span>Envoyer</span>
-                </button>
-              </div>
-
-            </div>
-
           </div>
+        </div>
 
+        <!-- Zone de Saisie -->
+        <div class="p-3.5 bg-white border-t border-slate-200">
+          <form onsubmit="event.preventDefault(); showToast('💬 Message envoyé sur Instagram !'); document.getElementById('msg-input').value='';" class="flex gap-2">
+            <input type="text" id="msg-input" placeholder="Répondre en tant que Teranga Gourmet..." class="flex-1 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
+            <button type="submit" class="px-4 py-2 bg-[#F94F06] hover:bg-[#e04605] text-white font-extrabold text-xs rounded-xl shadow-md shadow-[#F94F06]/20">Envoyer</button>
+          </form>
         </div>
 
       </div>
-    </main>
+
+    </div>
   </div>
 
-  <!-- Firebase SDK (CDN compat) -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js"></script>
-
-  <script src="js/app.js"></script>
-  <script src="js/backend.js"></script>
   <script>
-    // ---- DONNÉES INBOX MULTI-PLATEFORMES ----
-    const INBOX_DATA = [
-      {
-        id: 1,
-        author: 'Awa Ndiaye',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-        platform: 'instagram',
-        platformLabel: 'Instagram Direct',
-        clientName: 'Teranga Gourmet Dakar',
-        timeAgo: 'Il y a 5 min',
-        snippet: 'Bonjour, est-ce que vous livrez aux Almadies ce soir svp ?',
-        link: 'https://instagram.com',
-        messages: [
-          { sender: 'received', text: "Bonjour ! J'ai vu votre publication sur le nouveau menu de saison. Est-ce que vous livrez aux Almadies ce soir vers 20h ?", time: '19:42' }
-        ]
-      },
-      {
-        id: 2,
-        author: 'Mamadou Fall',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-        platform: 'facebook',
-        platformLabel: 'Facebook Page',
-        clientName: 'Teranga Gourmet Dakar',
-        timeAgo: 'Il y a 22 min',
-        snippet: 'Quel est le prix du menu dégustation svp ?',
-        link: 'https://facebook.com',
-        messages: [
-          { sender: 'received', text: "Salam aleikoum ! Superbe présentation. Quel est le prix du menu dégustation pour 4 personnes s'il vous plaît ?", time: '19:25' }
-        ]
-      },
-      {
-        id: 3,
-        author: 'Fatou Diallo',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
-        platform: 'tiktok',
-        platformLabel: 'TikTok Commentaire',
-        clientName: 'Teranga Gourmet Dakar',
-        timeAgo: 'Il y a 1h',
-        snippet: 'La vidéo donne trop envie ! Vous êtes ouverts le dimanche ?',
-        link: 'https://tiktok.com',
-        messages: [
-          { sender: 'received', text: "La vidéo donne trop envie ! 🔥 Vous êtes ouverts le dimanche midi pour un brunch en famille ?", time: '18:50' }
-        ]
-      },
-      {
-        id: 4,
-        author: 'Karim Ba',
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
-        platform: 'instagram',
-        platformLabel: 'Instagram Direct',
-        clientName: 'Teranga Gourmet Dakar',
-        timeAgo: 'Hier',
-        snippet: 'Merci pour l\'accueil hier soir, c\'était parfait !',
-        link: 'https://instagram.com',
-        messages: [
-          { sender: 'received', text: "Merci pour l'accueil hier soir, la table était magnifique et le service au top ! On reviendra très vite.", time: 'Hier 22:15' },
-          { sender: 'sent', text: "Merci infiniment Karim pour votre retour chaleureux ! Toute l'équipe de Teranga Gourmet vous attend avec grand plaisir. À très bientôt ! ✨", time: 'Hier 22:20' }
-        ]
-      }
-    ];
-
-    let currentPlatformFilter = 'all';
-    let currentSearchQuery = '';
-    let activeThreadId = 1;
-
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', () => {
-      initPlatformFilters();
-      initSearchInput();
-      initReplyKeypress();
-      renderThreadsList();
-      selectThread(activeThreadId);
-    });
-
-    // Filtres Plateformes
-    function initPlatformFilters() {
-      const filterButtons = document.querySelectorAll('#platform-filters-row button');
-      filterButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          filterButtons.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentPlatformFilter = btn.dataset.platform || 'all';
-          renderThreadsList();
-        });
-      });
-    }
-
-    // Recherche
-    function initSearchInput() {
-      const searchInput = document.getElementById('inbox-search');
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          currentSearchQuery = e.target.value.toLowerCase().trim();
-          renderThreadsList();
-        });
-      }
-    }
-
-    // Touche Entrée pour envoyer
-    function initReplyKeypress() {
-      const input = document.getElementById('inbox-reply-input');
-      if (input) {
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            sendInboxReply();
-          }
-        });
-      }
-    }
-
-    // Rendu de la liste des conversations
-    function renderThreadsList() {
-      const container = document.getElementById('inbox-threads-container');
-      if (!container) return;
-
-      const filtered = INBOX_DATA.filter(item => {
-        const matchesPlatform = (currentPlatformFilter === 'all' || item.platform === currentPlatformFilter);
-        const matchesSearch = !currentSearchQuery || 
-          item.author.toLowerCase().includes(currentSearchQuery) || 
-          item.snippet.toLowerCase().includes(currentSearchQuery);
-        return matchesPlatform && matchesSearch;
-      });
-
-      // Mettre à jour les compteurs
-      updateCounts();
-
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div style="padding: 32px 20px; text-align: center; color: var(--text-muted);">
-            <p style="font-size: 0.85rem; margin: 0;">Aucune conversation trouvée pour ce filtre.</p>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = filtered.map(item => `
-        <div class="inbox-thread-item ${item.id === activeThreadId ? 'active' : ''}" onclick="selectThread(${item.id})">
-          <img class="inbox-thread-avatar" src="${item.avatar}" alt="${escapeHtml(item.author)}">
-          <div class="inbox-thread-meta">
-            <div class="inbox-thread-top">
-              <span class="inbox-thread-author">${escapeHtml(item.author)}</span>
-              <span class="inbox-thread-time">${item.timeAgo}</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
-              <span class="social-tag" style="font-size: 0.65rem; padding: 1px 5px;">${item.platformLabel}</span>
-              <span style="font-size: 0.7rem; color: var(--text-muted);">· ${escapeHtml(item.clientName)}</span>
-            </div>
-            <div class="inbox-thread-snippet">${escapeHtml(item.snippet)}</div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function updateCounts() {
-      const allCount = INBOX_DATA.length;
-      const instaCount = INBOX_DATA.filter(i => i.platform === 'instagram').length;
-      const fbCount = INBOX_DATA.filter(i => i.platform === 'facebook').length;
-      const tkCount = INBOX_DATA.filter(i => i.platform === 'tiktok').length;
-
-      const cAll = document.getElementById('count-all');
-      const cInsta = document.getElementById('count-instagram');
-      const cFb = document.getElementById('count-facebook');
-      const cTk = document.getElementById('count-tiktok');
-
-      if (cAll) cAll.textContent = allCount;
-      if (cInsta) cInsta.textContent = instaCount;
-      if (cFb) cFb.textContent = fbCount;
-      if (cTk) cTk.textContent = tkCount;
-    }
-
-    // Sélection d'une conversation
-    function selectThread(id) {
-      activeThreadId = id;
-      const thread = INBOX_DATA.find(t => t.id === id);
-      if (!thread) return;
-
-      // Header Chat
-      const avatar = document.getElementById('chat-header-avatar');
-      const name = document.getElementById('chat-header-name');
-      const platform = document.getElementById('chat-header-platform');
-      const client = document.getElementById('chat-header-client');
-      const link = document.getElementById('chat-header-link');
-
-      if (avatar) avatar.src = thread.avatar;
-      if (name) name.textContent = thread.author;
-      if (platform) platform.textContent = thread.platformLabel;
-      if (client) client.textContent = thread.clientName;
-      if (link) {
-        link.href = thread.link;
-        link.textContent = `Ouvrir sur ${thread.platform.charAt(0).toUpperCase() + thread.platform.slice(1)}`;
-      }
-
-      // Messages Body
-      const list = document.getElementById('inbox-messages-list');
-      if (list) {
-        list.innerHTML = thread.messages.map(msg => `
-          <div class="inbox-msg-row ${msg.sender}">
-            <div class="inbox-msg-bubble">
-              ${escapeHtml(msg.text)}
-              <div style="font-size: 0.68rem; color: ${msg.sender === 'sent' ? 'rgba(255,255,255,0.7)' : '#94A3B8'}; margin-top: 4px; text-align: right;">${msg.time}</div>
-            </div>
-          </div>
-        `).join('');
-        list.scrollTop = list.scrollHeight;
-      }
-
-      // Re-rendre la liste pour mettre à jour la classe active
-      renderThreadsList();
-    }
-
-    // Insérer une réponse rapide
-    function insertQuickReply(text) {
-      const input = document.getElementById('inbox-reply-input');
-      if (input) {
-        input.value = text;
-        input.focus();
-      }
-    }
-
-    // Envoyer une réponse
-    function sendInboxReply() {
-      const input = document.getElementById('inbox-reply-input');
-      const text = input?.value.trim();
-      if (!text) return;
-
-      const thread = INBOX_DATA.find(t => t.id === activeThreadId);
-      if (thread) {
-        thread.messages.push({
-          sender: 'sent',
-          text: text,
-          time: 'À l\'instant'
-        });
-        thread.snippet = `Vous : ${text}`;
-        thread.timeAgo = 'À l\'instant';
-      }
-
-      const list = document.getElementById('inbox-messages-list');
-      if (list) {
-        const row = document.createElement('div');
-        row.className = 'inbox-msg-row sent';
-        row.innerHTML = `
-          <div class="inbox-msg-bubble">
-            ${escapeHtml(text)}
-            <div style="font-size: 0.68rem; color: rgba(255,255,255,0.7); margin-top: 4px; text-align: right;">À l'instant</div>
-          </div>
-        `;
-        list.appendChild(row);
-        list.scrollTop = list.scrollHeight;
-      }
-
-      input.value = '';
-      renderThreadsList();
-      showAppToast('Réponse envoyée au client avec succès ! 💬🚀', 'success');
+    function showToast(msg) {
+      const toast = document.getElementById('app-toast');
+      const text = document.getElementById('toast-text');
+      text.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3000);
     }
   </script>
 </body>
