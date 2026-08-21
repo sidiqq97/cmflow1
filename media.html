@@ -438,15 +438,27 @@
       </div>
 
       <form id="form-upload" class="space-y-4">
-        <div class="border-2 border-dashed border-slate-300 hover:border-[#0066FF] rounded-3xl p-6 text-center bg-slate-50/50 hover:bg-blue-50/20 cursor-pointer transition-colors">
-          <svg class="w-10 h-10 text-slate-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-          <div class="text-xs font-extrabold text-slate-800">Glissez-déposez vos fichiers ici</div>
-          <div class="text-[11px] text-slate-400 mt-0.5">JPG, PNG, WebP, MP4 jusqu'à 50 Mo</div>
+        <input type="file" id="media-upload-file-input" accept="image/*,video/mp4" class="hidden" />
+
+        <div id="media-upload-dropzone" onclick="document.getElementById('media-upload-file-input').click()" class="border-2 border-dashed border-slate-200 hover:border-orange-400 rounded-3xl p-6 text-center bg-slate-50/50 hover:bg-orange-50/20 cursor-pointer transition-all flex flex-col items-center justify-center">
+          <div class="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-[#F94F06] mb-2.5">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+          </div>
+          <div class="text-xs font-bold text-slate-800">Glissez-déposez vos fichiers ici, ou <span class="text-[#F94F06] underline">Parcourir</span></div>
+          <div class="text-[11px] text-slate-400 mt-1">JPG, PNG, MP4, MOV jusqu'à 50 Mo</div>
+        </div>
+
+        <div id="media-upload-preview-box" class="hidden rounded-2xl overflow-hidden relative border border-slate-200 bg-slate-900 h-44 flex items-center justify-center">
+          <img id="media-upload-preview-img" src="" class="w-full h-full object-cover" />
+          <video id="media-upload-preview-video" src="" controls class="hidden w-full h-full object-cover"></video>
+          <button type="button" onclick="clearMediaUploadPreview()" class="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
         </div>
 
         <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Nom du fichier *</label>
-          <input type="text" id="upload-name-input" placeholder="ex: menu-degustation.jpg" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]">
+          <input type="text" id="upload-name-input" placeholder="ex: menu-degustation.jpg" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/30">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -465,8 +477,8 @@
         </div>
 
         <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
-          <button type="button" class="btn-close-modal px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Annuler</button>
-          <button type="submit" class="px-5 py-2.5 text-xs font-extrabold bg-[#F94F06] hover:bg-[#e04605] text-white rounded-xl shadow-lg shadow-[#F94F06]/25 transition-all">Ajouter à la médiathèque</button>
+          <button type="button" class="btn-close-modal px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer">Annuler</button>
+          <button type="submit" class="px-5 py-2.5 text-xs font-extrabold bg-[#F94F06] hover:bg-[#e04605] text-white rounded-xl shadow-lg shadow-[#F94F06]/25 transition-all cursor-pointer">Ajouter à la médiathèque</button>
         </div>
       </form>
     </div>
@@ -621,6 +633,53 @@
         });
       });
 
+      // File Upload Listeners
+      const mediaFileInput = document.getElementById('media-upload-file-input');
+      const mediaDropzone = document.getElementById('media-upload-dropzone');
+      const mediaPreviewBox = document.getElementById('media-upload-preview-box');
+      const mediaPreviewImg = document.getElementById('media-upload-preview-img');
+      const mediaPreviewVideo = document.getElementById('media-upload-preview-video');
+      let uploadedFileUrl = '';
+      let uploadedFileType = 'image';
+
+      if (mediaFileInput) {
+        mediaFileInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const isVideo = file.type.startsWith('video/');
+            uploadedFileUrl = URL.createObjectURL(file);
+            uploadedFileType = isVideo ? 'video' : 'image';
+
+            if (!document.getElementById('upload-name-input').value) {
+              document.getElementById('upload-name-input').value = file.name;
+            }
+
+            if (isVideo) {
+              mediaPreviewImg.classList.add('hidden');
+              mediaPreviewVideo.classList.remove('hidden');
+              mediaPreviewVideo.src = uploadedFileUrl;
+              document.getElementById('upload-type-input').value = 'video';
+            } else {
+              mediaPreviewVideo.classList.add('hidden');
+              mediaPreviewImg.classList.remove('hidden');
+              mediaPreviewImg.src = uploadedFileUrl;
+              document.getElementById('upload-type-input').value = 'image';
+            }
+
+            mediaDropzone.classList.add('hidden');
+            mediaPreviewBox.classList.remove('hidden');
+            showToast('📁 Média sélectionné');
+          }
+        });
+      }
+
+      window.clearMediaUploadPreview = function() {
+        uploadedFileUrl = '';
+        mediaDropzone.classList.remove('hidden');
+        mediaPreviewBox.classList.add('hidden');
+        if (mediaFileInput) mediaFileInput.value = '';
+      };
+
       document.getElementById('form-upload').addEventListener('submit', (e) => {
         e.preventDefault();
         const name = document.getElementById('upload-name-input').value.trim();
@@ -631,11 +690,11 @@
 
         mediaAssets.unshift({
           id: `m-${Date.now()}`,
-          name: name.includes('.') ? name : `${name}.jpg`,
+          name: name.includes('.') ? name : `${name}.${type === 'video' ? 'mp4' : 'jpg'}`,
           type: type,
-          url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80',
-          dimensions: type === 'video' ? 'Vidéo 0:45' : '1080 x 1350 px',
-          size: '2.8 Mo',
+          url: uploadedFileUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80',
+          dimensions: type === 'video' ? 'Vidéo HD' : '1080 x 1350 px',
+          size: '3.4 Mo',
           usedCount: 0,
           tags: [tag || 'Nouveautés']
         });
@@ -643,6 +702,7 @@
         document.getElementById('modal-upload').classList.add('hidden');
         document.getElementById('modal-upload').classList.remove('flex');
         document.getElementById('upload-name-input').value = '';
+        clearMediaUploadPreview();
         renderMedia();
         showToast('✨ Média téléversé dans la bibliothèque !');
       });
