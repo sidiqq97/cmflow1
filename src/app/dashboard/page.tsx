@@ -7,6 +7,10 @@ import {
   Calendar as CalendarIcon,
   Users,
   Image as ImageIcon,
+  MessageSquare,
+  Globe,
+  BarChart3,
+  ShieldCheck,
   CreditCard,
   Settings,
   LogOut,
@@ -32,7 +36,16 @@ import {
   Menu,
   X,
   Sparkles,
-  Search
+  Search,
+  UploadCloud,
+  Check,
+  ArrowRight,
+  Smartphone,
+  TrendingUp,
+  Link2,
+  Layers,
+  Smile,
+  Hash
 } from 'lucide-react';
 
 // Types
@@ -43,10 +56,19 @@ export type ViewMode = 'week' | 'month' | 'list';
 export interface Client {
   id: string;
   name: string;
+  country: string;
+  flag: string;
   category: string;
   avatar: string;
   color: string;
   whatsapp: string;
+  connectedAccounts: {
+    instagram?: string;
+    facebook?: string;
+    tiktok?: string;
+    linkedin?: string;
+  };
+  approvalRate: number;
 }
 
 export interface Post {
@@ -59,90 +81,112 @@ export interface Post {
   caption: string;
   mediaUrl: string;
   mediaType: 'image' | 'video' | 'carousel';
-  likesCount?: number;
 }
 
-// Données Mockées Réalistes (Clients & Posts)
-const MOCK_CLIENTS: Client[] = [
+// Données Mockées Initiales (Clients & Publications)
+const INITIAL_CLIENTS: Client[] = [
   {
-    id: 'client-1',
+    id: 'teranga-gourmet',
     name: 'Teranga Gourmet',
-    category: 'Restaurant & Traiteur · Dakar 🇸🇳',
-    avatar: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=120&auto=format&fit=crop&q=80',
+    country: 'Sénégal',
+    flag: '🇸🇳',
+    category: 'Restaurant & Traiteur',
+    avatar: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=160&auto=format&fit=crop&q=80',
     color: '#F94F06',
     whatsapp: '+221 77 842 19 02',
+    connectedAccounts: {
+      instagram: '@teranga_gourmet_dakar',
+      facebook: 'Teranga Gourmet Officiel',
+      tiktok: '@terangagourmet',
+    },
+    approvalRate: 96,
   },
   {
-    id: 'client-2',
+    id: 'sira-cosmetiques',
     name: 'Sira Cosmétiques Bio',
-    category: 'Beauté & Skincare · Abidjan 🇨🇮',
-    avatar: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=120&auto=format&fit=crop&q=80',
+    country: 'Côte d\'Ivoire',
+    flag: '🇨🇮',
+    category: 'Beauté & Skincare Africain',
+    avatar: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=160&auto=format&fit=crop&q=80',
     color: '#0066FF',
     whatsapp: '+225 07 48 92 10 33',
+    connectedAccounts: {
+      instagram: '@siracosmetiques_abj',
+      facebook: 'Sira Cosmétiques',
+      linkedin: 'Sira Group CI',
+    },
+    approvalRate: 92,
   },
   {
-    id: 'client-3',
+    id: 'baobab-tech',
     name: 'Baobab Tech Hub',
-    category: 'SaaS & Innovation · Dakar 🇸🇳',
-    avatar: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=120&auto=format&fit=crop&q=80',
+    country: 'Sénégal',
+    flag: '🇸🇳',
+    category: 'SaaS & Incubateur Tech',
+    avatar: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=160&auto=format&fit=crop&q=80',
     color: '#10B981',
     whatsapp: '+221 78 112 45 88',
+    connectedAccounts: {
+      linkedin: 'Baobab Tech Dakar',
+      facebook: 'Baobab Tech Hub',
+    },
+    approvalRate: 98,
   },
 ];
 
 const INITIAL_POSTS: Post[] = [
   {
     id: 'post-1',
-    clientId: 'client-1',
+    clientId: 'teranga-gourmet',
     network: 'instagram',
     status: 'validated',
     scheduledDate: '2026-08-24', // Lundi
     scheduledTime: '18:30',
-    caption: 'Ce soir, découvrez notre nouveau Thiéboudienne revisité aux fruits de mer frais de Soumbédioune 🐟✨ Réservez votre table !',
+    caption: 'Ce soir, découvrez notre nouveau Thiéboudienne revisité aux fruits de mer frais de Soumbédioune 🐟✨ Réservez votre table pour le week-end ! #DakarFood #SenegalGourmet',
     mediaUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80',
     mediaType: 'carousel',
   },
   {
     id: 'post-2',
-    clientId: 'client-1',
+    clientId: 'teranga-gourmet',
     network: 'tiktok',
     status: 'pending_validation',
     scheduledDate: '2026-08-25', // Mardi
     scheduledTime: '12:15',
-    caption: 'Dans les coulisses avec notre Chef Moussa qui prépare les fameux pastels croustillants 🔥 #DakarFood #Foodie',
+    caption: 'Dans les coulisses avec notre Chef Moussa qui prépare les fameux pastels croustillants 🔥 Vous êtes plutôt sauce pimentée ou douce ? #DakarFood #Foodie #CuisineAfricaine',
     mediaUrl: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&auto=format&fit=crop&q=80',
     mediaType: 'video',
   },
   {
     id: 'post-3',
-    clientId: 'client-1',
+    clientId: 'teranga-gourmet',
     network: 'facebook',
     status: 'scheduled',
     scheduledDate: '2026-08-26', // Mercredi
     scheduledTime: '09:00',
-    caption: 'Offre spéciale déjeuner d\'entreprise : -15% sur toutes vos commandes de groupe du mercredi au vendredi 💼🍽️',
+    caption: 'Offre spéciale déjeuner d\'entreprise : -15% sur toutes vos commandes de groupe du mercredi au vendredi 💼🍽️ Livraison express au Plateau et aux Almadies.',
     mediaUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80',
     mediaType: 'image',
   },
   {
     id: 'post-4',
-    clientId: 'client-1',
+    clientId: 'teranga-gourmet',
     network: 'instagram',
     status: 'draft',
     scheduledDate: '2026-08-27', // Jeudi
     scheduledTime: '19:45',
-    caption: 'Ambiance feutrée et musique acoustique en terrasse ce week-end. Qui vous accompagne ? Mentionnez-les en commentaire ! 🥂',
+    caption: 'Ambiance feutrée et musique acoustique en terrasse ce week-end. Qui vous accompagne ? Mentionnez-les en commentaire ! 🥂🎷 #DakarNight #TerangaGourmet',
     mediaUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&auto=format&fit=crop&q=80',
     mediaType: 'image',
   },
   {
     id: 'post-5',
-    clientId: 'client-1',
+    clientId: 'teranga-gourmet',
     network: 'linkedin',
     status: 'validated',
     scheduledDate: '2026-08-28', // Vendredi
     scheduledTime: '10:30',
-    caption: 'Fier d\'accueillir les délégations du Sommet Tech Afrique de l\'Ouest pour leurs dîners officiels d\'affaires.',
+    caption: 'Fier d\'accueillir les délégations du Sommet Tech Afrique de l\'Ouest pour leurs déjeuners et dîners officiels d\'affaires. L\'excellence du service au cœur de notre engagement.',
     mediaUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=600&auto=format&fit=crop&q=80',
     mediaType: 'image',
   },
@@ -159,50 +203,69 @@ const DAYS_OF_WEEK = [
   { key: '2026-08-30', name: 'Dimanche', dateNum: '30' },
 ];
 
-export default function DashboardPage() {
-  // États de Navigation & Filtres
-  const [selectedClient, setSelectedClient] = useState<Client>(MOCK_CLIENTS[0]);
-  const [isClientDropdownOpen, setIsClientDropdownOpen] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+export default function DashboardCockpit() {
+  // Gestion des États
+  const [clients, setClients] = useState<Client[]>(INITIAL_CLIENTS);
+  const [selectedClient, setSelectedClient] = useState<Client>(INITIAL_CLIENTS[0]);
+  const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
+
+  // Filtres et Vues
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [filterNetwork, setFilterNetwork] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
+  const [isClientDropdownOpen, setIsClientDropdownOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [showOnboardingBanner, setShowOnboardingBanner] = useState(true);
 
   // Modales
   const [isValidationModalOpen, setIsValidationModalOpen] = useState(false);
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
+  const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
+  const [previewPost, setPreviewPost] = useState<Post | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Nouveau Post Form
+  // Formulaire Création Post
   const [newCaption, setNewCaption] = useState('');
   const [newNetwork, setNewNetwork] = useState<SocialNetwork>('instagram');
   const [newDate, setNewDate] = useState('2026-08-24');
   const [newTime, setNewTime] = useState('18:00');
   const [newStatus, setNewStatus] = useState<PostStatus>('pending_validation');
+  const [newMediaUrl, setNewMediaUrl] = useState('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80');
 
-  // Afficher un Toast temporaire
+  // Formulaire Ajout Client
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientCategory, setNewClientCategory] = useState('');
+  const [newClientCountry, setNewClientCountry] = useState('Sénégal 🇸🇳');
+  const [newClientWhatsapp, setNewClientWhatsapp] = useState('');
+
+  // Toast Notification
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3200);
   };
 
-  // Filtrage des posts
+  // Publications filtrées pour le client actif
+  const clientPosts = useMemo(() => {
+    return posts.filter((p) => p.clientId === selectedClient.id);
+  }, [posts, selectedClient.id]);
+
   const filteredPosts = useMemo(() => {
-    return posts.filter((post) => {
-      if (post.clientId !== selectedClient.id) return false;
+    return clientPosts.filter((post) => {
       if (filterNetwork !== 'all' && post.network !== filterNetwork) return false;
       if (filterStatus !== 'all' && post.status !== filterStatus) return false;
       return true;
     });
-  }, [posts, selectedClient.id, filterNetwork, filterStatus]);
+  }, [clientPosts, filterNetwork, filterStatus]);
 
-  // Ajouter un nouveau post
+  // Comptes connectés du client
+  const connectedPlatformsCount = Object.keys(selectedClient.connectedAccounts || {}).length;
+
+  // Création d'un post
   const handleCreatePost = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCaption.trim()) return;
 
-    const newPostItem: Post = {
+    const newPost: Post = {
       id: `post-${Date.now()}`,
       clientId: selectedClient.id,
       network: newNetwork,
@@ -210,24 +273,58 @@ export default function DashboardPage() {
       scheduledDate: newDate,
       scheduledTime: newTime,
       caption: newCaption,
-      mediaUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80',
+      mediaUrl: newMediaUrl,
       mediaType: 'image',
     };
 
-    setPosts([newPostItem, ...posts]);
+    setPosts([newPost, ...posts]);
     setIsCreatePostModalOpen(false);
     setNewCaption('');
-    triggerToast('Publication ajoutée au calendrier avec succès ! 🎉');
+    triggerToast('✨ Publication programmée avec succès dans le calendrier !');
   };
 
-  // Supprimer un post
+  // Ajout d'un nouveau client
+  const handleAddClient = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newClientName.trim()) return;
+
+    const flag = newClientCountry.includes('Côte') ? '🇨🇮' : '🇸🇳';
+    const newClient: Client = {
+      id: `client-${Date.now()}`,
+      name: newClientName,
+      country: newClientCountry,
+      flag: flag,
+      category: newClientCategory || 'Commerce & Services',
+      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=160&auto=format&fit=crop&q=80',
+      color: '#F94F06',
+      whatsapp: newClientWhatsapp || '+221 77 000 00 00',
+      connectedAccounts: {
+        instagram: `@${newClientName.toLowerCase().replace(/\s+/g, '')}`,
+        facebook: newClientName,
+      },
+      approvalRate: 100,
+    };
+
+    setClients([...clients, newClient]);
+    setSelectedClient(newClient);
+    setIsAddClientModalOpen(false);
+    setNewClientName('');
+    setNewClientWhatsapp('');
+    triggerToast(`🎉 Client « ${newClient.name} » ajouté et activé !`);
+  };
+
+  // Suppression d'un post
   const handleDeletePost = (id: string) => {
     setPosts(posts.filter((p) => p.id !== id));
-    triggerToast('Publication supprimée.');
+    triggerToast('🗑️ Publication supprimée.');
   };
 
-  // Rendu de l'icône Réseau Social
-  const renderNetworkIcon = (network: SocialNetwork, className = 'w-3.5 h-3.5') => {
+  // Lien magique généré pour le client
+  const magicValidationUrl = `https://cmflow.sn/v/${selectedClient.id}-a8f9`;
+  const whatsappPreFilledText = `Bonjour ! Votre planning de la semaine pour ${selectedClient.name} est prêt pour validation : ${magicValidationUrl} 🚀`;
+
+  // Icône Réseau Social
+  const renderNetworkIcon = (network: SocialNetwork, className = 'w-4 h-4') => {
     switch (network) {
       case 'instagram':
         return <Instagram className={`${className} text-[#E1306C]`} />;
@@ -237,14 +334,14 @@ export default function DashboardPage() {
         return <Linkedin className={`${className} text-[#0A66C2]`} />;
       case 'tiktok':
         return (
-          <span className={`${className} font-black text-black inline-flex items-center justify-center text-[10px] leading-none`}>
+          <span className={`${className} font-black text-black inline-flex items-center justify-center text-[10px] leading-none bg-slate-100 rounded px-1`}>
             TT
           </span>
         );
     }
   };
 
-  // Rendu du Badge de Statut
+  // Badge de Statut
   const renderStatusBadge = (status: PostStatus) => {
     switch (status) {
       case 'draft':
@@ -265,14 +362,14 @@ export default function DashboardPage() {
         return (
           <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
             <CheckCircle2 className="w-2.5 h-2.5 text-[#10B981]" />
-            Validé par le client
+            Validé client
           </span>
         );
       case 'scheduled':
         return (
           <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
             <Send className="w-2.5 h-2.5 text-[#0066FF]" />
-            Programmé
+            Programmé / Publié
           </span>
         );
     }
@@ -283,61 +380,65 @@ export default function DashboardPage() {
       
       {/* Toast Notification Flottante */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A] text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-sm font-medium flex items-center gap-2.5 animate-bounce">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A] text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-bounce">
           <Sparkles className="w-4 h-4 text-[#F94F06]" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* =======================================================================
-          A. SIDEBAR GAUCHE (Bleu Ardoise Profond #0F172A)
+          A. BARRE LATÉRALE (Sidebar Gauche - #0F172A)
           ======================================================================= */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#0F172A] text-white flex flex-col justify-between transition-transform duration-300 ease-in-out border-r border-slate-800 lg:translate-x-0 ${
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div>
-          {/* Logo Brand */}
-          <div className="p-6 border-b border-slate-800/80 flex items-center justify-between">
-            <Link href="/dashboard" className="inline-block transition-opacity hover:opacity-90">
+        <div className="overflow-y-auto">
+          {/* En-tête : Logo & Badge Pro */}
+          <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
+            <Link href="/dashboard" className="inline-flex items-center gap-2 transition-opacity hover:opacity-90">
               <Image
                 src="/images/logo-white.svg"
                 alt="CMFlow Logo"
-                width={120}
-                height={32}
-                className="h-7 w-auto object-contain"
+                width={115}
+                height={28}
+                className="h-6 w-auto object-contain"
                 priority
               />
+              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#F94F06]/20 text-[#F94F06] border border-[#F94F06]/30">
+                PRO
+              </span>
             </Link>
             <button
               onClick={() => setIsMobileSidebarOpen(false)}
-              className="lg:hidden text-slate-400 hover:text-white"
+              className="lg:hidden text-slate-400 hover:text-white p-1"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Sélecteur de Marque / Client (Dropdown) */}
-          <div className="p-4 relative">
-            <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-2 block mb-1.5">
-              Espace Client Actif
+          {/* Sélecteur de Marque / Client (Dropdown interactif) */}
+          <div className="p-3.5 relative">
+            <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 px-2 block mb-1.5">
+              Client Actif
             </label>
 
             <button
               type="button"
               onClick={() => setIsClientDropdownOpen(!isClientDropdownOpen)}
-              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 transition-all text-left group"
+              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-800 border border-slate-700/80 transition-all text-left group"
             >
-              <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-center gap-2.5 min-w-0">
                 <img
                   src={selectedClient.avatar}
                   alt={selectedClient.name}
-                  className="w-8 h-8 rounded-lg object-cover ring-2 ring-[#0066FF]/30 shrink-0"
+                  className="w-7 h-7 rounded-lg object-cover ring-2 ring-[#0066FF]/40 shrink-0"
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="text-xs font-bold text-white truncate group-hover:text-sky-300 transition-colors">
-                    {selectedClient.name}
+                  <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
+                    <span>{selectedClient.name}</span>
+                    <span className="text-xs">{selectedClient.flag}</span>
                   </div>
                   <div className="text-[10px] text-slate-400 truncate">
                     {selectedClient.category}
@@ -349,11 +450,11 @@ export default function DashboardPage() {
 
             {/* Menu Dropdown Clients */}
             {isClientDropdownOpen && (
-              <div className="absolute top-full left-4 right-4 mt-2 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl py-2 z-50">
-                <div className="text-[10px] font-bold text-slate-400 px-3 py-1 uppercase tracking-wider">
+              <div className="absolute top-full left-3.5 right-3.5 mt-1.5 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl py-2 z-50 max-h-60 overflow-y-auto">
+                <div className="text-[9px] font-bold text-slate-400 px-3 py-1 uppercase tracking-wider">
                   Changer de marque
                 </div>
-                {MOCK_CLIENTS.map((client) => (
+                {clients.map((client) => (
                   <button
                     key={client.id}
                     onClick={() => {
@@ -361,81 +462,131 @@ export default function DashboardPage() {
                       setIsClientDropdownOpen(false);
                       triggerToast(`Espace commuté sur « ${client.name} »`);
                     }}
-                    className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-slate-800 transition-colors ${
-                      selectedClient.id === client.id ? 'bg-slate-800/60 font-bold text-[#F94F06]' : 'text-slate-300'
+                    className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-slate-800 transition-colors ${
+                      selectedClient.id === client.id ? 'bg-slate-800/80 font-bold text-[#F94F06]' : 'text-slate-300'
                     }`}
                   >
-                    <img src={client.avatar} alt={client.name} className="w-6 h-6 rounded-md object-cover" />
-                    <div className="truncate text-xs">{client.name}</div>
+                    <div className="flex items-center gap-2 truncate">
+                      <img src={client.avatar} alt={client.name} className="w-5 h-5 rounded-md object-cover" />
+                      <span className="truncate text-xs">{client.name}</span>
+                    </div>
+                    <span className="text-xs">{client.flag}</span>
                   </button>
                 ))}
+                
                 <div className="border-t border-slate-800 my-1 pt-1">
                   <button
                     onClick={() => {
                       setIsClientDropdownOpen(false);
-                      triggerToast('Formulaire de création de nouveau client bientôt disponible !');
+                      setIsAddClientModalOpen(true);
                     }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-[#0066FF] hover:bg-slate-800/80 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>+ Ajouter un client</span>
+                    <span>+ Ajouter une marque</span>
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Navigation Principale */}
-          <nav className="px-3 space-y-1 mt-2">
+          {/* Navigation Principale (9 Modules) */}
+          <nav className="px-2.5 space-y-0.5">
+            
+            {/* 1. Calendrier */}
             <Link
               href="/dashboard"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold bg-[#F94F06] text-white shadow-lg shadow-[#F94F06]/20"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold bg-[#F94F06] text-white shadow-md shadow-[#F94F06]/20"
             >
               <CalendarIcon className="w-4 h-4" />
-              <span>Calendrier de publication</span>
+              <span>1. Calendrier & Queue</span>
             </Link>
 
+            {/* 2. Espaces Clients */}
             <Link
               href="/clients"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
             >
               <Users className="w-4 h-4 text-slate-400" />
-              <span>Espaces Clients (Workspaces)</span>
+              <span>2. Espaces Clients</span>
             </Link>
 
+            {/* 3. Médiathèque */}
             <Link
               href="/media"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
             >
               <ImageIcon className="w-4 h-4 text-slate-400" />
-              <span>Médiathèque (Assets)</span>
+              <span>3. Médiathèque & Assets</span>
             </Link>
 
+            {/* 4. Messagerie Unifiée */}
+            <Link
+              href="/inbox"
+              className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <MessageSquare className="w-4 h-4 text-slate-400" />
+                <span>4. Inbox Unifiée</span>
+              </div>
+              <span className="w-2 h-2 rounded-full bg-[#10B981]"></span>
+            </Link>
+
+            {/* 5. Start Page */}
+            <Link
+              href="/startpage"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+            >
+              <Globe className="w-4 h-4 text-slate-400" />
+              <span>5. Start Page (Bio)</span>
+            </Link>
+
+            {/* 6. Analytics & Rapports */}
+            <Link
+              href="/analytics"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+            >
+              <BarChart3 className="w-4 h-4 text-slate-400" />
+              <span>6. Analytics & Rapports</span>
+            </Link>
+
+            {/* 7. Portail Validation */}
+            <button
+              onClick={() => setIsValidationModalOpen(true)}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors text-left"
+            >
+              <ShieldCheck className="w-4 h-4 text-[#10B981]" />
+              <span>7. Portail Validation</span>
+            </button>
+
+            {/* 8. Facturation & Forfaits */}
             <Link
               href="/billing"
-              className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <CreditCard className="w-4 h-4 text-slate-400" />
-                <span>Facturation & Forfait</span>
+                <span>8. Forfait & Paiements</span>
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                Starter Wave
+              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                Wave
               </span>
             </Link>
 
+            {/* 9. Paramètres */}
             <Link
               href="/settings"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
             >
               <Settings className="w-4 h-4 text-slate-400" />
-              <span>Paramètres de l'Agence</span>
+              <span>9. Paramètres Agence</span>
             </Link>
+
           </nav>
         </div>
 
-        {/* Profil CM & Déconnexion */}
-        <div className="p-4 border-t border-slate-800/80 bg-slate-900/40">
+        {/* Pied de Sidebar : Profil CM & Déconnexion */}
+        <div className="p-3.5 border-t border-slate-800/80 bg-slate-900/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="relative">
@@ -446,14 +597,14 @@ export default function DashboardPage() {
               </div>
               <div className="min-w-0">
                 <div className="text-xs font-bold text-white truncate">Awa Diop</div>
-                <div className="text-[10px] text-slate-400 truncate">Lead CM · Dakar</div>
+                <div className="text-[10px] text-slate-400 truncate">Lead CM · Dakar 🇸🇳</div>
               </div>
             </div>
 
             <button
               type="button"
               onClick={() => {
-                if (confirm('Voulez-vous vous déconnecter ?')) {
+                if (confirm('Voulez-vous vous déconnecter de CMFlow ?')) {
                   window.location.href = '/login';
                 }
               }}
@@ -466,7 +617,7 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      {/* Fond sombre pour mobile quand la sidebar est ouverte */}
+      {/* Fond sombre pour mobile */}
       {isMobileSidebarOpen && (
         <div
           onClick={() => setIsMobileSidebarOpen(false)}
@@ -475,16 +626,16 @@ export default function DashboardPage() {
       )}
 
       {/* =======================================================================
-          CONTENU PRINCIPAL (HEADER + GRILLE CALENDRIER)
+          ZONE CENTRALE DU DASHBOARD (HEADER + KPIS + CALENDRIER)
           ======================================================================= */}
       <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
         
         {/* =====================================================================
             B. EN-TÊTE SUPÉRIEUR (TOP BAR)
             ===================================================================== */}
-        <header className="sticky top-0 z-20 bg-white border-b border-slate-200/80 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
+        <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 sm:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
           
-          {/* Titre & Hamburger Mobile */}
+          {/* Titre & Bouton Hamburger */}
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -495,27 +646,29 @@ export default function DashboardPage() {
             </button>
 
             <div>
-              <h1 className="text-lg sm:text-xl font-extrabold text-[#0F172A] tracking-tight flex items-center gap-2">
+              <h1 className="text-base sm:text-lg font-extrabold text-[#0F172A] tracking-tight flex items-center gap-2">
                 <span>Planning de publication</span>
                 <span className="text-slate-300 font-normal">/</span>
-                <span className="text-[#0066FF]">{selectedClient.name}</span>
+                <span className="text-[#0066FF] flex items-center gap-1.5">
+                  {selectedClient.name} {selectedClient.flag}
+                </span>
               </h1>
-              <p className="text-xs text-slate-500">
-                {filteredPosts.length} publication{filteredPosts.length > 1 ? 's' : ''} planifiée{filteredPosts.length > 1 ? 's' : ''} cette semaine
+              <p className="text-[11px] text-slate-500">
+                {clientPosts.length} publication{clientPosts.length > 1 ? 's' : ''} planifiée{clientPosts.length > 1 ? 's' : ''} ce mois-ci
               </p>
             </div>
           </div>
 
-          {/* Bascule de Vue & Actions Rapides */}
-          <div className="flex items-center flex-wrap gap-2.5">
+          {/* Sélecteur de vue & Boutons d'Action Rapide */}
+          <div className="flex items-center flex-wrap gap-2">
             
-            {/* Bascule Vue Semaine / Mois / Liste */}
-            <div className="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200 text-xs font-bold text-slate-600">
+            {/* Boutons Pilules de Vue */}
+            <div className="bg-slate-100 p-0.5 rounded-xl flex items-center border border-slate-200 text-xs font-bold text-slate-600">
               <button
                 type="button"
                 onClick={() => setViewMode('week')}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
-                  viewMode === 'week' ? 'bg-white text-[#0F172A] shadow-sm' : 'hover:text-slate-900'
+                  viewMode === 'week' ? 'bg-white text-[#0F172A] shadow-xs' : 'hover:text-slate-900'
                 }`}
               >
                 Semaine
@@ -524,7 +677,7 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setViewMode('month')}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
-                  viewMode === 'month' ? 'bg-white text-[#0F172A] shadow-sm' : 'hover:text-slate-900'
+                  viewMode === 'month' ? 'bg-white text-[#0F172A] shadow-xs' : 'hover:text-slate-900'
                 }`}
               >
                 Mois
@@ -533,29 +686,29 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => setViewMode('list')}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
-                  viewMode === 'list' ? 'bg-white text-[#0F172A] shadow-sm' : 'hover:text-slate-900'
+                  viewMode === 'list' ? 'bg-white text-[#0F172A] shadow-xs' : 'hover:text-slate-900'
                 }`}
               >
                 Liste
               </button>
             </div>
 
-            {/* Bouton WhatsApp Validation */}
+            {/* Bouton WhatsApp Validation (#10B981) */}
             <button
               type="button"
               onClick={() => setIsValidationModalOpen(true)}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#25D366]/10 text-[#059669] border border-[#25D366]/30 hover:bg-[#25D366]/20 transition-all"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#10B981]/10 text-[#059669] border border-[#10B981]/30 hover:bg-[#10B981]/20 transition-all"
             >
               <Send className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Envoyer pour validation</span>
               <span className="sm:hidden">WhatsApp</span>
             </button>
 
-            {/* Bouton Principal Orange Électrique (+ Créer un post) */}
+            {/* Bouton Principal Orange (+ Créer un post) */}
             <button
               type="button"
               onClick={() => setIsCreatePostModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] text-white shadow-md shadow-[#F94F06]/20 active:scale-[0.98] transition-all"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] text-white shadow-md shadow-[#F94F06]/25 active:scale-[0.98] transition-all"
             >
               <Plus className="w-4 h-4" />
               <span>+ Créer un post</span>
@@ -565,108 +718,234 @@ export default function DashboardPage() {
         </header>
 
         {/* =====================================================================
-            BARRE D'OUTILS & FILTRES DE CALENDRIER
+            BANNIÈRE ONBOARDING (DISMISSIBLE)
             ===================================================================== */}
-        <div className="bg-white border-b border-slate-200 px-4 sm:px-8 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-          
-          {/* Navigation Date (Précédent / Aujourd'hui / Suivant) */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl p-1">
-              <button
-                type="button"
-                className="p-1.5 hover:bg-white rounded-lg text-slate-600 transition-colors"
-                title="Semaine précédente"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                className="px-2.5 py-1 text-xs font-bold text-slate-700 hover:bg-white rounded-lg transition-colors"
-              >
-                Aujourd'hui
-              </button>
-              <button
-                type="button"
-                className="p-1.5 hover:bg-white rounded-lg text-slate-600 transition-colors"
-                title="Semaine suivante"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+        {showOnboardingBanner && (
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 sm:px-8 py-3 flex items-center justify-between gap-4 text-xs">
+            <div className="flex items-center gap-3 overflow-x-auto">
+              <span className="font-extrabold text-white flex items-center gap-1 shrink-0">
+                👋 Bienvenue sur CMFlow !
+              </span>
+              <span className="text-blue-100 hidden md:inline">Lancez votre campagne en 3 étapes :</span>
+              <div className="flex items-center gap-2 font-medium shrink-0">
+                <button
+                  onClick={() => setIsAddClientModalOpen(true)}
+                  className="px-2 py-0.5 bg-white/15 hover:bg-white/25 rounded-md border border-white/20"
+                >
+                  1. Ajouter une marque
+                </button>
+                <span>➔</span>
+                <button
+                  onClick={() => setIsCreatePostModalOpen(true)}
+                  className="px-2 py-0.5 bg-white/15 hover:bg-white/25 rounded-md border border-white/20"
+                >
+                  2. Créer un post
+                </button>
+                <span>➔</span>
+                <button
+                  onClick={() => setIsValidationModalOpen(true)}
+                  className="px-2 py-0.5 bg-white/15 hover:bg-white/25 rounded-md border border-white/20 font-bold text-amber-300"
+                >
+                  3. Tester validation WhatsApp
+                </button>
+              </div>
             </div>
 
-            <div className="text-sm font-extrabold text-[#0F172A]">
-              Semaine du 24 au 30 Août 2026
-            </div>
+            <button
+              onClick={() => setShowOnboardingBanner(false)}
+              className="text-blue-200 hover:text-white p-1 shrink-0"
+              title="Fermer la bannière"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
+        )}
 
-          {/* Filtres par Réseau Social & Statut */}
-          <div className="flex items-center flex-wrap gap-2 text-xs">
-            
-            {/* Filtre Réseau */}
-            <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1">
-              <Filter className="w-3.5 h-3.5 text-slate-400" />
-              <select
-                value={filterNetwork}
-                onChange={(e) => setFilterNetwork(e.target.value)}
-                className="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
-              >
-                <option value="all">Tous les réseaux</option>
-                <option value="instagram">Instagram</option>
-                <option value="facebook">Facebook</option>
-                <option value="tiktok">TikTok</option>
-                <option value="linkedin">LinkedIn</option>
-              </select>
-            </div>
-
-            {/* Filtre Statut */}
-            <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
-              >
-                <option value="all">Tous les statuts</option>
-                <option value="draft">Brouillon</option>
-                <option value="pending_validation">En attente WhatsApp</option>
-                <option value="validated">Validé client</option>
-                <option value="scheduled">Programmé</option>
-              </select>
-            </div>
-
-          </div>
-        </div>
-
-        {/* =====================================================================
-            C. CORPS CENTRAL : GRILLE HEBDOMADAIRE / MENSUELLE DU CALENDRIER
-            ===================================================================== */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-auto">
+        <div className="p-4 sm:p-6 lg:p-8 space-y-6">
           
           {/* ===================================================================
-              VUE SEMAINE (Desktop Grid 7 colonnes, Mobile List)
+              C. CARTES DE MÉTRIQUES CLÉS (4 KPIS CONTEXTUALISÉES)
+              =================================================================== */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            {/* KPI 1 : Espace Client */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Marque Active
+                </span>
+                <div className="text-base font-extrabold text-slate-900 mt-1 flex items-center gap-1.5">
+                  <span className="truncate">{selectedClient.name}</span>
+                  <span>{selectedClient.flag}</span>
+                </div>
+                <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1 mt-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Espace synchronisé
+                </span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-[#F94F06]">
+                <Users className="w-5 h-5" />
+              </div>
+            </div>
+
+            {/* KPI 2 : Comptes connectés */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Comptes Liés
+                </span>
+                <div className="text-lg font-extrabold text-slate-900 mt-1">
+                  {connectedPlatformsCount} Réseaux
+                </div>
+                <div className="flex items-center gap-1.5 mt-1">
+                  {selectedClient.connectedAccounts.instagram && <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />}
+                  {selectedClient.connectedAccounts.facebook && <Facebook className="w-3.5 h-3.5 text-[#1877F2]" />}
+                  {selectedClient.connectedAccounts.tiktok && <span className="text-[9px] font-bold">TT</span>}
+                  {selectedClient.connectedAccounts.linkedin && <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" />}
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF]">
+                <Link2 className="w-5 h-5" />
+              </div>
+            </div>
+
+            {/* KPI 3 : Posts ce mois */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Volume Ce Mois
+                </span>
+                <div className="text-lg font-extrabold text-slate-900 mt-1">
+                  {clientPosts.length} Publications
+                </div>
+                <span className="text-[10px] text-slate-500 font-medium block mt-1">
+                  Tous statuts confondus
+                </span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
+                <CalendarIcon className="w-5 h-5" />
+              </div>
+            </div>
+
+            {/* KPI 4 : Taux d'approbation client */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Taux d'Approbation
+                </span>
+                <div className="text-lg font-extrabold text-emerald-600 mt-1 flex items-center gap-1">
+                  <span>{selectedClient.approvalRate}%</span>
+                  <span className="text-[10px] text-slate-400 font-normal">au 1er envoi</span>
+                </div>
+                <span className="text-[10px] text-slate-500 font-medium block mt-1">
+                  Validation WhatsApp fluide
+                </span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+            </div>
+
+          </div>
+
+          {/* ===================================================================
+              D. BARRE D'OUTILS ET FILTRES DU CALENDRIER
+              =================================================================== */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 shadow-xs">
+            
+            {/* Navigation Temporelle */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl p-1">
+                <button
+                  type="button"
+                  onClick={() => triggerToast('Semaine précédente chargée')}
+                  className="p-1.5 hover:bg-white rounded-lg text-slate-600 transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  className="px-2.5 py-1 text-xs font-bold text-slate-800 hover:bg-white rounded-lg transition-colors"
+                >
+                  Aujourd'hui
+                </button>
+                <button
+                  type="button"
+                  onClick={() => triggerToast('Semaine suivante chargée')}
+                  className="p-1.5 hover:bg-white rounded-lg text-slate-600 transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="text-xs sm:text-sm font-extrabold text-[#0F172A]">
+                Semaine du 24 au 30 Août 2026
+              </div>
+            </div>
+
+            {/* Filtres Combinés (Réseaux & Statuts) */}
+            <div className="flex items-center flex-wrap gap-2 text-xs">
+              
+              {/* Filtre Réseau */}
+              <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5">
+                <Filter className="w-3.5 h-3.5 text-slate-400" />
+                <select
+                  value={filterNetwork}
+                  onChange={(e) => setFilterNetwork(e.target.value)}
+                  className="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
+                >
+                  <option value="all">Tous les réseaux</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="tiktok">TikTok</option>
+                  <option value="linkedin">LinkedIn</option>
+                </select>
+              </div>
+
+              {/* Filtre Statut */}
+              <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5">
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
+                >
+                  <option value="all">Tous les statuts</option>
+                  <option value="draft">Brouillons</option>
+                  <option value="pending_validation">En attente WhatsApp</option>
+                  <option value="validated">Validés client</option>
+                  <option value="scheduled">Programmés</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
+          {/* ===================================================================
+              VUE SEMAINE : GRILLE DU CALENDRIER MULTI-RÉSEAUX
               =================================================================== */}
           {viewMode === 'week' && (
-            <div className="grid grid-cols-1 md:grid-cols-7 gap-4 min-w-full md:min-w-[900px] items-start">
+            <div className="grid grid-cols-1 md:grid-cols-7 gap-4 min-w-full md:min-w-[920px] items-start">
               {DAYS_OF_WEEK.map((day) => {
                 const dayPosts = filteredPosts.filter((p) => p.scheduledDate === day.key);
-                const isToday = day.dateNum === '24'; // Exemple : 24 août aujourd'hui
+                const isToday = day.dateNum === '24';
 
                 return (
                   <div
                     key={day.key}
                     className={`rounded-2xl border transition-all ${
                       isToday
-                        ? 'bg-white border-[#0066FF]/40 shadow-md ring-1 ring-[#0066FF]/20'
-                        : 'bg-white/80 border-slate-200/80 hover:border-slate-300'
+                        ? 'bg-white border-[#0066FF]/50 shadow-md ring-2 ring-[#0066FF]/10'
+                        : 'bg-white border-slate-200/80 hover:border-slate-300'
                     }`}
                   >
                     {/* Header du Jour */}
                     <div
                       className={`p-3 border-b flex items-center justify-between rounded-t-2xl ${
-                        isToday ? 'bg-blue-50/60 border-blue-100' : 'bg-slate-50/60 border-slate-100'
+                        isToday ? 'bg-blue-50/70 border-blue-100' : 'bg-slate-50/70 border-slate-100'
                       }`}
                     >
                       <div>
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
                           {day.name}
                         </span>
                         <span
@@ -679,16 +958,16 @@ export default function DashboardPage() {
                       </div>
 
                       {isToday && (
-                        <span className="text-[10px] font-extrabold bg-[#0066FF] text-white px-2 py-0.5 rounded-full">
+                        <span className="text-[9px] font-extrabold bg-[#0066FF] text-white px-2 py-0.5 rounded-full">
                           Aujourd'hui
                         </span>
                       )}
                     </div>
 
                     {/* Zone de cartes de publication */}
-                    <div className="p-2 space-y-2.5 min-h-[320px]">
+                    <div className="p-2 space-y-2.5 min-h-[300px]">
                       {dayPosts.length === 0 ? (
-                        <div className="h-40 flex flex-col items-center justify-center text-center p-3 border border-dashed border-slate-200 rounded-xl text-slate-400">
+                        <div className="h-36 flex flex-col items-center justify-center text-center p-3 border border-dashed border-slate-200 rounded-xl text-slate-400">
                           <span className="text-[11px] font-medium">Aucun post</span>
                           <button
                             type="button"
@@ -696,9 +975,9 @@ export default function DashboardPage() {
                               setNewDate(day.key);
                               setIsCreatePostModalOpen(true);
                             }}
-                            className="mt-2 text-[11px] font-bold text-[#0066FF] hover:underline"
+                            className="mt-1.5 text-[11px] font-bold text-[#0066FF] hover:underline"
                           >
-                            + Ajouter
+                            + Planifier
                           </button>
                         </div>
                       ) : (
@@ -711,7 +990,7 @@ export default function DashboardPage() {
                             <div className="relative h-28 w-full bg-slate-100 overflow-hidden">
                               <img
                                 src={post.mediaUrl}
-                                alt="Aperçu du visuel"
+                                alt="Aperçu visuel"
                                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                               />
 
@@ -720,9 +999,9 @@ export default function DashboardPage() {
                                 {renderNetworkIcon(post.network)}
                               </div>
 
-                              {/* Type de Média */}
+                              {/* Badge Type Média */}
                               {post.mediaType === 'video' && (
-                                <div className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm text-white px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1">
+                                <div className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm text-white px-1.5 py-0.5 rounded text-[9px] font-bold flex items-center gap-1">
                                   <Video className="w-3 h-3" />
                                   <span>Vidéo</span>
                                 </div>
@@ -735,23 +1014,23 @@ export default function DashboardPage() {
                             </div>
 
                             {/* Contenu & Légende */}
-                            <div className="p-3 space-y-2">
-                              <p className="text-xs text-slate-700 line-clamp-2 leading-relaxed font-medium">
+                            <div className="p-2.5 space-y-2">
+                              <p className="text-[11px] text-slate-700 line-clamp-2 leading-relaxed font-medium">
                                 {post.caption}
                               </p>
 
-                              {/* Statut */}
-                              <div className="pt-1 flex items-center justify-between">
+                              {/* Badge Statut */}
+                              <div className="pt-0.5 flex items-center justify-between">
                                 {renderStatusBadge(post.status)}
                               </div>
                             </div>
 
                             {/* Actions Rapides au Survol */}
-                            <div className="absolute inset-0 bg-[#0F172A]/85 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-4 text-white">
+                            <div className="absolute inset-0 bg-[#0F172A]/85 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-3 text-white">
                               <button
                                 type="button"
-                                title="Prévisualiser le rendu"
-                                onClick={() => triggerToast(`Prévisualisation de la publication #${post.id}`)}
+                                title="Prévisualiser"
+                                onClick={() => setPreviewPost(post)}
                                 className="p-2 rounded-lg bg-white/20 hover:bg-white text-white hover:text-slate-900 transition-colors"
                               >
                                 <Eye className="w-4 h-4" />
@@ -760,7 +1039,7 @@ export default function DashboardPage() {
                               <button
                                 type="button"
                                 title="Modifier"
-                                onClick={() => triggerToast('Éditeur de post ouvert')}
+                                onClick={() => triggerToast('Édition du post ouverte')}
                                 className="p-2 rounded-lg bg-white/20 hover:bg-white text-white hover:text-slate-900 transition-colors"
                               >
                                 <Edit2 className="w-4 h-4" />
@@ -786,11 +1065,11 @@ export default function DashboardPage() {
           )}
 
           {/* ===================================================================
-              VUE LISTE OU MOIS ALTERNATIVE
+              VUE LISTE ALTERNATIVE
               =================================================================== */}
           {(viewMode === 'list' || viewMode === 'month') && (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-slate-200 bg-slate-50 font-bold text-xs uppercase tracking-wider text-slate-500 grid grid-cols-12 gap-4">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+              <div className="p-4 border-b border-slate-200 bg-slate-50 font-bold text-[11px] uppercase tracking-wider text-slate-500 grid grid-cols-12 gap-4">
                 <div className="col-span-2">Date & Heure</div>
                 <div className="col-span-2">Réseau</div>
                 <div className="col-span-5">Visuel & Légende</div>
@@ -802,17 +1081,17 @@ export default function DashboardPage() {
                 {filteredPosts.map((post) => (
                   <div
                     key={post.id}
-                    className="p-4 grid grid-cols-12 gap-4 items-center hover:bg-slate-50/80 transition-colors text-sm"
+                    className="p-4 grid grid-cols-12 gap-4 items-center hover:bg-slate-50/80 transition-colors text-xs"
                   >
-                    <div className="col-span-2 font-bold text-slate-900 text-xs">
+                    <div className="col-span-2 font-bold text-slate-900">
                       {post.scheduledDate} · {post.scheduledTime}
                     </div>
 
                     <div className="col-span-2 flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-slate-100">
+                      <div className="p-1 rounded-lg bg-slate-100">
                         {renderNetworkIcon(post.network)}
                       </div>
-                      <span className="text-xs font-bold capitalize text-slate-700">
+                      <span className="font-bold capitalize text-slate-700">
                         {post.network}
                       </span>
                     </div>
@@ -823,7 +1102,7 @@ export default function DashboardPage() {
                         alt="Thumbnail"
                         className="w-10 h-10 rounded-lg object-cover border border-slate-200 shrink-0"
                       />
-                      <p className="text-xs text-slate-700 truncate font-medium">
+                      <p className="text-slate-700 truncate font-medium">
                         {post.caption}
                       </p>
                     </div>
@@ -832,12 +1111,20 @@ export default function DashboardPage() {
                       {renderStatusBadge(post.status)}
                     </div>
 
-                    <div className="col-span-1 flex items-center justify-end gap-1.5">
+                    <div className="col-span-1 flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => setPreviewPost(post)}
+                        className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
+                        title="Voir"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
                       <button
                         onClick={() => handleDeletePost(post.id)}
                         className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50"
+                        title="Supprimer"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -846,7 +1133,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-        </main>
+        </div>
       </div>
 
       {/* =======================================================================
@@ -858,14 +1145,14 @@ export default function DashboardPage() {
             
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-full bg-[#25D366]/20 text-[#25D366] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-[#10B981]/20 text-[#10B981] flex items-center justify-center">
                   <Send className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-base font-extrabold text-[#0F172A]">
                     Lien Magique de Validation
                   </h3>
-                  <p className="text-xs text-slate-500">Pour {selectedClient.name}</p>
+                  <p className="text-xs text-slate-500">Pour {selectedClient.name} {selectedClient.flag}</p>
                 </div>
               </div>
               <button
@@ -877,36 +1164,40 @@ export default function DashboardPage() {
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed mb-4">
-              Votre client n'a <strong>pas besoin de créer de compte</strong>. En ouvrant ce lien sécurisé, il pourra valider chaque publication ou commenter d'un simple clic depuis son smartphone.
+              Votre client n'a <strong>pas besoin de mot de passe</strong>. En ouvrant ce lien sécurisé, il accède à une interface mobile fluide pour valider ou commenter chaque visuel en 1 clic.
             </p>
 
-            {/* Lien Magique Généré */}
+            {/* Lien Magique */}
             <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl mb-4 flex items-center justify-between gap-2">
-              <span className="text-xs font-mono text-slate-700 truncate">
-                https://cmflow.sn/v/{selectedClient.id}-aout26
+              <span className="text-xs font-mono text-slate-700 truncate font-semibold">
+                {magicValidationUrl}
               </span>
               <button
                 type="button"
                 onClick={() => {
-                  navigator.clipboard.writeText(`https://cmflow.sn/v/${selectedClient.id}-aout26`);
-                  triggerToast('Lien copié dans le presse-papier ! 📋');
+                  navigator.clipboard.writeText(magicValidationUrl);
+                  triggerToast('📋 Lien magique copié dans le presse-papier !');
                 }}
-                className="p-1.5 text-[#0066FF] hover:bg-blue-50 rounded-lg shrink-0 font-bold text-xs flex items-center gap-1"
+                className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200 text-[#0066FF] rounded-lg shrink-0 font-bold text-xs flex items-center gap-1 shadow-xs"
               >
-                <Copy className="w-4 h-4" />
+                <Copy className="w-3.5 h-3.5" />
                 <span>Copier</span>
               </button>
             </div>
 
-            {/* Actions WhatsApp */}
-            <div className="space-y-2.5">
+            {/* Aperçu Message WhatsApp */}
+            <div className="mb-4 p-3 bg-emerald-50/60 border border-emerald-100 rounded-xl text-xs text-emerald-900 leading-relaxed">
+              <span className="font-bold block text-emerald-800 mb-1">Message prêt pour WhatsApp :</span>
+              « {whatsappPreFilledText} »
+            </div>
+
+            {/* Boutons d'Action */}
+            <div className="space-y-2">
               <a
-                href={`https://wa.me/${selectedClient.whatsapp.replace(/[^0-9]/g, '')}?text=Bonjour%20${encodeURIComponent(
-                  selectedClient.name
-                )}%2C%20voici%20votre%20planning%20de%20publications%20%C3%A0%20valider%20sur%20CMFlow%20%3A%20https%3A%2F%2Fcmflow.sn%2Fv%2F${selectedClient.id}-aout26`}
+                href={`https://wa.me/${selectedClient.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappPreFilledText)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/25 transition-all"
+                className="w-full py-3 px-4 rounded-xl font-bold text-xs sm:text-sm bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/25 transition-all"
               >
                 <Send className="w-4 h-4" />
                 <span>Ouvrir sur WhatsApp ({selectedClient.whatsapp})</span>
@@ -926,7 +1217,7 @@ export default function DashboardPage() {
       )}
 
       {/* =======================================================================
-          MODALE 2 : CRÉER UN NOUVEAU POST (+ CRÉER UN POST)
+          MODALE 2 : CRÉATION / PROGRAMMATION DE POST
           ======================================================================= */}
       {isCreatePostModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
@@ -935,9 +1226,9 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
               <div>
                 <h3 className="text-base font-extrabold text-[#0F172A]">
-                  Nouvelle Publication
+                  Créer une Publication
                 </h3>
-                <p className="text-xs text-slate-500">Pour {selectedClient.name}</p>
+                <p className="text-xs text-slate-500">Pour {selectedClient.name} {selectedClient.flag}</p>
               </div>
               <button
                 onClick={() => setIsCreatePostModalOpen(false)}
@@ -949,7 +1240,7 @@ export default function DashboardPage() {
 
             <form onSubmit={handleCreatePost} className="space-y-4">
               
-              {/* Choix du réseau */}
+              {/* Choix Réseau Social */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                   Réseau Cible
@@ -962,7 +1253,7 @@ export default function DashboardPage() {
                       onClick={() => setNewNetwork(net)}
                       className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${
                         newNetwork === net
-                          ? 'border-[#0066FF] bg-blue-50/50 text-[#0066FF] font-bold shadow-xs'
+                          ? 'border-[#0066FF] bg-blue-50/60 text-[#0066FF] font-bold shadow-xs'
                           : 'border-slate-200 hover:bg-slate-50 text-slate-600'
                       }`}
                     >
@@ -973,11 +1264,28 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Texte de la légende */}
+              {/* Zone Drag & Drop Média */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Texte de la publication (Légende & Hashtags)
+                  Visuel ou Vidéo
                 </label>
+                <div className="border-2 border-dashed border-slate-200 hover:border-[#0066FF] rounded-xl p-4 text-center bg-slate-50/50 cursor-pointer transition-colors">
+                  <UploadCloud className="w-6 h-6 text-slate-400 mx-auto mb-1" />
+                  <div className="text-xs font-bold text-slate-700">Glissez-déposez votre visuel ici</div>
+                  <div className="text-[10px] text-slate-400">PNG, JPG, MP4 jusqu'à 50 Mo</div>
+                </div>
+              </div>
+
+              {/* Légende & Compteur */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    Légende & Hashtags
+                  </label>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    {newCaption.length} caractères
+                  </span>
+                </div>
                 <textarea
                   rows={4}
                   value={newCaption}
@@ -988,7 +1296,7 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {/* Date et Heure */}
+              {/* Date & Heure */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
@@ -1016,10 +1324,10 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Statut initial */}
+              {/* Statut Initial */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Statut initial
+                  Statut Initial
                 </label>
                 <select
                   value={newStatus}
@@ -1027,31 +1335,195 @@ export default function DashboardPage() {
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium"
                 >
                   <option value="pending_validation">En attente de validation client (WhatsApp)</option>
-                  <option value="draft">Brouillon interne CM</option>
-                  <option value="validated">Déjà validé par le client</option>
-                  <option value="scheduled">Prêt à publier / Programmé</option>
+                  <option value="draft">Brouillon interne</option>
+                  <option value="validated">Validé par le client</option>
+                  <option value="scheduled">Prêt pour programmation</option>
                 </select>
               </div>
 
-              {/* Bouton Créer */}
+              {/* Boutons d'Action */}
               <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsCreatePostModalOpen(false)}
-                  className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
                 >
                   Annuler
                 </button>
 
                 <button
                   type="submit"
-                  className="px-5 py-2.5 text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] text-white rounded-xl shadow-md shadow-[#F94F06]/20 transition-all"
+                  className="px-5 py-2 text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] text-white rounded-xl shadow-md shadow-[#F94F06]/20 transition-all"
                 >
-                  Enregistrer la publication
+                  Planifier le post
                 </button>
               </div>
 
             </form>
+
+          </div>
+        </div>
+      )}
+
+      {/* =======================================================================
+          MODALE 3 : AJOUTER UN NOUVEAU CLIENT
+          ======================================================================= */}
+      {isAddClientModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-slate-200 animate-fadeIn">
+            
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-orange-100 text-[#F94F06] flex items-center justify-center font-bold">
+                  +
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-[#0F172A]">
+                    Ajouter une Marque
+                  </h3>
+                  <p className="text-xs text-slate-500">Créer un nouvel espace client</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAddClientModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddClient} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Nom de la Marque / Entreprise
+                </label>
+                <input
+                  type="text"
+                  value={newClientName}
+                  onChange={(e) => setNewClientName(e.target.value)}
+                  placeholder="ex: Dakar Digital Studio"
+                  required
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  Secteur d'activité
+                </label>
+                <input
+                  type="text"
+                  value={newClientCategory}
+                  onChange={(e) => setNewClientCategory(e.target.value)}
+                  placeholder="ex: Mode & Prêt-à-porter"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Pays
+                  </label>
+                  <select
+                    value={newClientCountry}
+                    onChange={(e) => setNewClientCountry(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium"
+                  >
+                    <option value="Sénégal 🇸🇳">Sénégal 🇸🇳</option>
+                    <option value="Côte d'Ivoire 🇨🇮">Côte d'Ivoire 🇨🇮</option>
+                    <option value="Bénin 🇧🇯">Bénin 🇧🇯</option>
+                    <option value="Cameroun 🇨🇲">Cameroun 🇨🇲</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    WhatsApp Client
+                  </label>
+                  <input
+                    type="tel"
+                    value={newClientWhatsapp}
+                    onChange={(e) => setNewClientWhatsapp(e.target.value)}
+                    placeholder="+221 77 123 45 67"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAddClientModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] text-white rounded-xl shadow-md shadow-[#F94F06]/20 transition-all"
+                >
+                  Créer l'espace client
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
+      {/* =======================================================================
+          MODALE 4 : APERÇU DÉTAILLÉ D'UNE PUBLICATION
+          ======================================================================= */}
+      {previewPost && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 animate-fadeIn">
+            
+            {/* Header */}
+            <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {renderNetworkIcon(previewPost.network)}
+                <span className="text-xs font-extrabold capitalize text-slate-900">
+                  Aperçu {previewPost.network}
+                </span>
+              </div>
+              <button
+                onClick={() => setPreviewPost(null)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Média */}
+            <div className="h-64 w-full bg-slate-100">
+              <img
+                src={previewPost.mediaUrl}
+                alt="Aperçu"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Contenu */}
+            <div className="p-4 space-y-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-slate-500">
+                  {previewPost.scheduledDate} à {previewPost.scheduledTime}
+                </span>
+                {renderStatusBadge(previewPost.status)}
+              </div>
+
+              <p className="text-xs text-slate-800 leading-relaxed">
+                {previewPost.caption}
+              </p>
+
+              <button
+                onClick={() => setPreviewPost(null)}
+                className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors"
+              >
+                Fermer l'aperçu
+              </button>
+            </div>
 
           </div>
         </div>

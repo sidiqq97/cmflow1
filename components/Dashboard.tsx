@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import DashboardPage from '../src/app/dashboard/page';
+import DashboardCockpit from '../src/app/dashboard/page';
 
 export const Dashboard: React.FC = () => {
-  return <DashboardPage />;
+  return <DashboardCockpit />;
 };
 
 export default Dashboard;
