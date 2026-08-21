@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Messagerie Unifiée (Inbox) — CMFlow</title>
-  <meta name="description" content="Centralisez et répondez aux messages et commentaires WhatsApp, Instagram, Facebook et TikTok.">
+  <title>Messagerie Unifiée & Retours Clients — CMFlow</title>
+  <meta name="description" content="Centralisez et traitez les retours WhatsApp, DMs Instagram, Facebook et TikTok.">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -22,8 +22,8 @@
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: #F1F5F9;
@@ -148,109 +148,207 @@
         <div class="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#0F172A]">
           <span class="text-slate-400 font-medium">CMFlow</span>
           <span class="text-slate-300">/</span>
-          <span>Inbox & Messagerie Sociale</span>
+          <span>Messagerie Unifiée & Retours Clients</span>
         </div>
       </div>
       <span class="px-3 py-1 bg-emerald-50 text-emerald-700 font-extrabold text-xs rounded-full border border-emerald-200 flex items-center gap-1.5">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        3 Non-lus
+        2 Retours WhatsApp
       </span>
     </header>
 
-    <!-- INBOX LAYOUT (Split View) -->
-    <div class="flex-1 flex min-h-0 overflow-hidden">
-      
-      <!-- Liste des Conversations -->
-      <div class="w-full md:w-80 lg:w-96 border-r border-slate-200 bg-white/80 flex flex-col min-h-0">
-        <div class="p-3.5 border-b border-slate-100 space-y-2">
-          <input type="text" placeholder="Rechercher une conversation..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
-          <div class="flex gap-1 text-[11px] font-bold">
-            <button class="px-2.5 py-1 bg-[#0F172A] text-white rounded-lg">Tous (12)</button>
-            <button class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">Instagram (7)</button>
-            <button class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">WhatsApp (3)</button>
-          </div>
-        </div>
-
-        <div class="flex-1 overflow-y-auto divide-y divide-slate-100">
-          <div class="p-3.5 bg-orange-50/40 hover:bg-orange-50/60 cursor-pointer border-l-4 border-[#F94F06] transition-all">
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs font-extrabold text-[#0F172A]">Mamadou Fall</span>
-              <span class="text-[10px] text-slate-400">14:22</span>
-            </div>
-            <div class="text-[11px] text-slate-600 truncate font-medium">Bonjour, avez-vous des tables disponibles pour le dîner ce soir ?</div>
-            <div class="flex items-center gap-1.5 mt-2">
-              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-purple-100 text-purple-700 font-bold">Instagram DM</span>
-              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-orange-100 text-[#F94F06] font-bold">Teranga Gourmet</span>
-            </div>
-          </div>
-
-          <div class="p-3.5 hover:bg-slate-50 cursor-pointer transition-all">
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs font-extrabold text-[#0F172A]">Khadija Ndiaye</span>
-              <span class="text-[10px] text-slate-400">11:05</span>
-            </div>
-            <div class="text-[11px] text-slate-500 truncate">Le Thiéboudienne était incroyable hier, bravo au Chef ! ❤️</div>
-            <div class="flex items-center gap-1.5 mt-2">
-              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-700 font-bold">Facebook Post</span>
-              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-orange-100 text-[#F94F06] font-bold">Teranga Gourmet</span>
-            </div>
-          </div>
-
-          <div class="p-3.5 hover:bg-slate-50 cursor-pointer transition-all">
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs font-extrabold text-[#0F172A]">Sira Cosmétiques Client</span>
-              <span class="text-[10px] text-slate-400">Hier</span>
-            </div>
-            <div class="text-[11px] text-slate-500 truncate">Est-ce que le sérum à l'hibiscus est disponible à Abidjan ?</div>
-            <div class="flex items-center gap-1.5 mt-2">
-              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-700 font-bold">WhatsApp Direct</span>
-              <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-purple-100 text-purple-700 font-bold">Sira 🇨🇮</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Zone de Conversation Active -->
-      <div class="hidden md:flex flex-1 flex-col bg-slate-50/50 min-h-0">
+    <!-- INBOX EN 3 VOLETS -->
+    <div class="flex-1 p-3.5 min-h-0 overflow-hidden">
+      <div class="h-full grid grid-cols-1 md:grid-cols-12 gap-3 bg-white/80 backdrop-blur-md rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden p-2">
         
-        <!-- En-tête Message -->
-        <div class="p-4 bg-white border-b border-slate-200 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 text-white font-black text-xs flex items-center justify-center">MF</div>
-            <div>
-              <div class="text-xs font-extrabold text-[#0F172A]">Mamadou Fall (@mamadou_fall_dk)</div>
-              <div class="text-[10px] text-slate-400">Instagram Direct · Teranga Gourmet</div>
+        <!-- VOLET 1 : DOSSIERS & CANAUX GAUCHE -->
+        <div class="hidden lg:flex lg:col-span-3 flex-col justify-between p-3.5 bg-slate-50/70 rounded-2xl border border-slate-200/60 overflow-y-auto">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200/70">
+              <span class="text-xs font-black uppercase text-[#0F172A]">Dossiers</span>
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">En ligne</span>
+            </div>
+
+            <div class="space-y-1 text-xs font-bold text-slate-600">
+              <button type="button" class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-[#10B981] text-white shadow-sm">
+                <span>🟢 Retours WhatsApp</span>
+                <span class="bg-white/20 text-white text-[10px] px-1.5 py-0.2 rounded-full">2</span>
+              </button>
+              <button type="button" class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-200/70">
+                <span>💬 Tous les Messages</span>
+                <span class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.2 rounded-full">4</span>
+              </button>
+              <button type="button" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-200/70">
+                <span>📸 Instagram DMs</span>
+              </button>
+              <button type="button" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-200/70">
+                <span>📘 Facebook Messenger</span>
+              </button>
             </div>
           </div>
-          <button type="button" onclick="showToast('✅ Conversation marquée comme traitée')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Marquer comme traité</button>
+
+          <div class="p-2.5 bg-white rounded-xl border border-slate-200 text-[10px] text-slate-500 space-y-1">
+            <div class="font-extrabold text-emerald-600">✓ Sync 4G/3G Active</div>
+            <div>Webhooks WhatsApp & Meta connectés</div>
+          </div>
         </div>
 
-        <!-- Corps Discussion -->
-        <div class="flex-1 p-5 overflow-y-auto space-y-4">
-          <div class="flex gap-2.5 max-w-md">
-            <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center shrink-0">MF</div>
-            <div class="bg-white p-3 rounded-2xl rounded-tl-xs border border-slate-200 shadow-xs text-xs text-slate-800">
-              Bonjour, avez-vous des tables disponibles pour le dîner ce soir pour 4 personnes vers 20h30 ?
-            </div>
+        <!-- VOLET 2 : LISTE DES CONVERSATIONS -->
+        <div class="md:col-span-5 lg:col-span-4 flex flex-col border-r border-slate-200/60 min-h-0 bg-white/50">
+          <div class="p-2.5 border-b border-slate-200/60">
+            <input type="text" placeholder="Rechercher... (⌘K)" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
           </div>
 
-          <div class="flex gap-2.5 max-w-md ml-auto justify-end">
-            <div class="bg-[#F94F06] text-white p-3 rounded-2xl rounded-tr-xs shadow-md shadow-[#F94F06]/20 text-xs">
-              Bonjour Mamadou ! Oui, il nous reste 2 tables en terrasse feutrée pour 20h30. Souhaitez-vous que je vous réserve celle avec vue sur le jardin ? ✨
+          <div class="flex-1 overflow-y-auto divide-y divide-slate-100 p-1 space-y-1">
+            
+            <!-- Thread 1 Actif -->
+            <div class="p-3 rounded-2xl bg-white shadow-md border border-slate-200 ring-1 ring-[#0F172A]/10 cursor-pointer space-y-1">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 min-w-0">
+                  <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                    <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-[#10B981] text-white text-[8px] rounded-full flex items-center justify-center font-bold">W</span>
+                  </div>
+                  <span class="text-xs font-black text-[#0F172A] truncate">Mamadou Dieng (Marketing)</span>
+                </div>
+                <span class="text-[10px] text-slate-400">8 min</span>
+              </div>
+              <div>
+                <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
+                  Modification demandée
+                </span>
+              </div>
+              <p class="text-xs font-bold text-slate-800 truncate">
+                Super visuel, mais pouvez-vous corriger le prix à 4 500 FCFA ?
+              </p>
             </div>
+
+            <!-- Thread 2 -->
+            <div class="p-3 rounded-2xl hover:bg-slate-50 cursor-pointer space-y-1">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 min-w-0">
+                  <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                    <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-[#10B981] text-white text-[8px] rounded-full flex items-center justify-center font-bold">W</span>
+                  </div>
+                  <span class="text-xs font-bold text-slate-700 truncate">Aïcha Traoré</span>
+                </div>
+                <span class="text-[10px] text-slate-400">42 min</span>
+              </div>
+              <div>
+                <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  Validation confirmée
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 truncate">
+                Tout est validé pour le carrousel Brunch de dimanche ! 🎉
+              </p>
+            </div>
+
+            <!-- Thread 3 -->
+            <div class="p-3 rounded-2xl hover:bg-slate-50 cursor-pointer space-y-1">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 min-w-0">
+                  <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                    <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-purple-600 text-white text-[8px] rounded-full flex items-center justify-center font-bold">IG</span>
+                  </div>
+                  <span class="text-xs font-bold text-slate-700 truncate">Amadou Sow</span>
+                </div>
+                <span class="text-[10px] text-slate-400">1h</span>
+              </div>
+              <div>
+                <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 border border-blue-200">
+                  Question tarif / DM
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 truncate">
+                Bonjour, vos plats sont-ils disponibles en livraison ?
+              </p>
+            </div>
+
           </div>
         </div>
 
-        <!-- Zone de Saisie -->
-        <div class="p-3.5 bg-white border-t border-slate-200">
-          <form onsubmit="event.preventDefault(); showToast('💬 Message envoyé sur Instagram !'); document.getElementById('msg-input').value='';" class="flex gap-2">
-            <input type="text" id="msg-input" placeholder="Répondre en tant que Teranga Gourmet..." class="flex-1 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
-            <button type="submit" class="px-4 py-2 bg-[#F94F06] hover:bg-[#e04605] text-white font-extrabold text-xs rounded-xl shadow-md shadow-[#F94F06]/20">Envoyer</button>
-          </form>
+        <!-- VOLET 3 : DISCUSSION & COMPOSER -->
+        <div class="hidden md:flex md:col-span-7 lg:col-span-5 flex-col bg-white rounded-2xl border border-slate-200/80 min-h-0 overflow-hidden">
+          
+          <!-- En-tête -->
+          <div class="p-3.5 border-b border-slate-200/70 flex items-center justify-between bg-slate-50/50">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200">
+              <div>
+                <div class="text-xs font-black text-[#0F172A]">Mamadou Dieng</div>
+                <div class="text-[10px] text-slate-400 font-bold">WhatsApp Direct · +221 77 800 12 34</div>
+              </div>
+            </div>
+            <a href="https://wa.me/221778001234" target="_blank" class="px-2.5 py-1 bg-[#10B981]/10 text-[#059669] font-extrabold text-[11px] rounded-xl border border-[#10B981]/30">
+              Ouvrir WhatsApp
+            </a>
+          </div>
+
+          <!-- Chat -->
+          <div class="flex-1 overflow-y-auto p-3.5 space-y-3 bg-[#F8FAFC]/50">
+            
+            <!-- Contexte Post Widget -->
+            <div class="bg-gradient-to-r from-orange-50/80 to-amber-50/50 border border-orange-200/80 rounded-2xl p-2.5 flex items-center justify-between gap-2 shadow-2xs">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&auto=format&fit=crop&q=80" alt="Post" class="w-10 h-10 rounded-xl object-cover ring-1 ring-orange-300">
+                <div class="min-w-0">
+                  <div class="text-[9px] font-black uppercase text-[#F94F06]">Contexte de Validation</div>
+                  <div class="text-xs font-extrabold text-[#0F172A] truncate">Thiéboudienne Royal Déjeuner</div>
+                  <div class="text-[9px] text-slate-500">📅 24 Août à 12:30</div>
+                </div>
+              </div>
+              <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                Retouche
+              </span>
+            </div>
+
+            <!-- Messages -->
+            <div class="flex flex-col items-end space-y-1">
+              <span class="text-[10px] text-slate-400 font-bold">Awa Diop · 14:15</span>
+              <div class="max-w-xs p-2.5 rounded-2xl rounded-tr-xs bg-[#F94F06] text-white text-xs shadow-md shadow-[#F94F06]/20">
+                Bonjour M. Dieng ! Voici la maquette du post de lundi pour la formule déjeuner.
+              </div>
+            </div>
+
+            <div class="flex flex-col items-start space-y-1">
+              <span class="text-[10px] text-slate-400 font-bold">Mamadou Dieng · 14:22</span>
+              <div class="max-w-xs p-2.5 rounded-2xl rounded-tl-xs bg-white text-slate-800 border border-slate-200 text-xs shadow-2xs">
+                Superbe visuel et très beau texte ! Mais pouvez-vous corriger le prix à 4 500 FCFA au lieu de 5 000 FCFA sur l'affiche ? Merci beaucoup !
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Composer -->
+          <div class="p-3 border-t border-slate-200 bg-white space-y-2">
+            <div class="flex gap-1 overflow-x-auto text-[10px] font-bold">
+              <button type="button" onclick="setReply('C\'est bien noté, nous effectuons la retouche immédiatement ! 🎨')" class="px-2 py-0.5 bg-slate-100 hover:bg-orange-50 hover:text-[#F94F06] rounded-md border border-slate-200 whitespace-nowrap">
+                ⚡ Retouche immédiate
+              </button>
+              <button type="button" onclick="setReply('Merci pour votre validation ! Le post est programmé. 🚀')" class="px-2 py-0.5 bg-slate-100 hover:bg-orange-50 hover:text-[#F94F06] rounded-md border border-slate-200 whitespace-nowrap">
+                ⚡ Confirmation
+              </button>
+            </div>
+
+            <form onsubmit="event.preventDefault(); sendMsg();" class="space-y-2">
+              <textarea id="reply-input" rows="2" placeholder="Rédiger votre réponse..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none"></textarea>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                  Canal : WhatsApp
+                </span>
+                <button type="submit" class="px-4 py-1.5 bg-[#F94F06] hover:bg-[#e04605] text-white font-extrabold text-xs rounded-xl shadow-md">
+                  Envoyer la réponse
+                </button>
+              </div>
+            </form>
+          </div>
+
         </div>
 
       </div>
-
     </div>
   </div>
 
@@ -263,6 +361,17 @@
       setTimeout(() => {
         toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
       }, 3000);
+    }
+
+    function setReply(text) {
+      document.getElementById('reply-input').value = text;
+    }
+
+    function sendMsg() {
+      const input = document.getElementById('reply-input');
+      if (!input.value.trim()) return;
+      showToast('💬 Réponse envoyée directement sur WhatsApp !');
+      input.value = '';
     }
   </script>
 </body>
