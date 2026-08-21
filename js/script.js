@@ -993,7 +993,69 @@ function initFooterLinks() {
 }
 
 /* ==========================================================================
-   11. INITIALISATION GLOBALE (DOMContentLoaded)
+   11. BENTO GRID BRAND SIMULATION & FAQ ACCORDION
+   ========================================================================== */
+function simulateBentoBrand(brandKey) {
+  const brandData = {
+    shop: {
+      title: 'Vision Large Shop • Boutique Mode',
+      meta: '4 comptes connectés • Calendrier dédié',
+      img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80'
+    },
+    resto: {
+      title: 'Teranga Gourmet • Restaurant & Traiteur',
+      meta: 'Instagram + TikTok • Menu de la semaine',
+      img: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&auto=format&fit=crop&q=80'
+    },
+    school: {
+      title: 'Lycée Mahmady • Établissement Scolaire',
+      meta: 'Facebook + LinkedIn • Rentrée & Inscriptions',
+      img: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&auto=format&fit=crop&q=80'
+    }
+  };
+
+  const selected = brandData[brandKey] || brandData.shop;
+  const titleEl = document.getElementById('bento-sim-title');
+  const metaEl = document.getElementById('bento-sim-meta');
+  const imgEl = document.getElementById('bento-sim-img');
+  const simBox = document.getElementById('bento-sim-box');
+
+  if (titleEl) titleEl.textContent = selected.title;
+  if (metaEl) metaEl.textContent = selected.meta;
+  if (imgEl) imgEl.src = selected.img;
+
+  if (simBox) {
+    simBox.style.transform = 'scale(0.98)';
+    setTimeout(() => {
+      simBox.style.transform = 'scale(1)';
+    }, 150);
+  }
+
+  // Active tab styling
+  document.querySelectorAll('.bento-client-tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  if (window.event && window.event.currentTarget) {
+    window.event.currentTarget.classList.add('active');
+  }
+}
+
+function toggleFaqItem(headerEl) {
+  if (!headerEl) return;
+  const item = headerEl.closest('.faq-accordion-item');
+  if (!item) return;
+  const isActive = item.classList.contains('active');
+  
+  // Close other accordion items optionally or toggle current
+  item.classList.toggle('active', !isActive);
+}
+
+// Expose globally for inline onclick
+window.simulateBentoBrand = simulateBentoBrand;
+window.toggleFaqItem = toggleFaqItem;
+
+/* ==========================================================================
+   12. INITIALISATION GLOBALE (DOMContentLoaded)
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
@@ -1007,3 +1069,4 @@ document.addEventListener('DOMContentLoaded', () => {
   initProgressBars();
   initFooterLinks();
 });
+

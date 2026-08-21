@@ -444,6 +444,125 @@ const CMFlowBackend = {
     };
   },
 
+  // ========================================================================
+  // INSTAGRAM GRAPH API (META) — TEST & PUBLICATION DIRECTE
+  // ========================================================================
+  async testInstagramGraphApi(accessToken) {
+    if (!accessToken || typeof accessToken !== 'string') {
+      return { success: false, error: 'Veuillez renseigner un jeton d\'accès (Access Token).' };
+    }
+
+    const cleanToken = accessToken.trim();
+    const version = (typeof CMFlowSocialConfig !== 'undefined' && CMFlowSocialConfig.meta?.version) || 'v19.0';
+
+    try {
+      // 1. Récupérer les informations de l'utilisateur et de ses pages/comptes
+      const url = `https://graph.facebook.com/${version}/me/accounts?fields=name,id,access_token,instagram_business_account{id,username,name,profile_picture_url,followers_count,media_count}&access_token=${encodeURIComponent(cleanToken)}`;
+      
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.error) {
+        return {
+          success: false,
+          error: data.error.message || 'Erreur retournée par Meta Graph API',
+          code: data.error.code,
+          fbtraceId: data.error.fbtrace_id,
+          raw: data
+        };
+      }
+
+      // Parcourir les pages pour trouver un compte Instagram Business
+      const pages = data.data || [];
+      const igAccounts = [];
+
+      for (const page of pages) {
+        if (page.instagram_business_account) {
+          igAccounts.push({
+            pageId: page.id,
+            pageName: page.name,
+            pageAccessToken: page.access_token,
+            instagram: page.instagram_business_account
+          });
+        }
+      }
+
+      if (igAccounts.length === 0) {
+        return {
+          success: true,
+          hasInstagram: false,
+          pagesCount: pages.length,
+          pages: pages.map(p => ({ id: p.id, name: p.name })),
+          message: 'Pages Facebook trouvées, mais aucun compte Instagram Professionnel n\'y est associé. Veuillez lier votre compte Instagram à une Page Facebook dans les paramètres Instagram.',
+          raw: data
+        };
+      }
+
+      return {
+        success: true,
+        hasInstagram: true,
+        accounts: igAccounts,
+        primaryAccount: igAccounts[0],
+        message: `Compte Instagram Pro détecté avec succès (@${igAccounts[0].instagram.username || 'Compte'}) ! 🎉`,
+        raw: data
+      };
+    } catch (err) {
+      console.error('Erreur test Instagram Graph API:', err);
+      return { success: false, error: `Erreur de connexion réseau : ${err.message}` };
+    }
+  },
+
+  /** Publier un post réel sur Instagram via Instagram Graph API */
+  async publishRealInstagramPost(igUserId, accessToken, imageUrl, caption) {
+    if (!igUserId || !accessToken || !imageUrl) {
+      return { success: false, error: 'Paramètres manquants (igUserId, accessToken ou imageUrl).' };
+    }
+
+    const version = (typeof CMFlowSocialConfig !== 'undefined' && CMFlowSocialConfig.meta?.version) || 'v19.0';
+
+    try {
+      // Étape 1 : Créer le conteneur média (Media Container)
+      const containerUrl = `https://graph.facebook.com/${version}/${igUserId}/media?image_url=${encodeURIComponent(imageUrl)}&caption=${encodeURIComponent(caption || '')}&access_token=${encodeURIComponent(accessToken)}`;
+      const step1Res = await fetch(containerUrl, { method: 'POST' });
+      const step1Data = await step1Res.json();
+
+      if (step1Data.error) {
+        return {
+          success: false,
+          step: 'container_creation',
+          error: step1Data.error.message,
+          raw: step1Data
+        };
+      }
+
+      const creationId = step1Data.id;
+
+      // Étape 2 : Publier le conteneur média (Media Publish)
+      const publishUrl = `https://graph.facebook.com/${version}/${igUserId}/media_publish?creation_id=${creationId}&access_token=${encodeURIComponent(accessToken)}`;
+      const step2Res = await fetch(publishUrl, { method: 'POST' });
+      const step2Data = await step2Res.json();
+
+      if (step2Data.error) {
+        return {
+          success: false,
+          step: 'media_publish',
+          error: step2Data.error.message,
+          raw: step2Data
+        };
+      }
+
+      return {
+        success: true,
+        mediaId: step2Data.id,
+        message: 'Publication mise en ligne avec succès sur Instagram ! 🎉📸',
+        postUrl: `https://www.instagram.com/`,
+        raw: step2Data
+      };
+    } catch (err) {
+      return { success: false, error: `Erreur lors de la publication : ${err.message}` };
+    }
+  },
+
   // Obtenir le lien de partage client sécurisé avec token de validation
   generateClientPortalUrl(clientId) {
     const origin = window.location.origin;

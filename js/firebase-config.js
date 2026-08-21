@@ -26,6 +26,22 @@ const firebaseConfig = {
 };
 
 // ========================================================================
+// CONFIGURATION OFFICIELLE DES APIS RÉSEAUX SOCIAUX
+// ========================================================================
+const CMFlowSocialConfig = {
+  linkedin: {
+    clientId: "77589j7j2nnfkw",
+    clientSecret: "", // Conservé côté serveur sécurisé (OAuth backend)
+    scope: "w_member_social openid profile email",
+    authUrl: "https://www.linkedin.com/oauth/v2/authorization"
+  },
+  meta: {
+    appId: "4528780004104334",
+    version: "v19.0"
+  }
+};
+
+// ========================================================================
 // INITIALISATION FIREBASE
 // ========================================================================
 let cmfireApp = null;

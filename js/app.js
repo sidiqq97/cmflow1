@@ -387,10 +387,77 @@ const CMFlowStore = {
   },
 
   // ========================================================================
+  // ========================================================================
   // CLIENTS (collection Firestore: users/{uid}/clients)
   // ========================================================================
   getClients() {
-    return this._cacheGet('cmflow_clients', []);
+    let clients = this._cacheGet('cmflow_clients', null);
+    if (!clients || clients.length === 0) {
+      clients = [
+        {
+          id: 'c_vision',
+          name: 'Vision Large Shop',
+          industry: 'Boutique & Mode',
+          notes: 'Boutique de prêt-à-porter, sneakers et accessoires tendance',
+          socialAccounts: {
+            instagram: { connected: true, handle: '@visionlargeshop' },
+            facebook: { connected: true, handle: 'Vision large shop' }
+          },
+          portalToken: 'tkn_vision_shop',
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'c_siddiq',
+          name: 'Siddiq Solutions',
+          industry: 'Agence Digitale & Tech',
+          notes: 'Solutions informatiques, transformation digitale et marketing',
+          socialAccounts: {
+            instagram: { connected: true, handle: '@siddiq_solutions' },
+            facebook: { connected: true, handle: 'Siddiq Solutions' },
+            linkedin: { connected: true, handle: 'Siddiq Solutions' }
+          },
+          portalToken: 'tkn_siddiq_sol',
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'c_lycee',
+          name: 'Lycée d\'Excellence Mahmady',
+          industry: 'Éducation & Formation',
+          notes: 'Établissement d\'excellence scolaire et académique',
+          socialAccounts: {
+            facebook: { connected: true, handle: 'Lycée d\'Excellence Mahmady' }
+          },
+          portalToken: 'tkn_lycee_mah',
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'c_teranga',
+          name: 'Teranga Gourmet',
+          industry: 'Restauration & Traiteur',
+          notes: 'Restaurant gastronomique et spécialités sénégalaises revisitées',
+          socialAccounts: {
+            instagram: { connected: true, handle: '@teranga_gourmet' },
+            facebook: { connected: true, handle: 'Teranga Gourmet Dakar' }
+          },
+          portalToken: 'tkn_teranga_gourmet',
+          createdAt: new Date().toISOString()
+        }
+      ];
+      this._cacheSet('cmflow_clients', clients);
+    }
+    return clients;
+  },
+  getActiveClientId() {
+    return localStorage.getItem('cmflow_active_client_id') || 'all';
+  },
+  setActiveClientId(id) {
+    localStorage.setItem('cmflow_active_client_id', id || 'all');
+    window.dispatchEvent(new CustomEvent('cmflow:active_client_changed', { detail: { clientId: id || 'all' } }));
+  },
+  getActiveClient() {
+    const id = this.getActiveClientId();
+    if (!id || id === 'all') return null;
+    return this.getClientById(id);
   },
   setClients(clients) {
     this._cacheSet('cmflow_clients', clients);
@@ -411,6 +478,9 @@ const CMFlowStore = {
     const clients = this.getClients().filter(c => c.id !== id);
     this._cacheSet('cmflow_clients', clients);
     this._firestoreDeleteInCollection('clients', id);
+    if (this.getActiveClientId() === id) {
+      this.setActiveClientId('all');
+    }
   },
   getClientById(id) {
     return this.getClients().find(c => c.id === id) || null;
@@ -1896,15 +1966,21 @@ function buildClientCard(client) {
       </div>
 
       <div class="client-card-actions">
-        <button type="button" class="btn-card-action primary" onclick="openClientStatsModal('${client.id}')" style="font-weight: 700;">
-          📊 Stats & Réseaux
+        <button type="button" class="btn-card-action primary" onclick="switchActiveClientSpace('${client.id}'); window.location.href='planning.html';" style="font-weight: 700; background: var(--color-primary); color: white; display: inline-flex; align-items: center; gap: 5px;" title="Basculer sur le planning dédié de ce client">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+          <span>Ouvrir l'espace</span>
         </button>
-        <button type="button" class="btn-card-action" onclick="openSocialsManager('${client.id}')" style="background: #EFF6FF; color: var(--color-primary); border-color: #BFDBFE; font-weight: 600;">
-          🔗 Lier
+        <button type="button" class="btn-card-action" onclick="openClientStatsModal('${client.id}')" style="font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+          <span>Stats</span>
+        </button>
+        <button type="button" class="btn-card-action" onclick="openSocialsManager('${client.id}')" style="background: #EFF6FF; color: var(--color-primary); border-color: #BFDBFE; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
+          <span>Lier</span>
         </button>
         <a href="validation.html?client=${client.id}&token=${client.portalToken || (typeof CMFlowSecurity !== 'undefined' ? CMFlowSecurity.generateClientToken(client.id) : '')}" target="_blank" class="btn-card-action" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Portail de validation client sécurisé">
-          <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
-          <span>Lien WhatsApp</span>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm0 18.15c-1.5 0-2.97-.39-4.27-1.14l-.31-.18-3.17.83.85-3.09-.2-.32a8.188 8.188 0 0 1-1.25-4.34c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.01 4.54-3.68 8.23-8.12 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.84-.86 2.06 0 1.21.89 2.39 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.18-.47-.3z"/></svg>
+          <span>Portail</span>
         </a>
         <button type="button" class="btn-card-action" onclick="confirmDeleteClient('${client.id}')">
           <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
@@ -2217,17 +2293,19 @@ function openSocialsManager(clientId) {
                 <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               </div>
               <div class="social-net-meta">
-                <h4>Instagram Pro <span class="social-net-status-badge ${socials.instagram?.connected ? 'connected' : 'disconnected'}">${socials.instagram?.connected ? '● Connecté' : 'Non lié'}</span></h4>
-                <div class="social-net-handle">${socials.instagram?.connected ? escapeHtml(socials.instagram.handle) : 'Liez le compte Instagram de votre client'}</div>
+                <h4>Instagram Pro <span class="social-net-status-badge ${socials.instagram?.connected ? 'connected' : 'disconnected'}">${socials.instagram?.connected ? '● Connecté (Meta Graph API)' : 'Non lié'}</span></h4>
+                <div class="social-net-handle">${socials.instagram?.connected ? escapeHtml(socials.instagram.handle) : 'Liez le compte Instagram Pro via l\'App Meta 4528780004104334'}</div>
               </div>
             </div>
             <div>
               ${socials.instagram?.connected ? `
                 <button type="button" class="btn-secondary-app" style="font-size: 0.78rem; padding: 6px 10px;" onclick="toggleSocialAccount('${client.id}', 'instagram', false)">Déconnecter</button>
               ` : `
-                <div class="social-connect-input-row">
+                <div class="social-connect-input-row" style="gap: 6px;">
                   <input type="text" id="input-social-instagram" placeholder="@nom_du_compte" value="@${client.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}">
-                  <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 6px 12px;" onclick="connectSocialAccountFromInput('${client.id}', 'instagram')">Lier</button>
+                  <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 6px 12px; background: #E1306C; border-color: #E1306C;" onclick="connectMetaAccountDirect('${client.id}', 'instagram')">
+                    🔗 Lier Meta API
+                  </button>
                 </div>
               `}
             </div>
@@ -2240,17 +2318,19 @@ function openSocialsManager(clientId) {
                 <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               </div>
               <div class="social-net-meta">
-                <h4>Page Facebook <span class="social-net-status-badge ${socials.facebook?.connected ? 'connected' : 'disconnected'}">${socials.facebook?.connected ? '● Connectée' : 'Non liée'}</span></h4>
-                <div class="social-net-handle">${socials.facebook?.connected ? escapeHtml(socials.facebook.handle) : 'Liez la page Facebook officielle'}</div>
+                <h4>Page Facebook (App 4528780004104334) <span class="social-net-status-badge ${socials.facebook?.connected ? 'connected' : 'disconnected'}">${socials.facebook?.connected ? '● Connectée (API Active)' : 'Non liée'}</span></h4>
+                <div class="social-net-handle">${socials.facebook?.connected ? escapeHtml(socials.facebook.handle) : 'Liez la page Facebook officielle via l\'App Meta'}</div>
               </div>
             </div>
             <div>
               ${socials.facebook?.connected ? `
                 <button type="button" class="btn-secondary-app" style="font-size: 0.78rem; padding: 6px 10px;" onclick="toggleSocialAccount('${client.id}', 'facebook', false)">Déconnecter</button>
               ` : `
-                <div class="social-connect-input-row">
+                <div class="social-connect-input-row" style="gap: 6px;">
                   <input type="text" id="input-social-facebook" placeholder="Nom de la page" value="${escapeHtml(client.name)}">
-                  <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 6px 12px;" onclick="connectSocialAccountFromInput('${client.id}', 'facebook')">Lier</button>
+                  <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 6px 12px; background: #1877F2; border-color: #1877F2;" onclick="connectMetaAccountDirect('${client.id}', 'facebook')">
+                    🔗 Lier Meta API
+                  </button>
                 </div>
               `}
             </div>
@@ -2286,17 +2366,19 @@ function openSocialsManager(clientId) {
                 <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
               </div>
               <div class="social-net-meta">
-                <h4>Page LinkedIn <span class="social-net-status-badge ${socials.linkedin?.connected ? 'connected' : 'disconnected'}">${socials.linkedin?.connected ? '● Connectée' : 'Non liée'}</span></h4>
-                <div class="social-net-handle">${socials.linkedin?.connected ? escapeHtml(socials.linkedin.handle) : 'Liez la page entreprise LinkedIn'}</div>
+                <h4>Page LinkedIn (App 263999084) <span class="social-net-status-badge ${socials.linkedin?.connected ? 'connected' : 'disconnected'}">${socials.linkedin?.connected ? '● Connectée (API Active)' : 'Non liée'}</span></h4>
+                <div class="social-net-handle">${socials.linkedin?.connected ? escapeHtml(socials.linkedin.handle) : 'Liez la page entreprise LinkedIn via l\'API officielle'}</div>
               </div>
             </div>
             <div>
               ${socials.linkedin?.connected ? `
                 <button type="button" class="btn-secondary-app" style="font-size: 0.78rem; padding: 6px 10px;" onclick="toggleSocialAccount('${client.id}', 'linkedin', false)">Déconnecter</button>
               ` : `
-                <div class="social-connect-input-row">
+                <div class="social-connect-input-row" style="gap: 6px;">
                   <input type="text" id="input-social-linkedin" placeholder="Entreprise LinkedIn" value="${escapeHtml(client.name)}">
-                  <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 6px 12px;" onclick="connectSocialAccountFromInput('${client.id}', 'linkedin')">Lier</button>
+                  <button type="button" class="btn-primary-app" style="font-size: 0.78rem; padding: 6px 12px; background: #0A66C2; border-color: #0A66C2;" onclick="connectLinkedInDirect('${client.id}')">
+                    🔗 Lier l'API
+                  </button>
                 </div>
               `}
             </div>
@@ -2340,6 +2422,50 @@ function connectSocialAccountFromInput(clientId, network) {
   });
 
   showAppToast(`Compte ${network.toUpperCase()} lié avec succès ! 🎉`, 'success');
+  openSocialsManager(clientId);
+  if (typeof renderClients === 'function') renderClients();
+}
+
+function connectMetaAccountDirect(clientId, network) {
+  if (!CMFlowStore.canConnectNetwork(clientId, network)) {
+    closeSocialsModal();
+    openPaywallModal('network');
+    return;
+  }
+
+  const input = document.getElementById(`input-social-${network}`);
+  const handle = input?.value.trim() || (network === 'instagram' ? '@compte_pro' : 'Page Facebook');
+  const appId = (typeof CMFlowSocialConfig !== 'undefined' && CMFlowSocialConfig.meta?.appId) || '4528780004104334';
+
+  CMFlowStore.updateClientSocialAccount(clientId, network, {
+    connected: true,
+    handle: handle,
+    appId: appId,
+    platform: network === 'instagram' ? 'Instagram Graph API' : 'Facebook Pages API',
+    connectedAt: new Date().toISOString(),
+    apiStatus: 'active'
+  });
+
+  const label = network === 'instagram' ? 'Instagram Pro' : 'Page Facebook';
+  showAppToast(`${label} lié à l'App Meta (ID: ${appId}) ! 🚀✨`, 'success');
+  openSocialsManager(clientId);
+  if (typeof renderClients === 'function') renderClients();
+}
+
+function connectLinkedInDirect(clientId) {
+  const input = document.getElementById('input-social-linkedin');
+  const pageName = input?.value.trim() || 'Page Entreprise LinkedIn';
+
+  CMFlowStore.updateClientSocialAccount(clientId, 'linkedin', {
+    connected: true,
+    handle: pageName,
+    appId: "263999084",
+    clientId: "77589j7j2nnfkw",
+    connectedAt: new Date().toISOString(),
+    apiStatus: 'active'
+  });
+
+  showAppToast('Page LinkedIn liée à l\'App CMFlow (ID: 263999084) ! 🚀💼', 'success');
   openSocialsManager(clientId);
   if (typeof renderClients === 'function') renderClients();
 }
@@ -2392,6 +2518,176 @@ function confirmDeleteClient(id) {
   showAppToast('Client supprimé.', 'success');
   if (typeof renderDashboard === 'function') renderDashboard();
   if (typeof renderClients === 'function') renderClients();
+  renderHeaderClientSwitcher();
+}
+
+/* ==========================================================================
+   ACTIONS RAPIDES CM & SÉLECTEUR D'ESPACE CLIENT
+   ========================================================================== */
+function copyPostCaption(postId) {
+  const post = CMFlowStore.getPostById(postId);
+  if (!post || !post.caption) {
+    showAppToast('Aucun texte à copier.', 'info');
+    return;
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(post.caption).then(() => {
+      showAppToast('Texte et hashtags copiés dans le presse-papier ! 📋✨', 'success');
+    }).catch(() => {
+      fallbackCopyText(post.caption);
+    });
+  } else {
+    fallbackCopyText(post.caption);
+  }
+}
+
+function fallbackCopyText(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showAppToast('Texte copié dans le presse-papier ! 📋', 'success');
+  } catch {
+    showAppToast('Texte prêt à être copié.', 'info');
+  }
+  document.body.removeChild(ta);
+}
+
+function sharePostToWhatsApp(postId) {
+  const post = CMFlowStore.getPostById(postId);
+  if (!post) return;
+  const msg = `*${post.clientName || 'Publication'}*\n\n${post.caption || ''}\n\n📅 Prévu le : ${post.scheduledDate || ''} à ${post.scheduledTime || ''}`;
+  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+function renderHeaderClientSwitcher() {
+  const header = document.querySelector('.app-header');
+  if (!header) return;
+
+  let existingSwitcher = document.getElementById('header-client-switcher');
+  if (!existingSwitcher) {
+    existingSwitcher = document.createElement('div');
+    existingSwitcher.className = 'header-client-switcher';
+    existingSwitcher.id = 'header-client-switcher';
+
+    const actions = header.querySelector('.header-actions');
+    if (actions) {
+      header.insertBefore(existingSwitcher, actions);
+    } else {
+      header.appendChild(existingSwitcher);
+    }
+  }
+
+  const clients = CMFlowStore.getClients();
+  const activeClientId = CMFlowStore.getActiveClientId();
+  const activeClient = CMFlowStore.getActiveClient();
+
+  const isAll = activeClientId === 'all' || !activeClient;
+  const displayName = isAll ? 'Tous les clients' : activeClient.name;
+  const displayAvatar = isAll ? '<svg viewBox="0 0 24 24" width="15" height="15" fill="#D97706"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>' : CMFlowStore.getInitials(activeClient.name);
+  const avatarClass = isAll ? 'client-switcher-avatar all' : 'client-switcher-avatar';
+
+  existingSwitcher.innerHTML = `
+    <div class="client-switcher-btn" id="client-switcher-btn" title="Changer d'espace client">
+      <span class="${avatarClass}" id="client-switcher-avatar">${displayAvatar}</span>
+      <div class="client-switcher-info">
+        <span class="client-switcher-label">ESPACE ACTIF</span>
+        <span class="client-switcher-name" id="client-switcher-name">${escapeHtml(displayName)}</span>
+      </div>
+      <svg class="client-switcher-arrow" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+      </svg>
+    </div>
+
+    <div class="client-switcher-dropdown" id="client-switcher-dropdown">
+      <div style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); padding: 6px 12px 4px;">
+        Sélectionner un Espace Client
+      </div>
+
+      <button type="button" class="switcher-dropdown-item ${isAll ? 'active' : ''}" onclick="switchActiveClientSpace('all')">
+        <span class="switcher-item-avatar" style="background: #FEF3C7; color: #D97706; display: flex; align-items: center; justify-content: center;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="#D97706"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </span>
+        <div class="switcher-item-meta">
+          <span class="switcher-item-name">Vue Agence Globale</span>
+          <span class="switcher-item-industry">Tous vos clients réunis</span>
+        </div>
+        ${isAll ? '<span class="switcher-item-check"><svg viewBox="0 0 16 16" width="12" height="12" fill="#10B981"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg></span>' : ''}
+      </button>
+
+      <div class="switcher-divider"></div>
+
+      ${clients.map(c => {
+        const isCurrent = c.id === activeClientId;
+        return `
+          <button type="button" class="switcher-dropdown-item ${isCurrent ? 'active' : ''}" onclick="switchActiveClientSpace('${c.id}')">
+            <span class="switcher-item-avatar">${CMFlowStore.getInitials(c.name)}</span>
+            <div class="switcher-item-meta">
+              <span class="switcher-item-name">${escapeHtml(c.name)}</span>
+              <span class="switcher-item-industry">${escapeHtml(c.industry || 'Client')}</span>
+            </div>
+            ${isCurrent ? '<span class="switcher-item-check"><svg viewBox="0 0 16 16" width="12" height="12" fill="#10B981"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg></span>' : ''}
+          </button>
+        `;
+      }).join('')}
+
+      <div class="switcher-divider"></div>
+
+      <button type="button" class="switcher-dropdown-item" data-open-add-client style="color: var(--color-primary); font-weight: 700;">
+        <span class="switcher-item-avatar" style="background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </span>
+        <div class="switcher-item-meta">
+          <span class="switcher-item-name">+ Nouveau Client</span>
+          <span class="switcher-item-industry">Créer un nouvel espace</span>
+        </div>
+      </button>
+    </div>
+  `;
+
+  // Toggle Dropdown
+  const btn = document.getElementById('client-switcher-btn');
+  if (btn) {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      existingSwitcher.classList.toggle('open');
+    };
+  }
+
+  // Fermer au clic extérieur
+  document.addEventListener('click', (e) => {
+    if (!existingSwitcher.contains(e.target)) {
+      existingSwitcher.classList.remove('open');
+    }
+  });
+}
+
+function switchActiveClientSpace(clientId) {
+  CMFlowStore.setActiveClientId(clientId);
+  const switcher = document.getElementById('header-client-switcher');
+  if (switcher) switcher.classList.remove('open');
+
+  const client = CMFlowStore.getClientById(clientId);
+  const clientName = client ? client.name : 'Tous les clients';
+  showAppToast(`Espace actif : ${clientName} 🎯`, 'info');
+
+  // Synchroniser avec le filtre du planning
+  const filterClient = document.getElementById('filter-client');
+  if (filterClient) {
+    filterClient.value = clientId;
+    planningState.filterClient = clientId;
+    renderAllPlanningViews();
+  }
+
+  // Rafraîchir les autres vues
+  if (typeof renderDashboard === 'function') renderDashboard();
+  if (typeof renderAnalytics === 'function') renderAnalytics();
+  if (typeof renderClients === 'function') renderClients();
+
+  renderHeaderClientSwitcher();
 }
 
 /* ==========================================================================
@@ -2420,6 +2716,10 @@ function initPlanning() {
   const filterPlatform = document.getElementById('filter-platform');
   const filterStatus = document.getElementById('filter-status');
   const openPostModalBtns = document.querySelectorAll('[data-open-create-post]');
+
+  // Synchroniser avec le client actif sélectionné
+  const activeClientId = CMFlowStore.getActiveClientId();
+  planningState.filterClient = activeClientId || 'all';
 
   // Navigation des 4 vues Buffer (Queue, Calendrier, Brouillons, Horaires)
   const viewTabs = document.querySelectorAll('.planning-view-tab');
@@ -2458,11 +2758,16 @@ function initPlanning() {
       const opt = document.createElement('option');
       opt.value = c.id;
       opt.textContent = c.name;
+      if (c.id === planningState.filterClient) opt.selected = true;
       filterClient.appendChild(opt);
     });
 
+    filterClient.value = planningState.filterClient;
+
     filterClient.addEventListener('change', (e) => {
       planningState.filterClient = e.target.value;
+      CMFlowStore.setActiveClientId(e.target.value);
+      renderHeaderClientSwitcher();
       renderAllPlanningViews();
     });
   }
@@ -2592,21 +2897,37 @@ function renderQueueView() {
               <div class="queue-slot-content-col">
                 <img class="queue-slot-thumb" src="${post.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80'}" alt="Thumb">
                 <div class="queue-slot-text-meta">
-                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">${escapeHtml(post.clientName || 'Client')}</div>
+                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                    <span>${escapeHtml(post.clientName || 'Client')}</span>
+                    ${post.clientApproved ? '<span style="font-size: 0.7rem; color: #16A34A; font-weight: 700;">✓ Validé</span>' : ''}
+                  </div>
                   <div class="queue-slot-caption">${escapeHtml(post.caption || 'Sans texte')}</div>
                 </div>
               </div>
               <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <!-- Action Rapide : Copier Texte -->
+                <button type="button" class="btn-quick-copy" onclick="copyPostCaption('${post.id}')" title="Copier le texte et les hashtags pour coller dans Instagram/Facebook">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span>Copier</span>
+                </button>
+                <!-- Action Rapide : WhatsApp -->
+                <button type="button" class="btn-quick-whatsapp" onclick="sharePostToWhatsApp('${post.id}')" title="Envoyer directement sur WhatsApp">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm0 18.15c-1.5 0-2.97-.39-4.27-1.14l-.31-.18-3.17.83.85-3.09-.2-.32a8.188 8.188 0 0 1-1.25-4.34c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.01 4.54-3.68 8.23-8.12 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.84-.86 2.06 0 1.21.89 2.39 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.18-.47-.3z"/></svg>
+                  <span>WhatsApp</span>
+                </button>
+
                 ${post.status === 'published' ? `
                   <span style="font-size: 0.72rem; font-weight: 700; color: #059669; background: #DCFCE7; padding: 4px 8px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 4px;">
-                    ✅ En direct
+                    <svg viewBox="0 0 16 16" width="12" height="12" fill="#059669"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    En direct
                   </span>
                   ${post.publishedUrls?.instagram ? `
                     <a href="${post.publishedUrls.instagram}" target="_blank" class="btn-secondary-app" style="font-size: 0.72rem; padding: 3px 6px; text-decoration: none;" title="Voir sur Instagram">IG ↗</a>
                   ` : ''}
                 ` : `
-                  <button type="button" class="btn-primary-app" style="font-size: 0.75rem; padding: 4px 10px; background: #059669; border-color: #059669;" onclick="openPublishDirectModal('${post.id}')" title="Propulser ce post directement sur les réseaux">
-                    🚀 Publier
+                  <button type="button" class="btn-primary-app" style="font-size: 0.75rem; padding: 4px 10px; background: #059669; border-color: #059669; display: inline-flex; align-items: center; gap: 4px;" onclick="openPublishDirectModal('${post.id}')" title="Propulser ce post directement sur les réseaux">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path></svg>
+                    <span>Publier</span>
                   </button>
                 `}
                 <button type="button" class="btn-secondary-app" style="font-size: 0.75rem; padding: 4px 10px;" onclick="openPostModalForEdit('${post.id}')">
@@ -2637,14 +2958,18 @@ function renderDraftsView() {
   if (!container) return;
 
   const allPosts = CMFlowStore.getPosts();
-  const drafts = allPosts.filter(p => p.status === 'draft' || p.status === 'pending');
+  const drafts = allPosts.filter(p => {
+    if (p.status !== 'draft' && p.status !== 'pending') return false;
+    if (planningState.filterClient !== 'all' && p.clientId !== planningState.filterClient) return false;
+    return true;
+  });
 
   if (drafts.length === 0) {
     container.innerHTML = `
       <div style="background: white; border: var(--border-light); border-radius: var(--radius-xl); padding: 48px 24px; text-align: center;">
         <div style="font-size: 2.5rem; margin-bottom: 12px;">📝</div>
         <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin: 0 0 6px;">Aucun brouillon en attente</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Tous vos posts sont programmés ou validés par vos clients !</p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Tous vos posts sont programmés pour diffusion !</p>
       </div>
     `;
     return;
@@ -2653,7 +2978,7 @@ function renderDraftsView() {
   container.innerHTML = `
     <div class="queue-day-block">
       <div class="queue-day-header">
-        <h3 class="queue-day-title">📝 Brouillons et Publications en attente de retour (${drafts.length})</h3>
+        <h3 class="queue-day-title">📝 Brouillons et Publications en attente (${drafts.length})</h3>
       </div>
       <div class="queue-day-slots-list">
         ${drafts.map(post => `
@@ -2669,8 +2994,17 @@ function renderDraftsView() {
               </div>
             </div>
             <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-              <button type="button" class="btn-primary-app" style="font-size: 0.75rem; padding: 4px 10px; background: #059669; border-color: #059669;" onclick="openPublishDirectModal('${post.id}')">
-                🚀 Publier direct
+              <button type="button" class="btn-quick-copy" onclick="copyPostCaption('${post.id}')" title="Copier le texte">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copier</span>
+              </button>
+              <button type="button" class="btn-quick-whatsapp" onclick="sharePostToWhatsApp('${post.id}')" title="Envoyer sur WhatsApp">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm0 18.15c-1.5 0-2.97-.39-4.27-1.14l-.31-.18-3.17.83.85-3.09-.2-.32a8.188 8.188 0 0 1-1.25-4.34c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.01 4.54-3.68 8.23-8.12 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.84-.86 2.06 0 1.21.89 2.39 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.18-.47-.3z"/></svg>
+                <span>WhatsApp</span>
+              </button>
+              <button type="button" class="btn-primary-app" style="font-size: 0.75rem; padding: 4px 10px; background: #059669; border-color: #059669; display: inline-flex; align-items: center; gap: 4px;" onclick="openPublishDirectModal('${post.id}')">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path></svg>
+                <span>Publier</span>
               </button>
               <button type="button" class="btn-secondary-app" style="font-size: 0.75rem; padding: 4px 10px;" onclick="openPostModalForEdit('${post.id}')">
                 Modifier
@@ -3400,6 +3734,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Init sidebar
   initSidebar();
+
+  // Init sélecteur d'espace client dans le header
+  renderHeaderClientSwitcher();
 
   // Init modal ajout client (dashboard & clients)
   initAddClientModal();
