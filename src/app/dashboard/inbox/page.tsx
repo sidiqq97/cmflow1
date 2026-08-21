@@ -282,7 +282,7 @@ export default function InboxPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-8.5rem)] flex flex-col space-y-4">
+    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
       
       {/* Toast Flottant */}
       {toastMessage && (
@@ -293,9 +293,40 @@ export default function InboxPage() {
       )}
 
       {/* =======================================================================
+          A. EN-TÊTE STANDARD AVEC TITRE + ACTIONS
+          ======================================================================= */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
+              Boîte de Réception & Retours Clients
+            </h1>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping"></span>
+              {activeClient.name} {activeClient.flag}
+            </span>
+          </div>
+          <p className="text-sm text-slate-500 mt-1">
+            Centralisez les retours de validation WhatsApp et les commentaires réseaux sociaux.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => showToast('🔄 Actualisation de tous les flux en cours...')}
+            className="px-4 py-2.5 rounded-2xl font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs border border-slate-200/80 transition-all flex items-center gap-2"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#0066FF]" />
+            <span>Synchroniser</span>
+          </button>
+        </div>
+      </div>
+
+      {/* =======================================================================
           ARCHITECTURE EN 3 VOLETS ÉPURÉS (Style Dribbble / Linear)
           ======================================================================= */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4 min-h-0 bg-white/70 backdrop-blur-md rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden p-2">
+      <div className="h-[calc(100vh-16rem)] min-h-[600px] grid grid-cols-1 md:grid-cols-12 gap-4 bg-white/70 backdrop-blur-md rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden p-2">
         
         {/* =====================================================================
             VOLET 1 : CANAUX & DOSSIERS INTELLIGENTS (Navigation Gauche)

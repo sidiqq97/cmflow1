@@ -174,7 +174,7 @@ export default function BioPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
       
       {/* Toast Flottant */}
       {toastMessage && (
@@ -185,28 +185,26 @@ export default function BioPage() {
       )}
 
       {/* =======================================================================
-          A. EN-TÊTE DE MODULE & BARRE D'ACTIONS SUPÉRIEURE
+          A. EN-TÊTE STANDARD AVEC TITRE + ACTIONS
           ======================================================================= */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200/70 shadow-xs">
-        
-        {/* Titre & Badge Marque */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
+            <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
               Start Page • Lien en Bio
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold bg-orange-50 text-[#F94F06] border border-orange-200/80 shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-50 text-[#F94F06] border border-orange-200/80">
               <span className="w-1.5 h-1.5 rounded-full bg-[#F94F06]"></span>
               {activeClient.name} {activeClient.flag}
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+          <p className="text-sm text-slate-500 mt-1">
             Créez et personnalisez le microsite de redirection pour vos bios Instagram et TikTok.
           </p>
         </div>
 
         {/* Actions Supérieures & Statut Public */}
-        <div className="flex items-center flex-wrap gap-2.5">
+        <div className="flex items-center flex-wrap gap-3">
           
           {/* Switch Page en Ligne */}
           <button

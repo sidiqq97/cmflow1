@@ -247,7 +247,7 @@ export default function AssetsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
       
       {/* Toast Flottant */}
       {toastMessage && (
@@ -258,22 +258,20 @@ export default function AssetsPage() {
       )}
 
       {/* =======================================================================
-          A. EN-TÊTE & BARRE D'ACTIONS RAPIDES
+          A. EN-TÊTE STANDARD AVEC TITRE + ACTIONS
           ======================================================================= */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200/70 shadow-xs">
-        
-        {/* Gauche : Titre & Badge Marque */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
+            <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
               Médiathèque & Identité de Marque
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold bg-orange-50 text-[#F94F06] border border-orange-200/80 shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-50 text-[#F94F06] border border-orange-200/80">
               <span className="w-1.5 h-1.5 rounded-full bg-[#F94F06]"></span>
               {activeClient.name} {activeClient.flag}
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+          <p className="text-sm text-slate-500 mt-1">
             Stockez vos créations, palettes de couleurs, typographies et hashtags officiels.
           </p>
         </div>

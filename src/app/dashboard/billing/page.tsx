@@ -90,7 +90,7 @@ export default function BillingPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
       
       {/* Toast Flottant */}
       {toastMessage && (
@@ -101,41 +101,38 @@ export default function BillingPage() {
       )}
 
       {/* =======================================================================
-          A. EN-TÊTE DE MODULE & VUE D'ENSEMBLE
+          A. EN-TÊTE STANDARD AVEC TITRE + ACTIONS
           ======================================================================= */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200/70 shadow-xs">
-        
-        {/* Titre & Statut */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
+            <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
               Abonnement & Facturation Agence
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Compte Pro Actif
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+          <p className="text-sm text-slate-500 mt-1">
             Gérez votre forfait, vos moyens de paiement Mobile Money et téléchargez vos factures.
           </p>
         </div>
 
         {/* Bouton Changer d'offre */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => {
               const el = document.getElementById('pricing-grid');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="px-4 py-2 bg-[#F94F06] hover:bg-[#e04605] text-white text-xs font-black rounded-xl shadow-lg shadow-[#F94F06]/25 hover:shadow-[#F94F06]/40 active:scale-[0.98] transition-all flex items-center gap-1.5"
+            className="bg-[#F94F06] hover:bg-[#e04605] text-white px-5 py-2.5 rounded-2xl font-medium shadow-md shadow-orange-500/20 active:scale-[0.98] transition-all duration-200 flex items-center gap-2 text-xs"
           >
             <Zap className="w-4 h-4" />
             <span>Recharger / Changer d'offre</span>
           </button>
         </div>
-
       </div>
 
       {/* =======================================================================

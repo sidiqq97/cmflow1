@@ -276,7 +276,7 @@ export default function ClientsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
       
       {/* Toast Flottant */}
       {toastMessage && (
@@ -287,22 +287,20 @@ export default function ClientsPage() {
       )}
 
       {/* =======================================================================
-          A. EN-TÊTE & BARRE D'ACTIONS SUPÉRIEURE
+          A. EN-TÊTE STANDARD AVEC TITRE + ACTIONS
           ======================================================================= */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200/70 shadow-xs">
-        
-        {/* Gauche : Titre & Sous-titre */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
+            <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
               Espaces Clients & Marques Partenaires
             </h1>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-200/80">
-              <Building2 className="w-3 h-3 text-[#0066FF]" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80">
+              <Building2 className="w-3.5 h-3.5 text-[#0066FF]" />
               {clientsList.length} Workspaces
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+          <p className="text-sm text-slate-500 mt-1">
             Gérez vos différents workspaces de manière totalement étanche et sécurisée.
           </p>
         </div>
