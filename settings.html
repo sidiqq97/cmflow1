@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paramètres Agence & Profil — CMFlow</title>
-  <meta name="description" content="Paramètres de profil, gestion de votre agence et forfaits sur CMFlow.">
+  <title>Paramètres Généraux de l'Agence — CMFlow</title>
+  <meta name="description" content="Configurez votre identité, vos intégrations réseaux sociaux, l'API WhatsApp et votre équipe.">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -22,8 +22,8 @@
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: #F1F5F9;
@@ -32,20 +32,17 @@
       background: #CBD5E1;
       border-radius: 999px;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #94A3B8;
-    }
   </style>
 </head>
 <body class="min-h-full bg-[#F8FAFC] text-[#0F172A] antialiased flex selection:bg-[#F94F06]/20 selection:text-[#F94F06]">
 
-  <!-- Texture de lumière d'arrière-plan (Vercel / Linear Glow) -->
+  <!-- Texture de lumière d'arrière-plan -->
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
     <div class="absolute top-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-blue-100/40 via-purple-50/20 to-transparent rounded-full blur-3xl"></div>
     <div class="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-gradient-to-tr from-orange-100/30 via-amber-50/20 to-transparent rounded-full blur-3xl"></div>
   </div>
 
-  <!-- Toast Notification Flottante -->
+  <!-- Toast Notification -->
   <div id="app-toast" class="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
     <svg class="w-4 h-4 text-[#F94F06]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -53,106 +50,74 @@
     <span id="toast-text">Message</span>
   </div>
 
-  <!-- =========================================================================
-      A. SIDEBAR ÉLÉGANTE (#0F172A - Style Linear / Raycast)
-      ========================================================================= -->
+  <!-- SIDEBAR (#0F172A) -->
   <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-[#0F172A] text-white flex flex-col justify-between transition-transform duration-300 ease-out border-r border-slate-800/80 -translate-x-full lg:translate-x-0">
     <div class="overflow-y-auto">
-      
-      <!-- En-tête : Logo & Badge Pro -->
       <div class="p-5 border-b border-slate-800/60 flex items-center justify-between">
-        <a href="dashboard.html" class="inline-flex items-center gap-2.5 transition-opacity hover:opacity-90">
+        <a href="dashboard.html" class="inline-flex items-center gap-2.5">
           <img src="images/logo-white.svg" alt="CMFlow" class="h-6 w-auto object-contain">
-          <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#F94F06]/20 text-[#F94F06] border border-[#F94F06]/30 tracking-wider">
-            PRO
-          </span>
+          <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#F94F06]/20 text-[#F94F06] border border-[#F94F06]/30">PRO</span>
         </a>
         <button id="close-sidebar-btn" class="lg:hidden text-slate-400 hover:text-white p-1">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
 
-      <!-- Sélecteur de Marque & Workspace (Mini-carte Premium) -->
-      <div class="p-3.5 relative">
-        <div class="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 px-2 block mb-1.5 flex items-center justify-between">
+      <div class="p-3.5">
+        <div class="text-[9px] font-extrabold uppercase text-slate-400 px-2 mb-1.5 flex items-center justify-between">
           <span>Espace Client</span>
           <span class="text-emerald-400 flex items-center gap-1 font-bold">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-            Actif
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Actif
           </span>
         </div>
 
-        <button
-          type="button"
-          id="client-dropdown-btn"
-          class="w-full flex items-center justify-between p-2.5 rounded-2xl bg-gradient-to-b from-slate-800/90 to-slate-800/50 hover:from-slate-800 hover:to-slate-800/80 border border-slate-700/70 hover:border-slate-600 transition-all text-left group shadow-sm"
-        >
+        <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-800/80 border border-slate-700/70">
           <div class="flex items-center gap-3 min-w-0">
-            <div class="relative shrink-0">
-              <img
-                src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80"
-                alt="Client Avatar"
-                class="w-8 h-8 rounded-xl object-cover ring-2 ring-[#0066FF]/40"
-              >
-              <span class="absolute -bottom-1 -right-1 text-[10px] bg-slate-900 rounded-full px-0.5">
-                🇸🇳
-              </span>
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="text-xs font-bold text-white truncate group-hover:text-sky-300 transition-colors">
-                Teranga Gourmet
-              </div>
-              <div class="text-[10px] text-slate-400 truncate">
-                Haute Gastronomie & Traiteur
-              </div>
+            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="w-8 h-8 rounded-xl object-cover ring-2 ring-[#0066FF]/40">
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-white truncate">Teranga Gourmet</div>
+              <div class="text-[10px] text-slate-400 truncate">Haute Gastronomie 🇸🇳</div>
             </div>
           </div>
-          <svg class="w-4 h-4 text-slate-400 group-hover:text-white shrink-0 ml-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
+        </div>
       </div>
 
-      <!-- Navigation Latérale (9 Modules) -->
       <nav class="px-3 space-y-1 mt-1">
         <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
           <span>Tableau de bord</span>
         </a>
-
         <a href="clients.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span>Espaces Clients</span>
         </a>
-
         <a href="planning.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>Planning & Queue</span>
         </a>
-
+        <a href="media.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Médiathèque Assets</span>
+        </a>
         <a href="inbox.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
           <div class="flex items-center gap-3">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             <span>Inbox Unifiée</span>
           </div>
-          <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+          <span class="w-2 h-2 rounded-full bg-emerald-300"></span>
         </a>
-
         <a href="startpage.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           <span>Start Page (Bio)</span>
         </a>
-
         <a href="analytics.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           <span>Analytics & Rapports</span>
         </a>
-
-        <a href="validation.html" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+        <a href="validation.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
           <svg class="w-4 h-4 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <span>Portail Validation</span>
         </a>
-
         <a href="billing.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
           <div class="flex items-center gap-3">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
@@ -162,7 +127,6 @@
             Wave
           </span>
         </a>
-
         <a href="settings.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold bg-[#F94F06] text-white shadow-lg shadow-[#F94F06]/25 transition-all">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>Paramètres</span>
@@ -170,66 +134,35 @@
       </nav>
     </div>
 
-    <!-- Profil CM connecté -->
     <div class="p-3.5 border-t border-slate-800/70 bg-slate-900/60">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <div class="relative">
-            <div id="user-avatar-badge" class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0066FF] to-sky-400 flex items-center justify-center font-black text-xs text-white shadow-sm">
-              AD
-            </div>
-            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#10B981] border-2 border-[#0F172A] rounded-full"></span>
-          </div>
-          <div class="min-w-0">
-            <div id="user-display-name" class="text-xs font-bold text-white truncate">Awa Diop</div>
-            <div id="user-display-role" class="text-[10px] text-slate-400 truncate">Lead CM · Dakar 🇸🇳</div>
-          </div>
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0066FF] to-sky-400 flex items-center justify-center font-black text-xs text-white">AD</div>
+        <div>
+          <div class="text-xs font-bold text-white">Awa Diop</div>
+          <div class="text-[10px] text-slate-400">Lead CM · Dakar 🇸🇳</div>
         </div>
-
-        <button
-          type="button"
-          id="btn-logout"
-          title="Déconnexion"
-          class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800/80 transition-colors"
-        >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-        </button>
       </div>
     </div>
   </aside>
 
-  <!-- Fond sombre Mobile -->
   <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 z-30 hidden backdrop-blur-xs"></div>
 
-  <!-- =========================================================================
-      ZONE PRINCIPALE (Top Section + Paramètres)
-      ========================================================================= -->
+  <!-- MAIN WRAPPER -->
   <div class="flex-1 flex flex-col min-w-0 lg:pl-64 z-10">
     
-    <!-- Top Bar Aérée (Floating Glassmorphism) -->
-    <header class="sticky top-0 z-30 backdrop-blur-xl bg-white/80 border-b border-slate-200/60 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3 transition-all">
-      
-      <!-- Fil d'Ariane & Hamburger -->
+    <!-- Topbar -->
+    <header class="sticky top-0 z-30 backdrop-blur-xl bg-white/80 border-b border-slate-200/60 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <button id="open-sidebar-btn" class="lg:hidden p-2 rounded-xl text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-        </button>
-
-        <div>
-          <div class="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#0F172A] tracking-tight">
-            <span class="text-slate-400 font-medium">CMFlow</span>
-            <span class="text-slate-300">/</span>
-            <span class="text-slate-700 font-bold">Paramètres Agence & Profil</span>
-          </div>
+        <button id="open-sidebar-btn" class="lg:hidden p-2 rounded-xl text-slate-700 bg-slate-100"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+        <div class="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#0F172A]">
+          <span class="text-slate-400 font-medium">CMFlow</span>
+          <span class="text-slate-300">/</span>
+          <span>Paramètres Généraux de l'Agence</span>
         </div>
       </div>
 
-      <button
-        type="button"
-        id="btn-save-all"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold bg-[#F94F06] hover:bg-[#e04605] text-white shadow-lg shadow-[#F94F06]/25 transition-all"
-      >
-        <span>Enregistrer les modifications</span>
+      <button type="button" onclick="showToast('💾 Paramètres sauvegardés avec succès !')" class="px-4 py-2 bg-[#F94F06] hover:bg-[#e04605] text-white text-xs font-black rounded-xl shadow-lg shadow-[#F94F06]/25">
+        Enregistrer les modifications
       </button>
     </header>
 
@@ -237,142 +170,152 @@
     <main class="p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl">
       
       <!-- En-tête -->
-      <div class="bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200/70 shadow-xs flex items-center justify-between">
+      <div class="bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200/70 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 class="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
-            Réglages & Configuration
-          </h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-            Personnalisez votre agence, vos coordonnées WhatsApp et votre forfait CMFlow.
-          </p>
+          <h1 class="text-xl sm:text-2xl font-black text-[#0F172A]">Paramètres Agence</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">Configurez votre identité, vos intégrations réseaux sociaux, l'API WhatsApp et votre équipe.</p>
         </div>
       </div>
 
-      <!-- Navigation par Onglets -->
-      <div class="flex items-center gap-2 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/70 overflow-x-auto text-xs font-bold text-slate-600">
-        <button type="button" class="tab-nav-btn active px-4 py-2 rounded-xl bg-white text-[#0F172A] shadow-xs transition-all" data-tab="profile">
-          1. Mon Profil CM
+      <!-- ONGLETS HORIZONTAUX -->
+      <div class="flex items-center gap-1.5 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200/70 overflow-x-auto text-xs font-extrabold scrollbar-none">
+        <button type="button" onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn active flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white text-[#0F172A] shadow-xs">
+          🏢 Profil Agence & Marque Blanche
         </button>
-        <button type="button" class="tab-nav-btn px-4 py-2 rounded-xl hover:text-slate-900 transition-all" data-tab="agency">
-          2. Agence & Workspaces
+        <button type="button" onclick="switchTab('api')" id="tab-btn-api" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-500 hover:text-slate-900">
+          🔗 Connexions API Réseaux
         </button>
-        <button type="button" class="tab-nav-btn px-4 py-2 rounded-xl hover:text-slate-900 transition-all" data-tab="billing">
-          3. Abonnement & Forfaits
+        <button type="button" onclick="switchTab('whatsapp')" id="tab-btn-whatsapp" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-500 hover:text-slate-900">
+          💬 Configuration WhatsApp & Modèles
         </button>
-        <button type="button" class="tab-nav-btn px-4 py-2 rounded-xl hover:text-slate-900 transition-all" data-tab="notifications">
-          4. WhatsApp & Notifications
+        <button type="button" onclick="switchTab('team')" id="tab-btn-team" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-500 hover:text-slate-900">
+          👥 Équipe & Rôles
+        </button>
+        <button type="button" onclick="switchTab('security')" id="tab-btn-security" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-500 hover:text-slate-900">
+          🔒 Sécurité & Accès
         </button>
       </div>
 
-      <!-- Onglet 1 : Profil CM -->
-      <section id="tab-profile" class="tab-content bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
-        <h2 class="text-base font-extrabold text-[#0F172A] pb-3 border-b border-slate-100">
-          Informations du Community Manager
-        </h2>
-
-        <div class="flex items-center gap-4">
-          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#0066FF] to-sky-400 flex items-center justify-center font-black text-lg text-white shadow-md">
-            AD
-          </div>
-          <div>
-            <div class="text-sm font-extrabold text-[#0F172A]">Awa Diop</div>
-            <div class="text-xs text-slate-500">Lead Community Manager · Dakar 🇸🇳</div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Prénom & Nom</label>
-            <input type="text" value="Awa Diop" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Email Professionnel</label>
-            <input type="email" value="awa.diop@cmflow.sn" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Numéro WhatsApp Professionnel</label>
-            <input type="tel" value="+221 77 800 12 34" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#10B981]">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Spécialité & Marché</label>
-            <input type="text" value="Gastronomie, Beauté & Mode Afrique de l'Ouest" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]">
-          </div>
-        </div>
-      </section>
-
-      <!-- Onglet 2 : Agence & Workspace -->
-      <section id="tab-agency" class="tab-content hidden bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
-        <h2 class="text-base font-extrabold text-[#0F172A] pb-3 border-b border-slate-100">
-          Configuration de l'Agence
-        </h2>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Nom de l'Agence</label>
-            <input type="text" value="Dakar Social Media Studio" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Devise Principale</label>
-            <select class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium">
-              <option value="FCFA">Franc CFA (XOF/XAF)</option>
-              <option value="EUR">Euro (€)</option>
-              <option value="USD">Dollar ($)</option>
-            </select>
-          </div>
-        </div>
-      </section>
-
-      <!-- Onglet 3 : Facturation & Forfaits -->
-      <section id="tab-billing" class="tab-content hidden bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-          <div>
-            <h2 class="text-base font-extrabold text-[#0F172A]">Abonnement & Forfait Actif</h2>
-            <p class="text-xs text-slate-500">Plan Starter avec paiement Wave & Orange Money</p>
-          </div>
-          <span class="px-3 py-1 bg-emerald-50 text-emerald-700 font-extrabold text-xs rounded-full border border-emerald-200">
-            ✓ Actif
-          </span>
-        </div>
-
-        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-bold text-slate-700">Forfait Starter (5 Marques)</span>
-            <span class="font-extrabold text-[#F94F06]">19 000 FCFA / mois</span>
-          </div>
-          <div class="text-[11px] text-slate-500">
-            Prochain renouvellement automatique le 24 Septembre 2026 via Wave.
-          </div>
-        </div>
-      </section>
-
-      <!-- Onglet 4 : WhatsApp & Notifications -->
-      <section id="tab-notifications" class="tab-content hidden bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
-        <h2 class="text-base font-extrabold text-[#0F172A] pb-3 border-b border-slate-100">
-          Alertes WhatsApp & Notifications
-        </h2>
-
-        <div class="space-y-3">
-          <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer">
-            <input type="checkbox" checked class="w-4 h-4 text-[#F94F06] rounded focus:ring-0">
-            <div class="text-xs">
-              <span class="font-bold block text-slate-800">Notification WhatsApp dès qu'un client valide</span>
-              <span class="text-slate-500">Recevez un message instantané lorsqu'un planning est approuvé.</span>
+      <!-- ONGLET 1 : PROFIL AGENCE -->
+      <div id="tab-pane-profile" class="tab-pane space-y-6">
+        <div class="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
+          <h2 class="text-base font-black text-[#0F172A] pb-3 border-b border-slate-100">Identité & Logo de l'Agence</h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-3">
+              <div class="w-20 h-20 mx-auto rounded-2xl bg-[#0F172A] text-white flex items-center justify-center font-black text-xl shadow-md">KS</div>
+              <button type="button" onclick="showToast('🖼️ Téléversement d\'un nouveau logo...')" class="px-3 py-1.5 bg-white text-slate-700 font-bold text-xs rounded-xl border border-slate-200 shadow-2xs">Changer le logo</button>
             </div>
-          </label>
 
-          <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer">
-            <input type="checkbox" checked class="w-4 h-4 text-[#F94F06] rounded focus:ring-0">
-            <div class="text-xs">
-              <span class="font-bold block text-slate-800">Rappel automatique aux clients sans réponse</span>
-              <span class="text-slate-500">Envoie un rappel doux sur WhatsApp 24h avant la date de publication.</span>
+            <div class="md:col-span-2 space-y-4 text-xs font-bold">
+              <div>
+                <label class="block text-slate-700 uppercase mb-1">Nom Commercial</label>
+                <input type="text" value="Kitsune Studio · Sidiqq Solutions" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900" />
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-slate-700 uppercase mb-1">Email Officiel</label>
+                  <input type="email" value="contact@kitsunestudio.sn" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900" />
+                </div>
+                <div>
+                  <label class="block text-slate-700 uppercase mb-1">Téléphone Support</label>
+                  <input type="tel" value="+221 77 800 12 34" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900" />
+                </div>
+              </div>
             </div>
-          </label>
+          </div>
         </div>
-      </section>
+
+        <!-- Marque Blanche -->
+        <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-black text-[#0F172A]">Option Marque Blanche (White-Label)</h3>
+              <p class="text-xs text-slate-500">Masquez la mention CMFlow sur les liens de validation de vos clients.</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200">✓ Inclus sur Pro Agency</span>
+          </div>
+          <input type="text" value="validation.kitsunestudio.sn" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs font-bold text-slate-800" />
+        </div>
+      </div>
+
+      <!-- ONGLET 2 : API RÉSEAUX -->
+      <div id="tab-pane-api" class="tab-pane hidden space-y-4">
+        <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
+          <h2 class="text-base font-black text-[#0F172A] pb-3 border-b border-slate-100">Intégrations Réseaux Sociaux Officielles</h2>
+          
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black">M</div>
+              <div>
+                <div class="text-xs font-black text-[#0F172A]">Meta Graph API (Instagram & Facebook Pages)</div>
+                <div class="text-[11px] text-slate-500">Connecté · Token valide 58 jours</div>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">✓ Connecté</span>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center font-black">TK</div>
+              <div>
+                <div class="text-xs font-black text-[#0F172A]">TikTok Business API</div>
+                <div class="text-[11px] text-slate-500">Connecté · Publication vidéo activée</div>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">✓ Connecté</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ONGLET 3 : WHATSAPP TEMPLATES -->
+      <div id="tab-pane-whatsapp" class="tab-pane hidden space-y-4">
+        <div class="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+          <h2 class="text-base font-black text-[#0F172A] pb-3 border-b border-slate-100">Passerelle WhatsApp & Modèles Automatiques</h2>
+          
+          <div class="space-y-3 text-xs font-bold">
+            <div>
+              <label class="block text-slate-700 uppercase mb-1">Modèle 1 : Envoi du planning</label>
+              <textarea rows="2" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium">Bonjour {client_name} ! 🌟 Votre planning hebdomadaire est prêt pour validation sur votre mobile : {validation_link}</textarea>
+            </div>
+
+            <div>
+              <label class="block text-slate-700 uppercase mb-1">Modèle 2 : Relance avant expiration</label>
+              <textarea rows="2" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium">Rappel pour {client_name} ⏰ Votre session expire dans {expiration_time}. Accédez-y ici : {validation_link}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ONGLET 4 : ÉQUIPE -->
+      <div id="tab-pane-team" class="tab-pane hidden space-y-4">
+        <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+          <h2 class="text-base font-black text-[#0F172A] pb-3 border-b border-slate-100">Collaborateurs de l'Agence</h2>
+          <div class="space-y-2 text-xs">
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+              <div>
+                <span class="font-extrabold text-[#0F172A] block">Awa Diop</span>
+                <span class="text-slate-400 text-[11px]">awa@cmflow.sn · Lead CM</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">✓ Actif</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ONGLET 5 : SÉCURITÉ -->
+      <div id="tab-pane-security" class="tab-pane hidden space-y-4">
+        <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+          <h2 class="text-base font-black text-[#0F172A] pb-3 border-b border-slate-100">Sécurité & Double Authentification (2FA)</h2>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs font-bold">
+            <div>
+              <div class="text-[#0F172A]">Double Authentification SMS / Authenticator</div>
+              <div class="text-[11px] text-slate-500 font-normal">Protégez l'accès aux espaces de vos marques partenaires.</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800">Activée</span>
+          </div>
+        </div>
+      </div>
 
     </main>
   </div>
@@ -388,50 +331,17 @@
       }, 3000);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      // Onglets
-      document.querySelectorAll('.tab-nav-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const target = btn.getAttribute('data-tab');
-
-          document.querySelectorAll('.tab-nav-btn').forEach(b => {
-            b.className = 'tab-nav-btn px-4 py-2 rounded-xl hover:text-slate-900 transition-all';
-          });
-          btn.className = 'tab-nav-btn active px-4 py-2 rounded-xl bg-white text-[#0F172A] shadow-xs transition-all';
-
-          document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.add('hidden');
-          });
-          document.getElementById(`tab-${target}`).classList.remove('hidden');
-        });
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-[#0F172A]', 'shadow-xs');
+        btn.classList.add('text-slate-500');
       });
+      document.getElementById('tab-btn-' + tabId).classList.add('bg-white', 'text-[#0F172A]', 'shadow-xs');
+      document.getElementById('tab-btn-' + tabId).classList.remove('text-slate-500');
 
-      // Save
-      document.getElementById('btn-save-all').addEventListener('click', (e) => {
-        e.preventDefault();
-        showToast('💾 Modifications des paramètres enregistrées avec succès !');
-      });
-
-      // Sidebar Mobile
-      const openSide = document.getElementById('open-sidebar-btn');
-      const closeSide = document.getElementById('close-sidebar-btn');
-      const side = document.getElementById('sidebar');
-      const sideBack = document.getElementById('sidebar-backdrop');
-
-      openSide.addEventListener('click', () => {
-        side.classList.remove('-translate-x-full');
-        sideBack.classList.remove('hidden');
-      });
-      closeSide.addEventListener('click', () => {
-        side.classList.add('-translate-x-full');
-        sideBack.classList.add('hidden');
-      });
-      sideBack.addEventListener('click', () => {
-        side.classList.add('-translate-x-full');
-        sideBack.classList.add('hidden');
-      });
-    });
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+      document.getElementById('tab-pane-' + tabId).classList.remove('hidden');
+    }
   </script>
 </body>
 </html>
