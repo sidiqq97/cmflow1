@@ -2570,47 +2570,6 @@ button {
   pointer-events: none;
 }
 
-/* --------------------------------------------------------------------------
-   RESPONSIVE BENTO & SECTIONS
-   -------------------------------------------------------------------------- */
-@media (max-width: 1024px) {
-  .bento-card.col-large,
-  .bento-card.col-medium,
-  .bento-card.col-equal {
-    grid-column: span 12;
-  }
-  .workflow-grid-3 {
-    grid-template-columns: 1fr;
-  }
-  .pricing-cards-grid {
-    grid-template-columns: 1fr;
-    max-width: 480px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .pricing-card-modern.popular {
-    transform: none;
-  }
-  .pricing-card-modern.popular:hover {
-    transform: translateY(-4px);
-  }
-  .hero-floating-phone-card,
-  .hero-floating-pill-wave {
-    position: static;
-    margin-top: 16px;
-    width: 100%;
-  }
-}
-
-@media (max-width: 640px) {
-  .bento-grid-wrapper {
-    grid-template-columns: 1fr;
-  }
-  .dark-cta-banner-card {
-    padding: 40px 20px;
-  }
-}
-
 /* ==========================================================================
    NOUVEAU FOOTER SAAS B2B MODERNE & SÉCURISÉ (4 COLONNES)
    ========================================================================== */
@@ -2729,17 +2688,20 @@ button {
 .footer-whatsapp-btn {
   background: #16A34A;
   color: #FFFFFF !important;
-  font-size: 0.86rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  padding: 10px 16px;
-  border-radius: 10px;
+  padding: 12px 18px;
+  min-height: 48px;
+  border-radius: 12px;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   width: fit-content;
   box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
   transition: all 0.25s ease;
+  touch-action: manipulation;
 }
 
 .footer-whatsapp-btn:hover {
@@ -2800,19 +2762,19 @@ button {
   background: #FFFFFF;
   border-radius: 24px;
   max-width: 520px;
-  width: 90%;
-  padding: 36px;
+  width: 92%;
+  padding: 32px 24px;
   box-shadow: 0 25px 60px rgba(15, 23, 42, 0.3);
   position: relative;
   animation: modalScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .calc-slider-wrapper {
-  margin: 28px 0;
+  margin: 24px 0;
 }
 
 .calc-slider-val-badge {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: #2563EB;
 }
@@ -2821,8 +2783,8 @@ button {
   background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%);
   border: 1px solid #BFDBFE;
   border-radius: 16px;
-  padding: 20px;
-  margin: 24px 0;
+  padding: 18px;
+  margin: 20px 0;
 }
 
 .calc-metric-row {
@@ -2839,27 +2801,333 @@ button {
 }
 
 .calc-metric-val {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #059669;
 }
 
+/* ==========================================================================
+   FLOATING WHATSAPP BUTTON (MOBILE ONLY)
+   ========================================================================== */
+.mobile-floating-whatsapp-btn {
+  display: none;
+  position: fixed;
+  bottom: 22px;
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #25D366;
+  color: #FFFFFF;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
+  z-index: 999;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  touch-action: manipulation;
+  text-decoration: none;
+}
+
+.mobile-floating-whatsapp-btn:active {
+  transform: scale(0.92);
+}
+
+/* ==========================================================================
+   RÈGLES D'ADAPTATION RESPONSIVE MOBILE ULTIME (< 1024px & < 768px)
+   ========================================================================== */
+
+/* TABLETTES (<= 1024px) */
 @media (max-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .hero-content {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .hero-cta-group {
+    justify-content: center;
+  }
+  .hero-reassurance {
+    justify-content: center;
+  }
+  .bento-card.col-large,
+  .bento-card.col-medium,
+  .bento-card.col-equal {
+    grid-column: span 12;
+  }
+  .workflow-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .pricing-cards-grid {
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 24px;
+  }
+  /* Formule Starter en tête de liste sur mobile/tablette */
+  .pricing-card-modern.popular {
+    order: -1;
+    transform: none !important;
+  }
   .footer-b2b-grid {
     grid-template-columns: 1fr 1fr;
     gap: 40px;
   }
 }
 
-@media (max-width: 640px) {
+/* SMARTPHONES & MOBILES (<= 768px - Focus 320px à 430px) */
+@media (max-width: 768px) {
+  
+  /* 1. Base technique & Ergonomie tactile */
+  body {
+    overflow-x: hidden;
+  }
+
+  input, select, textarea {
+    font-size: 16px !important; /* Évite tout zoom intempestif iOS */
+  }
+
+  .btn, .btn-lg, .btn-primary, .btn-secondary, .btn-orange-glow, .btn-block {
+    min-height: 48px !important;
+    font-size: 0.95rem !important;
+    padding: 12px 20px !important;
+    touch-action: manipulation;
+    justify-content: center;
+  }
+
+  /* 2. Hero Section Mobile : 1 colonne verticale & Mockup fluide */
+  .hero-title {
+    font-size: clamp(1.85rem, 7vw, 2.3rem) !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .hero-subtitle {
+    font-size: 0.96rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .hero-cta-group .btn {
+    width: 100% !important;
+  }
+
+  .hero-mockup-perspective-wrapper {
+    transform: none !important;
+    perspective: none !important;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hero-desktop-window {
+    width: 100% !important;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  }
+
+  .hero-window-header {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .window-client-badge-pill {
+    max-width: 100%;
+    font-size: 0.72rem;
+  }
+
+  .hero-floating-pill-wave {
+    position: static !important;
+    width: 100% !important;
+    transform: none !important;
+    animation: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .hero-floating-phone-card {
+    position: static !important;
+    width: 100% !important;
+    transform: none !important;
+    animation: none !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  /* 3. Social Proof Bar : Défilement horizontal fluide (Swipe) */
+  .social-proof-bar {
+    padding: 20px 0;
+  }
+
+  .social-logos-flex {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding: 8px 16px;
+    justify-content: flex-start;
+    scrollbar-width: none;
+  }
+
+  .social-logos-flex::-webkit-scrollbar {
+    display: none;
+  }
+
+  .social-logo-item {
+    flex-shrink: 0;
+    scroll-snap-align: center;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+
+  /* 4. Workflow 1-2-3 & Bento Grid : Cartes verticales lisibles */
+  .workflow-step-card {
+    padding: 22px 18px;
+    border-radius: 16px;
+  }
+
+  .workflow-step-badge {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+
+  .bento-grid-wrapper {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .bento-card {
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
+
+  .bento-client-tabs-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    padding-bottom: 6px;
+    width: 100%;
+  }
+
+  .bento-client-tabs-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bento-client-tab-btn {
+    flex-shrink: 0;
+    font-size: 0.8rem;
+    padding: 7px 12px;
+    min-height: 40px;
+  }
+
+  .dark-cta-banner-card {
+    padding: 36px 18px;
+    border-radius: 20px;
+    margin-top: 36px;
+  }
+
+  /* 5. Grille Tarifaire Mobile : Starter en tête + Boutons 50px */
+  .pricing-cards-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 4px;
+  }
+
+  .pricing-card-modern {
+    padding: 28px 20px;
+    border-radius: 20px;
+  }
+
+  .pricing-card-modern.popular {
+    order: -1;
+    border-width: 2px;
+    box-shadow: 0 12px 30px rgba(249, 79, 6, 0.15);
+  }
+
+  .pricing-card-modern .btn {
+    min-height: 50px !important;
+  }
+
+  /* 6. Footer Mobile : Centré + WhatsApp accessible au pouce */
+  .footer-modern-b2b {
+    padding: 50px 0 0 0;
+  }
+
   .footer-b2b-grid {
     grid-template-columns: 1fr;
-    gap: 36px;
-    padding-bottom: 40px;
+    gap: 32px;
+    padding-bottom: 36px;
+    text-align: center;
   }
+
+  .footer-b2b-col.identity-col {
+    padding-right: 0;
+    align-items: center;
+  }
+
+  .footer-slogan {
+    max-width: 100%;
+    margin: 12px auto 20px auto;
+  }
+
+  .footer-trust-payment-block {
+    max-width: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .trust-payment-badges {
+    justify-content: center;
+  }
+
+  .footer-col-list {
+    align-items: center;
+  }
+
+  .footer-col-list li a {
+    justify-content: center;
+  }
+
+  .footer-whatsapp-btn {
+    width: 100% !important;
+    justify-content: center;
+    min-height: 50px;
+    font-size: 0.95rem;
+  }
+
+  .footer-email-link {
+    justify-content: center;
+  }
+
   .footer-bottom-flex {
     flex-direction: column;
     text-align: center;
-    gap: 10px;
+    gap: 12px;
+  }
+
+  /* Bouton WhatsApp flottant activé sur mobile */
+  .mobile-floating-whatsapp-btn {
+    display: flex;
   }
 }
+
