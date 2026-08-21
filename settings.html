@@ -216,210 +216,435 @@
     </header>
 
     <!-- Corps de Page -->
-    <main class="p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl">
+    <main class="p-4 sm:p-6 lg:p-8 space-y-8 max-w-6xl mx-auto">
       
-      <!-- En-tête -->
-      <div class="bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200/70 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <!-- =======================================================================
+          1. EN-TÊTE ÉPURÉ SANS CHEVAUCHEMENT (Dribbble / Linear Style)
+          ======================================================================= -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 class="text-xl sm:text-2xl font-black text-[#0F172A]">Paramètres Agence</h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">Configurez votre identité, vos intégrations réseaux sociaux, l'API WhatsApp et votre équipe.</p>
+          <!-- Fil d'Ariane discret -->
+          <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1.5">
+            <span>CMFlow</span>
+            <span class="text-slate-300">/</span>
+            <span class="text-slate-600 font-medium">Paramètres Agence</span>
+          </div>
+
+          <h1 class="text-2xl font-bold tracking-tight text-[#0F172A]">
+            Paramètres Généraux de l'Agence
+          </h1>
+          <p class="text-sm text-slate-500 mt-1">
+            Configurez votre identité, vos intégrations réseaux sociaux, l'API WhatsApp et votre équipe.
+          </p>
+        </div>
+
+        {/* Bouton Enregistrer Principal */}
+        <div class="flex items-center gap-3 shrink-0">
+          <button
+            type="button"
+            onclick="showToast('💾 Modifications enregistrées avec succès pour l\'agence !')"
+            class="bg-[#F94F06] hover:bg-[#e04605] text-white px-5 py-2.5 rounded-2xl font-medium shadow-md shadow-orange-500/20 active:scale-[0.98] transition-all flex items-center gap-2 text-xs cursor-pointer"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>Enregistrer les modifications</span>
+          </button>
         </div>
       </div>
 
-      <!-- ONGLETS HORIZONTAUX -->
-      <div class="flex items-center gap-1.5 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200/70 overflow-x-auto text-xs font-extrabold scrollbar-none">
-        <button type="button" onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn active flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white text-[#0F172A] shadow-xs">
-          🏢 Profil Agence & Marque Blanche
+      <!-- =======================================================================
+          2. REFONTE DE LA BARRE D'ONGLETS (MODERN SEGMENTED PILLS)
+          ======================================================================= -->
+      <div class="bg-slate-200/60 p-1.5 rounded-2xl flex items-center gap-1.5 w-fit border border-slate-200/80 overflow-x-auto max-w-full">
+        <button
+          type="button"
+          onclick="switchTab('profile')"
+          id="tab-btn-profile"
+          class="tab-btn active flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#0F172A] shadow-sm border border-slate-200/60 whitespace-nowrap transition-all cursor-pointer"
+        >
+          <svg class="w-3.5 h-3.5 text-[#F94F06]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>
+          <span>Profil Agence & Marque Blanche</span>
         </button>
-        <button type="button" onclick="switchTab('api')" id="tab-btn-api" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-500 hover:text-slate-900">
-          🔗 Connexions API Réseaux
+
+        <button
+          type="button"
+          onclick="switchTab('api')"
+          id="tab-btn-api"
+          class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/50 whitespace-nowrap transition-all cursor-pointer"
+        >
+          <svg class="w-3.5 h-3.5 text-[#0066FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span>Connexions API Réseaux</span>
         </button>
-        <button type="button" onclick="switchTab('whatsapp')" id="tab-btn-whatsapp" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-500 hover:text-slate-900">
-          💬 Configuration WhatsApp & Modèles
+
+        <button
+          type="button"
+          onclick="switchTab('whatsapp')"
+          id="tab-btn-whatsapp"
+          class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/50 whitespace-nowrap transition-all cursor-pointer"
+        >
+          <svg class="w-3.5 h-3.5 text-[#10B981]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Configuration WhatsApp & Modèles</span>
         </button>
-        <button type="button" onclick="switchTab('team')" id="tab-btn-team" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-500 hover:text-slate-900">
-          👥 Équipe & Rôles
+
+        <button
+          type="button"
+          onclick="switchTab('team')"
+          id="tab-btn-team"
+          class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/50 whitespace-nowrap transition-all cursor-pointer"
+        >
+          <svg class="w-3.5 h-3.5 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Équipe & Rôles</span>
         </button>
-        <button type="button" onclick="switchTab('security')" id="tab-btn-security" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-500 hover:text-slate-900">
-          🔒 Sécurité & Accès
+
+        <button
+          type="button"
+          onclick="switchTab('security')"
+          id="tab-btn-security"
+          class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/50 whitespace-nowrap transition-all cursor-pointer"
+        >
+          <svg class="w-3.5 h-3.5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          <span>Sécurité & Accès</span>
         </button>
       </div>
+
+      <!-- =======================================================================
+          3. CONTENU DES ONGLETS (BENTO CARDS)
+          ======================================================================= -->
 
       <!-- ONGLET 1 : PROFIL AGENCE -->
       <div id="tab-pane-profile" class="tab-pane space-y-6">
-        <div class="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
-          <h2 class="text-base font-black text-[#0F172A] pb-3 border-b border-slate-100">Identité & Logo de l'Agence</h2>
+        <div class="bg-white border border-slate-200/70 rounded-3xl shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] p-6 md:p-8 space-y-6">
+          <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-[#0F172A]">Identité de l'Agence & Logo Officiel</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Ce logo et ce nom sont affichés sur les portails de validation mobile WhatsApp de vos clients.</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 self-start sm:self-auto">✓ Marque Blanche Incluse</span>
+          </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-3">
-              <div class="w-20 h-20 mx-auto rounded-2xl bg-[#0F172A] text-white flex items-center justify-center font-black text-xl shadow-md">KS</div>
-              <button type="button" onclick="showToast('🖼️ Téléversement d\'un nouveau logo...')" class="px-3 py-1.5 bg-white text-slate-700 font-bold text-xs rounded-xl border border-slate-200 shadow-2xs">Changer le logo</button>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+            <div class="p-5 rounded-2xl bg-slate-50/60 border border-slate-200/80 text-center space-y-3">
+              <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider">Logo de l'Agence</label>
+              <div class="w-20 h-20 mx-auto rounded-2xl bg-[#0F172A] text-white flex items-center justify-center font-black text-xl shadow-md border-2 border-white">KS</div>
+              <button type="button" onclick="showToast('🖼️ Téléversement d\'un nouveau logo...')" class="px-3 py-1.5 bg-white text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 shadow-xs hover:bg-slate-50 transition-all cursor-pointer">Changer le logo</button>
+              <p class="text-[10px] text-slate-400">PNG ou SVG transparent recommandé</p>
             </div>
 
-            <div class="md:col-span-2 space-y-4 text-xs font-bold">
+            <div class="md:col-span-2 space-y-4 text-xs font-semibold">
               <div>
-                <label class="block text-slate-700 uppercase mb-1">Nom Commercial</label>
-                <input type="text" value="Kitsune Studio · Sidiqq Solutions" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900" />
+                <label class="block text-slate-700 uppercase tracking-wider mb-1.5">Nom Commercial de l'Agence</label>
+                <input type="text" value="Kitsune Studio · Dakar" class="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all" />
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-slate-700 uppercase mb-1">Email Officiel</label>
-                  <input type="email" value="contact@kitsunestudio.sn" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900" />
+                  <label class="block text-slate-700 uppercase tracking-wider mb-1.5">Email Officiel</label>
+                  <input type="email" value="contact@kitsunestudio.sn" class="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all" />
                 </div>
                 <div>
-                  <label class="block text-slate-700 uppercase mb-1">Téléphone Support</label>
-                  <input type="tel" value="+221 77 800 12 34" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-900" />
+                  <label class="block text-slate-700 uppercase tracking-wider mb-1.5">Téléphone WhatsApp Agence</label>
+                  <input type="tel" value="+221 77 800 12 34" class="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all" />
+                </div>
+              </div>
+
+              <div class="pt-2">
+                <label class="block text-slate-700 uppercase tracking-wider mb-1.5">Domaine Personnalisé CNAME (White-Label)</label>
+                <div class="flex items-center gap-2">
+                  <input type="text" value="validation.kitsunestudio.sn" class="flex-1 p-2.5 bg-slate-50/70 border border-slate-200 rounded-xl font-mono text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06]" />
+                  <button type="button" onclick="showToast('🔗 DNS vérifié : CNAME actif et sécurisé SSL !')" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl border border-slate-200 transition-all cursor-pointer shrink-0">Tester DNS</button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Marque Blanche -->
-        <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-sm font-black text-[#0F172A]">Option Marque Blanche (White-Label)</h3>
-              <p class="text-xs text-slate-500">Masquez la mention CMFlow sur les liens de validation de vos clients.</p>
-            </div>
-            <span class="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200">✓ Inclus sur Pro Agency</span>
-          </div>
-          <input type="text" value="validation.kitsunestudio.sn" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs font-bold text-slate-800" />
         </div>
       </div>
 
       <!-- ONGLET 2 : API RÉSEAUX -->
-      <div id="tab-pane-api" class="tab-pane hidden space-y-4">
-        <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
-            <div>
-              <h2 class="text-base font-black text-[#0F172A]">Intégrations Réseaux Sociaux Officielles</h2>
-              <p class="text-xs text-slate-500">Connectez vos comptes Meta Graph API (Instagram Pro & Facebook) et TikTok pour automatiser la publication.</p>
-            </div>
-            <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200 self-start sm:self-auto">
-              Espace actif : <strong id="settings-active-client-label" class="text-slate-800">Teranga Gourmet 🇸🇳</strong>
-            </span>
-          </div>
+      <div id="tab-pane-api" class="tab-pane hidden space-y-6">
+        <div class="bg-white border border-slate-200/70 rounded-3xl shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] p-6 md:p-8 space-y-6">
           
-          <!-- Meta Graph API Card (Dribbble / Raycast Style) -->
-          <div class="p-5 rounded-3xl bg-gradient-to-r from-slate-50 to-white border border-slate-200/90 hover:border-slate-300 transition-all shadow-xs relative overflow-hidden">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div class="flex items-start gap-3.5">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#E1306C] via-[#FD1D1D] to-[#1877F2] p-0.5 shadow-md shadow-pink-500/15 shrink-0 flex items-center justify-center">
-                  <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center gap-1">
-                    <svg class="w-4 h-4 text-[#E1306C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                    <svg class="w-4 h-4 text-[#1877F2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-[#0F172A]">Intégrations Réseaux Sociaux Officielles</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Connectez les comptes de vos marques pour activer la publication directe et la synchronisation des analytics.</p>
+            </div>
+            
+            <div class="bg-slate-100 border border-slate-200 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 self-start sm:self-auto shrink-0">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Espace : <strong id="settings-active-client-label" class="text-slate-800">Teranga Gourmet 🇸🇳</strong></span>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            
+            <!-- LIGNE 1 : META GRAPH API -->
+            <div class="p-5 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500/10 via-purple-500/10 to-blue-500/10 border border-slate-200 flex items-center justify-center text-pink-600 shrink-0">
+                  <div class="flex items-center -space-x-1">
+                    <svg class="w-5 h-5 text-[#E1306C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                    <svg class="w-5 h-5 text-[#1877F2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                   </div>
                 </div>
+
                 <div>
-                  <div class="text-xs font-black text-[#0F172A] flex items-center gap-2 flex-wrap">
-                    <span>Meta Graph API (Instagram Professionnel & Pages Facebook)</span>
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                      ✓ Connecté (Token 60j)
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-900">
+                      Meta Graph API (Instagram Pro & Facebook Pages)
+                    </h3>
+                    <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>
+                      <span>Connecté</span>
                     </span>
                   </div>
-                  <div class="text-[11px] text-slate-500 mt-1">
-                    Publication automatique des Reels, Stories, Carrousels et lecture des Insights d'audience en direct.
-                  </div>
-                  <div class="flex items-center gap-3 mt-2 text-[11px] text-slate-600 font-medium">
-                    <span class="text-slate-700 font-bold">@terangagourmet_sn</span>
-                    <span class="text-slate-300">•</span>
+
+                  <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Publication automatique des Reels, Stories, carrousels et lecture des Insights d'audience.
+                  </p>
+
+                  <div class="flex items-center gap-2 mt-2 text-xs text-slate-500 font-medium">
+                    <span class="text-slate-800 font-semibold">@terangagourmet_sn</span>
+                    <span>•</span>
                     <span>34.2K abonnés</span>
-                    <span class="text-slate-300">•</span>
-                    <span class="text-emerald-600 font-bold">6.2% engagement</span>
+                    <span>•</span>
+                    <span class="text-emerald-600 font-semibold">6.2% engagement</span>
                   </div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-2 shrink-0 self-start sm:self-center">
+              <div class="shrink-0 self-start md:self-center">
                 <button
                   type="button"
                   onclick="triggerMetaConnect()"
-                  class="px-4 py-2.5 bg-gradient-to-r from-[#E1306C] via-[#FD1D1D] to-[#1877F2] text-white text-xs font-bold rounded-xl shadow-md shadow-pink-500/20 hover:opacity-95 active:scale-[0.98] transition-all cursor-pointer inline-flex items-center gap-2"
+                  class="bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2 hover:border-slate-300 active:scale-[0.98] cursor-pointer"
                 >
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  <svg class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                   <span>Re-synchroniser Meta</span>
                 </button>
               </div>
             </div>
-          </div>
 
-          <!-- TikTok Business API -->
-          <div class="p-5 rounded-3xl bg-slate-50 border border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="flex items-center gap-3.5">
-              <div class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center font-black text-sm shadow-md">
-                TK
+            <!-- LIGNE 2 : TIKTOK BUSINESS API -->
+            <div class="p-5 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <div class="bg-black text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                  TK
+                </div>
+
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-900">
+                      TikTok Business API
+                    </h3>
+                    <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>
+                      <span>Connecté</span>
+                    </span>
+                  </div>
+
+                  <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Publication vidéo HD instantanée et suivi des statistiques de diffusion TikTok.
+                  </p>
+
+                  <div class="flex items-center gap-2 mt-2 text-xs text-slate-500 font-medium">
+                    <span class="text-slate-800 font-semibold">@terangagourmet_sn_tiktok</span>
+                    <span>•</span>
+                    <span>Direct Video API Ready</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div class="text-xs font-black text-[#0F172A] flex items-center gap-2">
-                  <span>TikTok Business API</span>
-                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">✓ Connecté</span>
-                </div>
-                <div class="text-[11px] text-slate-500 mt-0.5">
-                  Direct Posting vidéo HD activé et suivi des vues en temps réel.
-                </div>
+
+              <div class="shrink-0 self-start md:self-center">
+                <button
+                  type="button"
+                  onclick="showToast('🔄 Compte TikTok Business synchronisé !')"
+                  class="bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2 hover:border-slate-300 active:scale-[0.98] cursor-pointer"
+                >
+                  <span>Gérer</span>
+                </button>
               </div>
             </div>
 
-            <div class="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onclick="showToast('🔄 Compte TikTok Business synchronisé !')"
-                class="px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 shadow-2xs transition-all cursor-pointer"
-              >
-                Gérer
-              </button>
+            <!-- LIGNE 3 : LINKEDIN COMPANY PAGES -->
+            <div class="p-5 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <div class="bg-[#0077B5] text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                  in
+                </div>
+
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-900">
+                      LinkedIn Company Pages
+                    </h3>
+                    <span class="bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                      Non configuré
+                    </span>
+                  </div>
+
+                  <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Publiez des carrousels PDF, articles et mises à jour pour les comptes professionnels B2B.
+                  </p>
+                </div>
+              </div>
+
+              <div class="shrink-0 self-start md:self-center">
+                <button
+                  type="button"
+                  onclick="showToast('🔗 Connexion OAuth LinkedIn initiée...')"
+                  class="bg-white hover:bg-blue-50/50 text-[#0077B5] border border-[#0077B5]/30 hover:border-[#0077B5] px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all flex items-center gap-2 active:scale-[0.98] cursor-pointer"
+                >
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>Connecter le compte</span>
+                </button>
+              </div>
             </div>
+
+            <!-- LIGNE 4 : X (TWITTER) API V2 -->
+            <div class="p-5 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <div class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                  𝕏
+                </div>
+
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-900">
+                      X (Twitter) API v2
+                    </h3>
+                    <span class="bg-slate-100 text-slate-500 border border-slate-200 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                      Optionnel
+                    </span>
+                  </div>
+
+                  <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Diffusion de threads instantanés et micro-annonces officielles.
+                  </p>
+                </div>
+              </div>
+
+              <div class="shrink-0 self-start md:self-center">
+                <button
+                  type="button"
+                  onclick="showToast('🔗 Connexion X / Twitter initiée...')"
+                  class="bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2 hover:border-slate-300 active:scale-[0.98] cursor-pointer"
+                >
+                  <span>Connecter</span>
+                </button>
+              </div>
+            </div>
+
           </div>
+
         </div>
       </div>
 
       <!-- ONGLET 3 : WHATSAPP TEMPLATES -->
-      <div id="tab-pane-whatsapp" class="tab-pane hidden space-y-4">
-        <div class="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <h2 class="text-base font-black text-[#0F172A] pb-3 border-b border-slate-100">Passerelle WhatsApp & Modèles Automatiques</h2>
+      <div id="tab-pane-whatsapp" class="tab-pane hidden space-y-6">
+        <div class="bg-white border border-slate-200/70 rounded-3xl shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] p-6 md:p-8 space-y-6">
+          <div class="border-b border-slate-100 pb-4">
+            <h2 class="text-base sm:text-lg font-bold text-[#0F172A]">Passerelle WhatsApp & Modèles de Relance</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Personnalisez les messages automatiques envoyés à vos clients lors de la soumission de plannings.</p>
+          </div>
           
-          <div class="space-y-3 text-xs font-bold">
+          <div class="space-y-4 text-xs font-semibold">
             <div>
-              <label class="block text-slate-700 uppercase mb-1">Modèle 1 : Envoi du planning</label>
-              <textarea rows="2" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium">Bonjour {client_name} ! 🌟 Votre planning hebdomadaire est prêt pour validation sur votre mobile : {validation_link}</textarea>
+              <label class="block text-slate-700 uppercase tracking-wider mb-1.5">Ligne Émettrice WhatsApp Officielle</label>
+              <div class="flex items-center gap-3">
+                <input type="text" value="+221 77 800 12 34" class="w-full max-w-sm p-3 bg-slate-50/70 border border-slate-200 rounded-xl font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06]" />
+                <span class="px-3 py-2 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>
+                  Connecté API Cloud
+                </span>
+              </div>
             </div>
 
-            <div>
-              <label class="block text-slate-700 uppercase mb-1">Modèle 2 : Relance avant expiration</label>
-              <textarea rows="2" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium">Rappel pour {client_name} ⏰ Votre session expire dans {expiration_time}. Accédez-y ici : {validation_link}</textarea>
+            <div class="space-y-3 pt-2">
+              <div>
+                <label class="block text-slate-700 uppercase tracking-wider mb-1">Modèle 1 : Envoi Initial du Planning</label>
+                <textarea rows="2" class="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl font-normal text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06]">Bonjour {client_name} ! 🌟 Votre planning hebdomadaire est prêt pour validation sur votre mobile en 1 clic sans mot de passe : {validation_link} (Lien actif 48h)</textarea>
+              </div>
+
+              <div>
+                <label class="block text-slate-700 uppercase tracking-wider mb-1">Modèle 2 : Relance avant Expiration (H-12)</label>
+                <textarea rows="2" class="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl font-normal text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06]">Rappel amical pour {client_name} ⏰ Votre session de validation expire dans {expiration_time}. Accédez-y ici : {validation_link}</textarea>
+              </div>
+
+              <div>
+                <label class="block text-slate-700 uppercase tracking-wider mb-1">Modèle 3 : Confirmation de Validation Intégrale</label>
+                <textarea rows="2" class="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl font-normal text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06]">Parfait ! Merci {client_name} 🎉 Toutes vos publications sont validées et programmées sur vos réseaux.</textarea>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- ONGLET 4 : ÉQUIPE -->
-      <div id="tab-pane-team" class="tab-pane hidden space-y-4">
-        <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <h2 class="text-base font-black text-[#0F172A] pb-3 border-b border-slate-100">Collaborateurs de l'Agence</h2>
-          <div class="space-y-2 text-xs">
-            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-              <div>
-                <span class="font-extrabold text-[#0F172A] block">Awa Diop</span>
-                <span class="text-slate-400 text-[11px]">awa@cmflow.sn · Lead CM</span>
+      <div id="tab-pane-team" class="tab-pane hidden space-y-6">
+        <div class="bg-white border border-slate-200/70 rounded-3xl shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] p-6 md:p-8 space-y-6">
+          <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-[#0F172A]">Collaborateurs & Gestion des Rôles</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Gérez les accès de vos Community Managers, graphistes et responsables de comptes.</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <input type="email" id="invite-email-input" placeholder="nom@agence.com" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none" />
+              <button type="button" onclick="showToast('📩 Invitation envoyée avec succès !')" class="px-3.5 py-2 bg-[#F94F06] hover:bg-[#e04605] text-white text-xs font-semibold rounded-xl shadow-xs transition-all cursor-pointer shrink-0">+ Inviter</button>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <div class="p-3.5 rounded-2xl bg-slate-50/60 border border-slate-200/80 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+              <div class="flex items-center gap-3">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Awa" class="w-9 h-9 rounded-xl object-cover ring-2 ring-white shadow-xs" />
+                <div>
+                  <div class="text-xs font-bold text-slate-900">Awa Diop</div>
+                  <div class="text-[11px] text-slate-500">awa@cmflow.sn · <strong class="text-slate-700 font-semibold">Lead CM</strong></div>
+                </div>
               </div>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">✓ Actif</span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">✓ Actif</span>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50/60 border border-slate-200/80 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+              <div class="flex items-center gap-3">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" alt="Sidiqq" class="w-9 h-9 rounded-xl object-cover ring-2 ring-white shadow-xs" />
+                <div>
+                  <div class="text-xs font-bold text-slate-900 flex items-center gap-2">
+                    <span>Sidiqq Ndiaye</span>
+                    <span class="text-[10px] bg-amber-500/10 text-amber-600 border border-amber-500/20 font-bold px-2 py-0.2 rounded-full">Owner</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500">sidiqq@kitsunestudio.sn · <strong class="text-slate-700 font-semibold">Admin / Owner</strong></div>
+                </div>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">✓ Actif</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- ONGLET 5 : SÉCURITÉ -->
-      <div id="tab-pane-security" class="tab-pane hidden space-y-4">
-        <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <h2 class="text-base font-black text-[#0F172A] pb-3 border-b border-slate-100">Sécurité & Double Authentification (2FA)</h2>
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs font-bold">
-            <div>
-              <div class="text-[#0F172A]">Double Authentification SMS / Authenticator</div>
-              <div class="text-[11px] text-slate-500 font-normal">Protégez l'accès aux espaces de vos marques partenaires.</div>
+      <div id="tab-pane-security" class="tab-pane hidden space-y-6">
+        <div class="bg-white border border-slate-200/70 rounded-3xl shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] p-6 md:p-8 space-y-6">
+          <div class="border-b border-slate-100 pb-4">
+            <h2 class="text-base sm:text-lg font-bold text-[#0F172A]">Sécurité & Double Authentification (2FA)</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Protégez l'accès à vos données d'agence et aux identifiants sociaux de vos clients.</p>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="p-4 rounded-2xl bg-slate-50/60 border border-slate-200/80 flex items-center justify-between gap-4">
+              <div>
+                <h3 class="text-xs font-bold text-slate-900">Double Authentification (SMS & Authenticator)</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5">Exige un code de confirmation lors des connexions depuis un nouvel appareil.</p>
+              </div>
+              <button type="button" onclick="showToast('🔐 Paramètre 2FA mis à jour.')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 cursor-pointer">✓ Activée</button>
             </div>
-            <span class="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800">Activée</span>
+
+            <div class="p-4 rounded-2xl bg-slate-50/60 border border-slate-200/80 flex items-center justify-between gap-4">
+              <div>
+                <h3 class="text-xs font-bold text-slate-900">Durée de validité des Liens Magiques WhatsApp</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5">Les liens expirent automatiquement pour garantir la sécurité des accès.</p>
+              </div>
+              <span class="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-800 font-bold text-xs">48 Heures (Défaut)</span>
+            </div>
           </div>
         </div>
       </div>

@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
-  Building,
-  Link as LinkIcon,
+  Building2,
+  Link2,
   MessageSquare,
   Users,
-  Shield,
+  ShieldCheck,
   Save,
   Check,
   Sparkles,
@@ -26,10 +26,16 @@ import {
   ExternalLink,
   ChevronRight,
   Sliders,
-  Send
+  Send,
+  Instagram,
+  Facebook,
+  Linkedin,
+  Clock,
+  ShieldAlert,
+  Unlink,
+  CheckCheck
 } from 'lucide-react';
-import { useClient } from '../../../context/ClientContext';
-import ConnectMetaButton from '../../../components/ConnectMetaButton';
+import { useWorkspace } from '../../../context/WorkspaceContext';
 
 // Types
 export interface TeamMember {
@@ -69,13 +75,13 @@ const INITIAL_TEAM: TeamMember[] = [
 ];
 
 export default function SettingsPage() {
-  const { activeClient } = useClient();
+  const { activeWorkspace } = useWorkspace();
 
   // Onglet Actif
   const [activeTab, setActiveTab] = useState<'profile' | 'api' | 'whatsapp' | 'team' | 'security'>('profile');
 
   // Formulaire Profil Agence
-  const [agencyName, setAgencyName] = useState('Kitsune Studio · Sidiqq Solutions');
+  const [agencyName, setAgencyName] = useState('Kitsune Studio · Dakar');
   const [agencyEmail, setAgencyEmail] = useState('contact@kitsunestudio.sn');
   const [agencyPhone, setAgencyPhone] = useState('+221 77 800 12 34');
   const [customDomain, setCustomDomain] = useState('validation.kitsunestudio.sn');
@@ -145,41 +151,49 @@ export default function SettingsPage() {
     showToast(`📩 Invitation envoyée à ${newMember.email} !`);
   };
 
+  const currentWorkspaceName = activeWorkspace?.name || 'Teranga Gourmet';
+  const currentWorkspaceFlag = activeWorkspace?.flag || '🇸🇳';
+  const currentIgFollowers = activeWorkspace?.socialMetrics?.instagram?.followers || '34.2K';
+  const currentIgEngagement = activeWorkspace?.socialMetrics?.instagram?.engagement || '6.2%';
+  const currentIgUsername = activeWorkspace?.slug ? `@${activeWorkspace.slug}` : '@terangagourmet_sn';
+
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
       
       {/* Toast Flottant */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-bounce">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom-5">
           <Sparkles className="w-4 h-4 text-[#F94F06]" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* =======================================================================
-          A. EN-TÊTE STANDARD AVEC TITRE + ACTIONS
+          1. EN-TÊTE ÉPURÉ SANS CHEVAUCHEMENT (Dribbble / Linear Style)
           ======================================================================= */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
-              Paramètres Généraux de l'Agence
-            </h1>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-              Workspace Agence
-            </span>
+          {/* Fil d'Ariane discret */}
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1.5">
+            <span>CMFlow</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-600 font-medium">Paramètres Agence</span>
           </div>
+
+          <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
+            Paramètres Généraux de l'Agence
+          </h1>
           <p className="text-sm text-slate-500 mt-1">
             Configurez votre identité, vos intégrations réseaux sociaux, l'API WhatsApp et votre équipe.
           </p>
         </div>
 
-        {/* Bouton Sauvegarder Principal */}
-        <div className="flex items-center gap-3">
+        {/* Bouton Enregistrer Principal */}
+        <div className="flex items-center gap-3 shrink-0">
           <button
             type="button"
             onClick={() => handleSaveSettings()}
-            className="bg-[#F94F06] hover:bg-[#e04605] text-white px-5 py-2.5 rounded-2xl font-medium shadow-md shadow-orange-500/20 active:scale-[0.98] transition-all duration-200 flex items-center gap-2 text-xs"
+            className="bg-[#F94F06] hover:bg-[#e04605] text-white px-5 py-2.5 rounded-2xl font-medium shadow-md shadow-orange-500/20 active:scale-[0.98] transition-all duration-200 flex items-center gap-2 text-xs cursor-pointer"
           >
             <Save className="w-4 h-4" />
             <span>Enregistrer les modifications</span>
@@ -188,79 +202,83 @@ export default function SettingsPage() {
       </div>
 
       {/* =======================================================================
-          B. NAVIGATION PAR ONGLETS HORIZONTAUX (SEGMENTED TAB BAR)
+          2. REFONTE DE LA BARRE D'ONGLETS (MODERN SEGMENTED PILLS)
           ======================================================================= */}
-      <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/90 backdrop-blur-md rounded-2xl border border-slate-200/70 overflow-x-auto text-xs font-extrabold scrollbar-none">
+      <div className="bg-slate-200/60 p-1.5 rounded-2xl flex items-center gap-1.5 w-fit border border-slate-200/80 overflow-x-auto max-w-full">
         
+        {/* Onglet 1 : Profil Agence */}
         <button
           type="button"
           onClick={() => setActiveTab('profile')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl whitespace-nowrap transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'profile'
-              ? 'bg-white text-[#0F172A] shadow-xs'
-              : 'text-slate-500 hover:text-slate-900 hover:bg-white/40'
+              ? 'bg-white text-[#0F172A] shadow-sm border border-slate-200/60 font-bold'
+              : 'font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/50'
           }`}
         >
-          <Building className="w-3.5 h-3.5 text-[#F94F06]" />
+          <Building2 className={`w-3.5 h-3.5 ${activeTab === 'profile' ? 'text-[#F94F06]' : 'text-slate-500'}`} />
           <span>Profil Agence & Marque Blanche</span>
         </button>
 
+        {/* Onglet 2 : Connexions API */}
         <button
           type="button"
           onClick={() => setActiveTab('api')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl whitespace-nowrap transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'api'
-              ? 'bg-white text-[#0F172A] shadow-xs'
-              : 'text-slate-500 hover:text-slate-900 hover:bg-white/40'
+              ? 'bg-white text-[#0F172A] shadow-sm border border-slate-200/60 font-bold'
+              : 'font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/50'
           }`}
         >
-          <LinkIcon className="w-3.5 h-3.5 text-[#0066FF]" />
+          <Link2 className={`w-3.5 h-3.5 ${activeTab === 'api' ? 'text-[#0066FF]' : 'text-slate-500'}`} />
           <span>Connexions API Réseaux</span>
         </button>
 
+        {/* Onglet 3 : WhatsApp */}
         <button
           type="button"
           onClick={() => setActiveTab('whatsapp')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl whitespace-nowrap transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'whatsapp'
-              ? 'bg-white text-[#0F172A] shadow-xs'
-              : 'text-slate-500 hover:text-slate-900 hover:bg-white/40'
+              ? 'bg-white text-[#0F172A] shadow-sm border border-slate-200/60 font-bold'
+              : 'font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/50'
           }`}
         >
-          <MessageSquare className="w-3.5 h-3.5 text-[#10B981]" />
+          <MessageSquare className={`w-3.5 h-3.5 ${activeTab === 'whatsapp' ? 'text-[#10B981]' : 'text-slate-500'}`} />
           <span>Configuration WhatsApp & Modèles</span>
         </button>
 
+        {/* Onglet 4 : Équipe */}
         <button
           type="button"
           onClick={() => setActiveTab('team')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl whitespace-nowrap transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'team'
-              ? 'bg-white text-[#0F172A] shadow-xs'
-              : 'text-slate-500 hover:text-slate-900 hover:bg-white/40'
+              ? 'bg-white text-[#0F172A] shadow-sm border border-slate-200/60 font-bold'
+              : 'font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/50'
           }`}
         >
-          <Users className="w-3.5 h-3.5 text-purple-600" />
+          <Users className={`w-3.5 h-3.5 ${activeTab === 'team' ? 'text-purple-600' : 'text-slate-500'}`} />
           <span>Équipe & Rôles ({teamMembers.length})</span>
         </button>
 
+        {/* Onglet 5 : Sécurité */}
         <button
           type="button"
           onClick={() => setActiveTab('security')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl whitespace-nowrap transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'security'
-              ? 'bg-white text-[#0F172A] shadow-xs'
-              : 'text-slate-500 hover:text-slate-900 hover:bg-white/40'
+              ? 'bg-white text-[#0F172A] shadow-sm border border-slate-200/60 font-bold'
+              : 'font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/50'
           }`}
         >
-          <Shield className="w-3.5 h-3.5 text-emerald-600" />
+          <ShieldCheck className={`w-3.5 h-3.5 ${activeTab === 'security' ? 'text-emerald-600' : 'text-slate-500'}`} />
           <span>Sécurité & Accès</span>
         </button>
-
       </div>
 
       {/* =======================================================================
-          C. CONTENU DES ONGLETS (BENTO CARDS)
+          3. CONTENU DES ONGLETS (BENTO CARDS PREMIER CHOIX)
           ======================================================================= */}
 
       {/* ---------------------------------------------------------------------
@@ -268,22 +286,27 @@ export default function SettingsPage() {
           --------------------------------------------------------------------- */}
       {activeTab === 'profile' && (
         <div className="space-y-6">
-          
-          <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
-            <div className="border-b border-slate-100 pb-4">
-              <h2 className="text-base sm:text-lg font-black text-[#0F172A]">
-                Identité de l'Agence & Logo Officiel
-              </h2>
-              <p className="text-xs text-slate-500">
-                Ce logo et ce nom sont affichés en en-tête des portails de validation mobile de vos clients.
-              </p>
+          <div className="bg-white border border-slate-200/70 rounded-3xl shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] p-6 md:p-8 space-y-6">
+            
+            <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-[#0F172A]">
+                  Identité de l'Agence & Marque Blanche
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Ce logo et ce nom sont affichés sur les portails mobiles WhatsApp et les rapports PDF envoyés à vos clients.
+                </p>
+              </div>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 self-start sm:self-auto">
+                ✓ Marque Blanche Activée
+              </span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
               
               {/* Téléversement Logo */}
-              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3 text-center">
-                <label className="block text-xs font-extrabold uppercase text-slate-500 tracking-wider">
+              <div className="p-5 rounded-2xl bg-slate-50/60 border border-slate-200/80 space-y-3 text-center">
+                <label className="block text-xs font-bold uppercase text-slate-500 tracking-wider">
                   Logo de l'Agence
                 </label>
 
@@ -294,18 +317,18 @@ export default function SettingsPage() {
                 <div className="pt-2">
                   <button
                     type="button"
-                    onClick={() => showToast('🖼️ Téléversement d\'un nouveau logo PNG...')}
-                    className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 shadow-2xs inline-flex items-center gap-1.5"
+                    onClick={() => showToast('🖼️ Sélecteur de fichier ouvert...')}
+                    className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 shadow-xs inline-flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <Upload className="w-3.5 h-3.5 text-[#F94F06]" />
                     <span>Changer le logo</span>
                   </button>
                 </div>
-                <p className="text-[10px] text-slate-400">Format PNG ou SVG transparent recommandé (Max 2MB)</p>
+                <p className="text-[10px] text-slate-400">PNG ou SVG transparent (Recommandé : 400x400px)</p>
               </div>
 
-              {/* Champs Nom, Email, Support */}
-              <div className="lg:col-span-2 space-y-4 text-xs font-bold">
+              {/* Champs Formulaire */}
+              <div className="lg:col-span-2 space-y-4 text-xs font-semibold">
                 <div>
                   <label className="block text-slate-700 uppercase tracking-wider mb-1.5">
                     Nom Commercial de l'Agence
@@ -314,7 +337,7 @@ export default function SettingsPage() {
                     type="text"
                     value={agencyName}
                     onChange={(e) => setAgencyName(e.target.value)}
-                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06]"
+                    className="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
                   />
                 </div>
 
@@ -327,75 +350,51 @@ export default function SettingsPage() {
                       type="email"
                       value={agencyEmail}
                       onChange={(e) => setAgencyEmail(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06]"
+                      className="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
                     />
                   </div>
 
                   <div>
                     <label className="block text-slate-700 uppercase tracking-wider mb-1.5">
-                      Numéro de Support Client
+                      Téléphone & Ligne WhatsApp Agence
                     </label>
                     <input
-                      type="tel"
+                      type="text"
                       value={agencyPhone}
                       onChange={(e) => setAgencyPhone(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06]"
+                      className="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
                     />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <label className="block text-slate-700 uppercase tracking-wider mb-1.5">
+                    Domaine Personnalisé CNAME (Option Pro Agency)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <span className="absolute left-3 top-3 text-slate-400 text-xs">https://</span>
+                      <input
+                        type="text"
+                        value={customDomain}
+                        onChange={(e) => setCustomDomain(e.target.value)}
+                        className="w-full pl-16 pr-3 py-2.5 bg-slate-50/70 border border-slate-200 rounded-xl text-slate-900 font-mono text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => showToast('🔗 Test DNS réussi : validation.kitsunestudio.sn pointe vers CMFlow.')}
+                      className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl border border-slate-200 transition-all cursor-pointer shrink-0"
+                    >
+                      Tester DNS
+                    </button>
                   </div>
                 </div>
               </div>
 
             </div>
+
           </div>
-
-          {/* Marque Blanche & Sous-domaine */}
-          <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-black text-[#0F172A] flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-[#0066FF]" />
-                  <span>Option Marque Blanche (White-Label)</span>
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Masquez la mention CMFlow et utilisez votre propre sous-domaine pour tous vos liens de validation.
-                </p>
-              </div>
-
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={whiteLabelEnabled}
-                  onChange={(e) => setWhiteLabelEnabled(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10B981]"></div>
-              </label>
-            </div>
-
-            {whiteLabelEnabled && (
-              <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 space-y-3">
-                <div className="text-xs font-bold text-emerald-950">
-                  Sous-domaine personnalisé actif :
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={customDomain}
-                    onChange={(e) => setCustomDomain(e.target.value)}
-                    className="flex-1 p-2.5 bg-white border border-emerald-300 rounded-xl text-xs font-mono text-emerald-900 font-bold"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => showToast('🔗 DNS vérifié : CNAME pointe correctement vers CMFlow !')}
-                    className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl"
-                  >
-                    Tester DNS
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
         </div>
       )}
 
@@ -403,116 +402,201 @@ export default function SettingsPage() {
           ONGLET 2 : CONNEXIONS API RÉSEAUX SOCIAUX
           --------------------------------------------------------------------- */}
       {activeTab === 'api' && (
-        <div className="space-y-4">
-          
-          <div className="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-            <div className="border-b border-slate-100 pb-3">
-              <h2 className="text-base font-black text-[#0F172A]">
-                Comptes & Intégrations Réseaux Sociaux
-              </h2>
-              <p className="text-xs text-slate-500">
-                Connectez les pages professionnelles pour activer la publication automatique après validation client.
-              </p>
+        <div className="space-y-6">
+          <div className="bg-white border border-slate-200/70 rounded-3xl shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] p-6 md:p-8 space-y-6">
+            
+            {/* En-tête interne */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-[#0F172A]">
+                  Intégrations Réseaux Sociaux Officielles
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Connectez les comptes de vos marques pour activer la publication directe et la synchronisation des analytics.
+                </p>
+              </div>
+              
+              {/* Badge Workspace Actif */}
+              <div className="bg-slate-100 border border-slate-200 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 self-start sm:self-auto shrink-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Espace : <strong>{currentWorkspaceName} {currentWorkspaceFlag}</strong></span>
+              </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               
-              {/* Meta Graph API (Instagram Pro & Facebook Pages) */}
-              <ConnectMetaButton variant="card" />
-
-              {/* TikTok Business API */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center font-black text-base shadow-sm">
-                    TK
+              {/* ---------------------------------------------------------------
+                  LIGNE 1 : META GRAPH API (INSTAGRAM PRO & FACEBOOK PAGES)
+                  --------------------------------------------------------------- */}
+              <div className="p-5 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  {/* Pastille Dégradé Subtil Meta */}
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500/10 via-purple-500/10 to-blue-500/10 border border-slate-200 flex items-center justify-center text-pink-600 shrink-0">
+                    <div className="flex items-center -space-x-1">
+                      <Instagram className="w-5 h-5 text-[#E1306C]" />
+                      <Facebook className="w-5 h-5 text-[#1877F2]" />
+                    </div>
                   </div>
+
                   <div>
-                    <div className="text-xs font-black text-[#0F172A] flex items-center gap-2">
-                      <span>TikTok Business API</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                        ✓ Connecté
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-xs sm:text-sm font-bold text-slate-900">
+                        Meta Graph API (Instagram Pro & Facebook Pages)
+                      </h3>
+                      <span className="bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                        <CheckCheck className="w-3.5 h-3.5" />
+                        <span>Connecté</span>
                       </span>
                     </div>
-                    <div className="text-[11px] text-slate-500">
-                      Publication vidéo directe et statistiques Reels
+
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                      Publication automatique des Reels, Stories, carrousels et lecture des Insights d'audience.
+                    </p>
+
+                    {/* Métriques intégrées fines */}
+                    <div className="flex items-center gap-2 mt-2 text-xs text-slate-500 font-medium">
+                      <span className="text-slate-800 font-semibold">{currentIgUsername}</span>
+                      <span>•</span>
+                      <span>{currentIgFollowers} abonnés</span>
+                      <span>•</span>
+                      <span className="text-emerald-600 font-semibold">{currentIgEngagement} engagement</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                {/* Bouton d'action épuré */}
+                <div className="shrink-0 self-start md:self-center">
+                  <a
+                    href={`/api/auth/meta/login?workspaceId=${activeWorkspace?.id || 'teranga-gourmet'}`}
+                    className="bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2 hover:border-slate-300 active:scale-[0.98]"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Re-synchroniser Meta</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* ---------------------------------------------------------------
+                  LIGNE 2 : TIKTOK BUSINESS API
+                  --------------------------------------------------------------- */}
+              <div className="p-5 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  {/* Pastille Noire TikTok */}
+                  <div className="bg-black text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                    TK
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-xs sm:text-sm font-bold text-slate-900">
+                        TikTok Business API
+                      </h3>
+                      <span className="bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                        <CheckCheck className="w-3.5 h-3.5" />
+                        <span>Connecté</span>
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                      Publication vidéo HD instantanée et suivi des statistiques de diffusion TikTok.
+                    </p>
+
+                    <div className="flex items-center gap-2 mt-2 text-xs text-slate-500 font-medium">
+                      <span className="text-slate-800 font-semibold">{currentIgUsername}_tiktok</span>
+                      <span>•</span>
+                      <span>Direct Video API Ready</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="shrink-0 self-start md:self-center">
                   <button
                     type="button"
-                    onClick={() => showToast('🔄 Synchronisation TikTok OK.')}
-                    className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 shadow-2xs"
+                    onClick={() => showToast('🔄 Paramètres TikTok Business à jour.')}
+                    className="bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2 hover:border-slate-300 active:scale-[0.98] cursor-pointer"
                   >
-                    Vérifier
+                    <span>Gérer</span>
                   </button>
                 </div>
               </div>
 
-              {/* LinkedIn API */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 opacity-80">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-[#0077B5] text-white flex items-center justify-center font-black text-base shadow-sm">
+              {/* ---------------------------------------------------------------
+                  LIGNE 3 : LINKEDIN COMPANY PAGES (NON CONNECTÉ)
+                  --------------------------------------------------------------- */}
+              <div className="p-5 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  {/* Pastille Bleue LinkedIn */}
+                  <div className="bg-[#0077B5] text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
                     in
                   </div>
+
                   <div>
-                    <div className="text-xs font-black text-[#0F172A] flex items-center gap-2">
-                      <span>LinkedIn Company Pages</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-xs sm:text-sm font-bold text-slate-900">
+                        LinkedIn Company Pages
+                      </h3>
+                      <span className="bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold px-2.5 py-0.5 rounded-full">
                         Non configuré
                       </span>
                     </div>
-                    <div className="text-[11px] text-slate-500">
-                      Publiez des articles et carrousels B2B automatiquement
-                    </div>
+
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                      Publiez des carrousels PDF, articles et mises à jour pour les comptes professionnels B2B.
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="shrink-0 self-start md:self-center">
                   <button
                     type="button"
-                    onClick={() => showToast('🔗 Connexion OAuth LinkedIn initiée...')}
-                    className="px-3 py-1.5 bg-[#0077B5] hover:bg-[#006097] text-white text-xs font-bold rounded-xl shadow-xs"
+                    onClick={() => showToast('🔗 Redirection vers OAuth 2.0 LinkedIn en cours...')}
+                    className="bg-white hover:bg-blue-50/50 text-[#0077B5] border border-[#0077B5]/30 hover:border-[#0077B5] px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all flex items-center gap-2 active:scale-[0.98] cursor-pointer"
                   >
-                    Connecter le compte
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Connecter le compte</span>
                   </button>
                 </div>
               </div>
 
-              {/* X / Twitter API */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 opacity-80">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-base shadow-sm">
+              {/* ---------------------------------------------------------------
+                  LIGNE 4 : X (TWITTER) API V2
+                  --------------------------------------------------------------- */}
+              <div className="p-5 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
                     𝕏
                   </div>
+
                   <div>
-                    <div className="text-xs font-black text-[#0F172A] flex items-center gap-2">
-                      <span>X (Twitter) API v2</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-xs sm:text-sm font-bold text-slate-900">
+                        X (Twitter) API v2
+                      </h3>
+                      <span className="bg-slate-100 text-slate-500 border border-slate-200 text-xs font-semibold px-2.5 py-0.5 rounded-full">
                         Optionnel
                       </span>
                     </div>
-                    <div className="text-[11px] text-slate-500">
-                      Gestion des threads et micro-publications
-                    </div>
+
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                      Diffusion de threads instantanés et micro-annonces officielles.
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="shrink-0 self-start md:self-center">
                   <button
                     type="button"
                     onClick={() => showToast('🔗 Connexion X / Twitter initiée...')}
-                    className="px-3 py-1.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl shadow-xs"
+                    className="bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2 hover:border-slate-300 active:scale-[0.98] cursor-pointer"
                   >
-                    Connecter
+                    <span>Connecter</span>
                   </button>
                 </div>
               </div>
 
             </div>
-          </div>
 
+          </div>
         </div>
       )}
 
@@ -521,191 +605,151 @@ export default function SettingsPage() {
           --------------------------------------------------------------------- */}
       {activeTab === 'whatsapp' && (
         <div className="space-y-6">
-          
-          <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
-            <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
+          <div className="bg-white border border-slate-200/70 rounded-3xl shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] p-6 md:p-8 space-y-6">
+            
+            <div className="border-b border-slate-100 pb-4">
+              <h2 className="text-base sm:text-lg font-bold text-[#0F172A]">
+                Passerelle WhatsApp & Modèles de Relance
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Personnalisez les messages automatiques envoyés à vos clients lors de la soumission de plannings.
+              </p>
+            </div>
+
+            <div className="space-y-4 text-xs font-semibold">
               <div>
-                <h2 className="text-base sm:text-lg font-black text-[#0F172A] flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-[#10B981]" />
-                  <span>Passerelle WhatsApp & Modèles de Relance Automatiques</span>
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Personnalisez les messages envoyés à vos clients pour l'envoi de liens magiques et les relances.
-                </p>
+                <label className="block text-slate-700 uppercase tracking-wider mb-1.5">
+                  Ligne Émettrice WhatsApp Officielle
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={waSenderPhone}
+                    onChange={(e) => setWaSenderPhone(e.target.value)}
+                    className="w-full max-w-sm p-3 bg-slate-50/70 border border-slate-200 rounded-xl text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
+                  />
+                  <span className="px-3 py-2 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                    <CheckCheck className="w-4 h-4" />
+                    Connecté API WhatsApp Cloud
+                  </span>
+                </div>
               </div>
 
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
-                🟢 API WhatsApp Active
-              </span>
-            </div>
+              <div className="space-y-3 pt-2">
+                <div>
+                  <label className="block text-slate-700 uppercase tracking-wider mb-1">
+                    Modèle 1 : Envoi Initial du Planning
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={template1}
+                    onChange={(e) => setTemplate1(e.target.value)}
+                    className="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl text-slate-900 font-normal focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
+                  />
+                </div>
 
-            {/* Numéro Expéditeur */}
-            <div className="max-w-md space-y-1.5 text-xs font-bold">
-              <label className="block text-slate-700 uppercase tracking-wider">
-                Numéro WhatsApp Expéditeur de l'Agence
-              </label>
-              <input
-                type="tel"
-                value={waSenderPhone}
-                onChange={(e) => setWaSenderPhone(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 font-bold focus:bg-white focus:outline-none"
-              />
-            </div>
+                <div>
+                  <label className="block text-slate-700 uppercase tracking-wider mb-1">
+                    Modèle 2 : Relance avant Expiration (H-12)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={template2}
+                    onChange={(e) => setTemplate2(e.target.value)}
+                    className="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl text-slate-900 font-normal focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
+                  />
+                </div>
 
-            {/* Tags Dynamiques Rappel */}
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center gap-2 flex-wrap text-[11px] font-semibold text-slate-600">
-              <span className="text-slate-400 font-bold">Variables disponibles :</span>
-              <span className="bg-white px-2 py-0.5 rounded-md border border-slate-200 font-mono text-[#F94F06] font-bold">{'{client_name}'}</span>
-              <span className="bg-white px-2 py-0.5 rounded-md border border-slate-200 font-mono text-[#0066FF] font-bold">{'{validation_link}'}</span>
-              <span className="bg-white px-2 py-0.5 rounded-md border border-slate-200 font-mono text-emerald-600 font-bold">{'{expiration_time}'}</span>
-            </div>
-
-            {/* 3 Modèles */}
-            <div className="space-y-4 text-xs font-bold">
-              
-              {/* Modèle 1 */}
-              <div className="space-y-1.5">
-                <label className="block text-[#0F172A] flex items-center justify-between">
-                  <span>Modèle 1 : Envoi du planning hebdomadaire</span>
-                  <span className="text-slate-400 font-normal">Message initial</span>
-                </label>
-                <textarea
-                  rows={2}
-                  value={template1}
-                  onChange={(e) => setTemplate1(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:bg-white focus:outline-none"
-                />
-              </div>
-
-              {/* Modèle 2 */}
-              <div className="space-y-1.5">
-                <label className="block text-[#0F172A] flex items-center justify-between">
-                  <span>Modèle 2 : Relance avant expiration du lien</span>
-                  <span className="text-amber-600 font-normal">Envoyé à J-24h</span>
-                </label>
-                <textarea
-                  rows={2}
-                  value={template2}
-                  onChange={(e) => setTemplate2(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:bg-white focus:outline-none"
-                />
-              </div>
-
-              {/* Modèle 3 */}
-              <div className="space-y-1.5">
-                <label className="block text-[#0F172A] flex items-center justify-between">
-                  <span>Modèle 3 : Message de remerciement après validation</span>
-                  <span className="text-emerald-600 font-normal">Clôture de session</span>
-                </label>
-                <textarea
-                  rows={2}
-                  value={template3}
-                  onChange={(e) => setTemplate3(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:bg-white focus:outline-none"
-                />
+                <div>
+                  <label className="block text-slate-700 uppercase tracking-wider mb-1">
+                    Modèle 3 : Confirmation de Validation Intégrale
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={template3}
+                    onChange={(e) => setTemplate3(e.target.value)}
+                    className="w-full p-3 bg-slate-50/70 border border-slate-200 rounded-xl text-slate-900 font-normal focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
+                  />
+                </div>
               </div>
 
             </div>
 
           </div>
-
         </div>
       )}
 
       {/* ---------------------------------------------------------------------
-          ONGLET 4 : MEMBRES DE L'ÉQUIPE & RÔLES
+          ONGLET 4 : ÉQUIPE & RÔLES
           --------------------------------------------------------------------- */}
       {activeTab === 'team' && (
         <div className="space-y-6">
-          
-          <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
-            <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="bg-white border border-slate-200/70 rounded-3xl shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] p-6 md:p-8 space-y-6">
+            
+            <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-base sm:text-lg font-black text-[#0F172A]">
-                  Collaborateurs de l'Agence
+                <h2 className="text-base sm:text-lg font-bold text-[#0F172A]">
+                  Collaborateurs & Gestion des Rôles
                 </h2>
-                <p className="text-xs text-slate-500">
-                  Gérez les accès de vos Community Managers, graphistes et chefs de projets.
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Gérez les accès de vos Community Managers, graphistes et responsables de comptes.
                 </p>
               </div>
+
+              <form onSubmit={handleInviteMember} className="flex items-center gap-2">
+                <input
+                  type="email"
+                  placeholder="nom@agence.com"
+                  value={newMemberEmail}
+                  onChange={(e) => setNewMemberEmail(e.target.value)}
+                  className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="px-3.5 py-2 bg-[#F94F06] hover:bg-[#e04605] text-white text-xs font-semibold rounded-xl shadow-xs transition-all cursor-pointer shrink-0"
+                >
+                  + Inviter
+                </button>
+              </form>
             </div>
 
-            {/* Formulaire Invitation Rapide */}
-            <form onSubmit={handleInviteMember} className="flex flex-col sm:flex-row items-stretch gap-2">
-              <input
-                type="email"
-                placeholder="email.collaborateur@agence.sn"
-                value={newMemberEmail}
-                onChange={(e) => setNewMemberEmail(e.target.value)}
-                className="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:bg-white focus:outline-none"
-              />
-              <select
-                value={newMemberRole}
-                onChange={(e) => setNewMemberRole(e.target.value as any)}
-                className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:outline-none"
-              >
-                <option value="Lead CM">Lead CM</option>
-                <option value="Graphiste UI">Graphiste UI</option>
-              </select>
-              <button
-                type="submit"
-                className="px-4 py-2.5 bg-[#F94F06] hover:bg-[#e04605] text-white text-xs font-black rounded-xl shadow-md shadow-[#F94F06]/20 flex items-center justify-center gap-1.5 shrink-0"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Inviter</span>
-              </button>
-            </form>
+            <div className="space-y-2">
+              {teamMembers.map((member) => (
+                <div
+                  key={member.id}
+                  className="p-3.5 rounded-2xl bg-slate-50/60 border border-slate-200/80 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={member.avatar}
+                      alt={member.name}
+                      className="w-9 h-9 rounded-xl object-cover ring-2 ring-white shadow-xs"
+                    />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
+                        <span>{member.name}</span>
+                        {member.role === 'Admin / Owner' && (
+                          <span className="text-[10px] bg-amber-500/10 text-amber-600 border border-amber-500/20 font-bold px-2 py-0.2 rounded-full">
+                            Owner
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-slate-500">
+                        {member.email} · <strong className="text-slate-700 font-semibold">{member.role}</strong>
+                      </div>
+                    </div>
+                  </div>
 
-            {/* Tableau Collaborateurs */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-slate-100 text-[10px] uppercase font-black tracking-wider text-slate-400">
-                    <th className="pb-3">Collaborateur</th>
-                    <th className="pb-3">Rôle</th>
-                    <th className="pb-3">Statut</th>
-                    <th className="pb-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                  {teamMembers.map((member) => (
-                    <tr key={member.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3.5 flex items-center gap-3">
-                        <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-xl object-cover ring-1 ring-slate-200" />
-                        <div>
-                          <div className="font-extrabold text-[#0F172A]">{member.name}</div>
-                          <div className="text-[11px] text-slate-400 font-normal">{member.email}</div>
-                        </div>
-                      </td>
-                      <td className="py-3.5 font-bold">
-                        <span className={`px-2 py-0.5 rounded-lg text-[10px] ${
-                          member.role.includes('Admin') ? 'bg-orange-100 text-orange-800' : 'bg-slate-100 text-slate-700'
-                        }`}>
-                          {member.role}
-                        </span>
-                      </td>
-                      <td className="py-3.5">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          {member.status === 'active' ? '✓ Actif' : 'Invité'}
-                        </span>
-                      </td>
-                      <td className="py-3.5 text-right">
-                        <button
-                          type="button"
-                          onClick={() => showToast(`⚙️ Modification des droits de ${member.name}...`)}
-                          className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 shadow-2xs"
-                        >
-                          Gérer
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                      ✓ Actif
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
 
           </div>
-
         </div>
       )}
 
@@ -714,89 +758,60 @@ export default function SettingsPage() {
           --------------------------------------------------------------------- */}
       {activeTab === 'security' && (
         <div className="space-y-6">
-          
-          {/* Mot de passe */}
-          <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-            <h2 className="text-base font-black text-[#0F172A] flex items-center gap-2">
-              <Lock className="w-4 h-4 text-[#F94F06]" />
-              <span>Changer le Mot de Passe de l'Agence</span>
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold max-w-2xl">
-              <div>
-                <label className="block text-slate-700 uppercase tracking-wider mb-1">Mot de passe actuel</label>
-                <input type="password" placeholder="••••••••••••" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl" />
-              </div>
-              <div>
-                <label className="block text-slate-700 uppercase tracking-wider mb-1">Nouveau mot de passe</label>
-                <input type="password" placeholder="••••••••••••" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl" />
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => showToast('🔒 Mot de passe mis à jour avec succès !')}
-              className="px-4 py-2 bg-slate-900 hover:bg-black text-white font-extrabold text-xs rounded-xl"
-            >
-              Mettre à jour le mot de passe
-            </button>
-          </div>
-
-          {/* Double Authentification 2FA */}
-          <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-black text-[#0F172A]">Double Authentification (2FA)</h3>
-                <p className="text-xs text-slate-500">Sécurisez les accès aux comptes de vos clients via SMS ou Google Authenticator.</p>
-              </div>
-
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={twoFactorEnabled}
-                  onChange={(e) => setTwoFactorEnabled(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10B981]"></div>
-              </label>
-            </div>
-          </div>
-
-          {/* Sessions Actives */}
-          <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
-            <h3 className="text-base font-black text-[#0F172A]">Sessions Actives Connectées</h3>
+          <div className="bg-white border border-slate-200/70 rounded-3xl shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] p-6 md:p-8 space-y-6">
             
-            <div className="space-y-2 text-xs">
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Laptop className="w-4 h-4 text-emerald-600" />
-                  <div>
-                    <div className="font-extrabold text-[#0F172A]">Safari sur Mac · Dakar, Sénégal 🇸🇳</div>
-                    <div className="text-[11px] text-slate-400">Cette session (Active maintenant)</div>
-                  </div>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">Actif</span>
-              </div>
+            <div className="border-b border-slate-100 pb-4">
+              <h2 className="text-base sm:text-lg font-bold text-[#0F172A]">
+                Sécurité & Double Authentification (2FA)
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Protégez l'accès à vos données d'agence et aux identifiants sociaux de vos clients.
+              </p>
+            </div>
 
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Smartphone className="w-4 h-4 text-slate-400" />
-                  <div>
-                    <div className="font-extrabold text-[#0F172A]">Chrome sur iPhone 15 Pro · Abidjan 🇨🇮</div>
-                    <div className="text-[11px] text-slate-400">Dernière activité : Il y a 2 jours</div>
-                  </div>
+            <div className="space-y-4">
+              <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-200/80 flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xs font-bold text-slate-900">
+                    Double Authentification (SMS & Authenticator)
+                  </h3>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Exige un code de confirmation lors des connexions depuis un nouvel appareil.
+                  </p>
                 </div>
+
                 <button
                   type="button"
-                  onClick={() => showToast('🔌 Session mobile déconnectée.')}
-                  className="text-rose-600 font-bold text-[11px] hover:underline"
+                  onClick={() => {
+                    setTwoFactorEnabled(!twoFactorEnabled);
+                    showToast(twoFactorEnabled ? '2FA désactivée' : '2FA activée avec succès');
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    twoFactorEnabled
+                      ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}
                 >
-                  Déconnecter
+                  {twoFactorEnabled ? '✓ Activée' : 'Désactivée'}
                 </button>
               </div>
-            </div>
-          </div>
 
+              <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-200/80 flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xs font-bold text-slate-900">
+                    Durée de validité des Liens Magiques WhatsApp
+                  </h3>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Les liens expirent automatiquement pour garantir la fraîcheur des contenus.
+                  </p>
+                </div>
+                <span className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-800 font-bold text-xs">
+                  48 Heures (Défaut)
+                </span>
+              </div>
+            </div>
+
+          </div>
         </div>
       )}
 
