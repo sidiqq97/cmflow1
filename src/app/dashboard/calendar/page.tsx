@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import {
   Calendar as CalendarIcon,
@@ -27,9 +27,21 @@ import {
   Check,
   Share2,
   ExternalLink,
-  MessageSquare
+  MessageSquare,
+  Image as ImageIcon,
+  Film,
+  Play,
+  RotateCcw,
+  Heart,
+  Bookmark,
+  MoreHorizontal,
+  CheckCheck,
+  FolderOpen,
+  Sliders,
+  CheckSquare,
+  Square
 } from 'lucide-react';
-import { useClient } from '../../../context/ClientContext';
+import { useWorkspace } from '../../../context/WorkspaceContext';
 
 // Types
 export type SocialNetwork = 'instagram' | 'facebook' | 'tiktok' | 'linkedin';
@@ -48,6 +60,15 @@ export interface CalendarPost {
   mediaType: 'image' | 'video' | 'carousel';
   carouselCount?: number;
   likesEst?: number;
+}
+
+export interface BrandAsset {
+  id: string;
+  title: string;
+  url: string;
+  type: 'image' | 'video';
+  duration?: string;
+  category: string;
 }
 
 // Données Mockées Réalistes (Teranga Gourmet & autres)
@@ -127,6 +148,53 @@ const INITIAL_CALENDAR_POSTS: CalendarPost[] = [
   }
 ];
 
+// Bibliothèque d'assets par défaut
+const BRAND_ASSETS_LIBRARY: BrandAsset[] = [
+  {
+    id: 'asset-1',
+    title: 'Thiéboudienne Royal & Dorade',
+    url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80',
+    type: 'image',
+    category: 'Plats Chauds',
+  },
+  {
+    id: 'asset-2',
+    title: 'Coulisses Cuisine Chef Moussa (Reel)',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-cooking-fresh-pasta-in-a-kitchen-42795-large.mp4',
+    type: 'video',
+    duration: '0:32',
+    category: 'Reels / Vidéos',
+  },
+  {
+    id: 'asset-3',
+    title: 'Plateau Pastels Chauds Croustillants',
+    url: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80',
+    type: 'image',
+    category: 'Entrées',
+  },
+  {
+    id: 'asset-4',
+    title: 'Terrasse Vue Mer & Ambiance Soir',
+    url: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&auto=format&fit=crop&q=80',
+    type: 'image',
+    category: 'Ambiance',
+  },
+  {
+    id: 'asset-5',
+    title: 'Jus de Bissap Menthe Glacé',
+    url: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=800&auto=format&fit=crop&q=80',
+    type: 'image',
+    category: 'Boissons',
+  },
+  {
+    id: 'asset-6',
+    title: 'Dressage Salade Mangue & Crevettes',
+    url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop&q=80',
+    type: 'image',
+    category: 'Entrées',
+  }
+];
+
 // Jours de la semaine
 const DAYS_OF_WEEK = [
   { key: '2026-08-24', name: 'Lun', fullName: 'Lundi', dateNum: '24' },
@@ -139,10 +207,9 @@ const DAYS_OF_WEEK = [
 ];
 
 export default function CalendarPage() {
-  // Récupération de la marque active via le ClientContext universel
-  const { activeClient } = useClient();
+  const { activeWorkspace } = useWorkspace();
 
-  // État local
+  // État local des publications
   const [posts, setPosts] = useState<CalendarPost[]>(INITIAL_CALENDAR_POSTS);
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [selectedNetworkFilter, setSelectedNetworkFilter] = useState<string>('all');
@@ -151,34 +218,109 @@ export default function CalendarPage() {
   // Modales
   const [isValidationModalOpen, setIsValidationModalOpen] = useState(false);
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
+  const [isAssetLibraryOpen, setIsAssetLibraryOpen] = useState(false);
   const [previewPost, setPreviewPost] = useState<CalendarPost | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Formulaire Nouveau Post
-  const [newCaption, setNewCaption] = useState('');
-  const [newNetwork, setNewNetwork] = useState<SocialNetwork>('instagram');
-  const [newDate, setNewDate] = useState('2026-08-24');
-  const [newTime, setNewTime] = useState('18:00');
-  const [newStatus, setNewStatus] = useState<PostStatus>('pending_validation');
-  const [newMediaUrl, setNewMediaUrl] = useState('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80');
+  // Formulaire Nouveau Post enrichi
+  const [caption, setCaption] = useState('');
+  const [targetPlatforms, setTargetPlatforms] = useState<SocialNetwork[]>(['instagram', 'facebook']);
+  const [scheduledDate, setScheduledDate] = useState('2026-08-24');
+  const [scheduledTime, setScheduledTime] = useState('18:30');
+  const [initialStatus, setInitialStatus] = useState<PostStatus>('pending_validation');
+
+  // Gestion des Médias
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
+  const [mediaType, setMediaType] = useState<'IMAGE' | 'VIDEO' | 'CAROUSEL'>('IMAGE');
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [activeCarouselIndex, setActiveCarouselIndex] = useState(0);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // Traitement d'importation de fichiers (Drag & Drop ou File Dialog)
+  const handleFilesSelected = (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    if (fileArray.length === 0) return;
+
+    const newPreviews: string[] = [];
+    let detectedType: 'IMAGE' | 'VIDEO' | 'CAROUSEL' = 'IMAGE';
+
+    fileArray.forEach((file) => {
+      const url = URL.createObjectURL(file);
+      newPreviews.push(url);
+      if (file.type.startsWith('video/')) {
+        detectedType = 'VIDEO';
+      }
+    });
+
+    if (newPreviews.length > 1) {
+      detectedType = 'CAROUSEL';
+    }
+
+    setMediaFiles(fileArray);
+    setMediaPreviews(newPreviews);
+    setMediaType(detectedType);
+    setSelectedAssetId(null);
+    setActiveCarouselIndex(0);
+    triggerToast(`📁 ${fileArray.length} média(s) chargé(s) avec succès !`);
+  };
+
+  // Sélection depuis la Médiathèque
+  const handleSelectAsset = (asset: BrandAsset) => {
+    setMediaFiles([]);
+    setMediaPreviews([asset.url]);
+    setMediaType(asset.type === 'video' ? 'VIDEO' : 'IMAGE');
+    setSelectedAssetId(asset.id);
+    setActiveCarouselIndex(0);
+    setIsAssetLibraryOpen(false);
+    triggerToast(`🖼️ Visuel « ${asset.title} » sélectionné !`);
+  };
+
+  // Suppression du média
+  const handleRemoveMedia = () => {
+    setMediaFiles([]);
+    setMediaPreviews([]);
+    setMediaType('IMAGE');
+    setSelectedAssetId(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    triggerToast('🗑️ Média retiré.');
+  };
+
+  // Toggle plateforme cible
+  const togglePlatform = (platform: SocialNetwork) => {
+    if (targetPlatforms.includes(platform)) {
+      if (targetPlatforms.length > 1) {
+        setTargetPlatforms(targetPlatforms.filter((p) => p !== platform));
+      } else {
+        triggerToast('⚠️ Veuillez conserver au moins un réseau cible.');
+      }
+    } else {
+      setTargetPlatforms([...targetPlatforms, platform]);
+    }
   };
 
   // Filtrage des posts pour la marque active
+  const currentWorkspaceId = activeWorkspace?.id || 'teranga-gourmet';
+  const currentWorkspaceName = activeWorkspace?.name || 'Teranga Gourmet';
+  const currentWorkspaceFlag = activeWorkspace?.flag || '🇸🇳';
+  const currentWorkspaceWhatsapp = activeWorkspace?.whatsappNumber || '+221 77 800 12 34';
+
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
-      if (post.clientId !== activeClient.id) return false;
+      if (post.clientId !== currentWorkspaceId && post.clientId !== 'teranga-gourmet') return false;
       if (selectedNetworkFilter !== 'all' && post.network !== selectedNetworkFilter) return false;
       if (selectedStatusFilter !== 'all' && post.status !== selectedStatusFilter) return false;
       return true;
     });
-  }, [posts, activeClient.id, selectedNetworkFilter, selectedStatusFilter]);
+  }, [posts, currentWorkspaceId, selectedNetworkFilter, selectedStatusFilter]);
 
   // KPIs
-  const totalPostsMonth = 28;
   const pendingPostsCount = useMemo(() => filteredPosts.filter((p) => p.status === 'pending_validation').length, [filteredPosts]);
   const validatedPostsCount = useMemo(() => filteredPosts.filter((p) => p.status === 'validated').length, [filteredPosts]);
   const scheduledPostsCount = useMemo(() => filteredPosts.filter((p) => p.status === 'scheduled').length, [filteredPosts]);
@@ -186,95 +328,83 @@ export default function CalendarPage() {
   // Soumission Création Post
   const handleCreatePostSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCaption.trim()) return;
+    if (!caption.trim() && mediaPreviews.length === 0) {
+      triggerToast('⚠️ Veuillez ajouter au moins un média ou une légende.');
+      return;
+    }
+
+    const primaryNetwork = targetPlatforms[0] || 'instagram';
+    const mainMedia = mediaPreviews[0] || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80';
 
     const newPost: CalendarPost = {
       id: `post-${Date.now()}`,
-      clientId: activeClient.id,
-      network: newNetwork,
-      status: newStatus,
-      scheduledDate: newDate,
-      scheduledTime: newTime,
-      caption: newCaption,
-      mediaUrl: newMediaUrl,
-      mediaType: 'image',
-      likesEst: 160,
+      clientId: currentWorkspaceId,
+      network: primaryNetwork,
+      status: initialStatus,
+      scheduledDate,
+      scheduledTime,
+      caption,
+      mediaUrl: mainMedia,
+      mediaType: mediaType === 'VIDEO' ? 'video' : mediaType === 'CAROUSEL' ? 'carousel' : 'image',
+      carouselCount: mediaPreviews.length > 1 ? mediaPreviews.length : undefined,
+      likesEst: Math.floor(Math.random() * 400) + 50,
     };
 
     setPosts([newPost, ...posts]);
     setIsCreatePostModalOpen(false);
-    setNewCaption('');
-    triggerToast('✨ Publication ajoutée au calendrier avec succès !');
+
+    // Reset formulaire
+    setCaption('');
+    setMediaFiles([]);
+    setMediaPreviews([]);
+    setMediaType('IMAGE');
+
+    triggerToast('🎉 Publication programmée et ajoutée au calendrier !');
   };
 
-  // Supprimer un post
-  const handleDeletePost = (id: string) => {
-    setPosts(posts.filter((p) => p.id !== id));
-    triggerToast('🗑️ Publication supprimée.');
-  };
+  const magicLink = `https://cmflow.sn/v/${currentWorkspaceId}-${Date.now().toString(36).slice(-4)}`;
+  const whatsappText = `Bonjour ${currentWorkspaceName} ! 🌟 Votre planning hebdomadaire de publications est prêt pour validation sur votre mobile en 1 clic sans mot de passe : ${magicLink}`;
 
-  // Dupliquer un post
-  const handleDuplicatePost = (post: CalendarPost) => {
-    const copy: CalendarPost = {
-      ...post,
-      id: `post-${Date.now()}`,
-      caption: `[Copie] ${post.caption}`,
-      status: 'draft',
-    };
-    setPosts([copy, ...posts]);
-    triggerToast('📋 Publication dupliquée en brouillon.');
-  };
-
-  // Lien Magique WhatsApp
-  const magicValidationUrl = `https://cmflow.sn/v/${activeClient.id}-a8f9`;
-  const whatsappText = `Bonjour ! Votre planning pour ${activeClient.name} est prêt pour validation : ${magicValidationUrl} 🚀`;
-
-  // Rendu de l'icône réseau
-  const renderNetworkIcon = (network: SocialNetwork, className = 'w-3.5 h-3.5') => {
+  const renderNetworkIcon = (network: SocialNetwork, className = 'w-4 h-4') => {
     switch (network) {
       case 'instagram':
         return <Instagram className={`${className} text-[#E1306C]`} />;
       case 'facebook':
         return <Facebook className={`${className} text-[#1877F2]`} />;
-      case 'linkedin':
-        return <Linkedin className={`${className} text-[#0A66C2]`} />;
       case 'tiktok':
-        return (
-          <span className={`${className} font-black text-slate-900 inline-flex items-center justify-center text-[10px] leading-none`}>
-            TT
-          </span>
-        );
+        return <Video className={`${className} text-black`} />;
+      case 'linkedin':
+        return <Linkedin className={`${className} text-[#0077B5]`} />;
     }
   };
 
-  // Rendu badge de statut
   const renderStatusBadge = (status: PostStatus) => {
     switch (status) {
       case 'draft':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
             <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
             Brouillon
           </span>
         );
       case 'pending_validation':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 border border-amber-500/25">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
             En attente WhatsApp
           </span>
         );
       case 'validated':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/25">
-            <CheckCircle2 className="w-3 h-3 text-[#10B981]" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <CheckCheck className="w-3 h-3 text-emerald-600" />
             Validé client
           </span>
         );
       case 'scheduled':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/25">
-            <Send className="w-3 h-3 text-[#0066FF]" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+            <Clock className="w-3 h-3 text-blue-600" />
             Programmé
           </span>
         );
@@ -286,24 +416,30 @@ export default function CalendarPage() {
       
       {/* Toast Flottant */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-bounce">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom-5">
           <Sparkles className="w-4 h-4 text-[#F94F06]" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* =======================================================================
-          A. EN-TÊTE STANDARD AVEC TITRE + ACTIONS
+          A. EN-TÊTE DE PAGE & ACTIONS RAPIDES
           ======================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1.5">
+            <span>CMFlow</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-600 font-medium">Planning & File de publication</span>
+          </div>
+
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
-              Planning & File de Publication
+              Planning des Publications
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-50 text-[#F94F06] border border-orange-200/80">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F94F06]"></span>
-              {activeClient.name} {activeClient.flag}
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>{currentWorkspaceName} {currentWorkspaceFlag}</span>
             </span>
           </div>
           <p className="text-sm text-slate-500 mt-1">
@@ -311,467 +447,183 @@ export default function CalendarPage() {
           </p>
         </div>
 
-        {/* Droite : Segmented Control & Boutons d'Action */}
-        <div className="flex items-center flex-wrap gap-3">
-          
-          {/* Segmented-Control Vue */}
-          <div className="bg-slate-100/90 backdrop-blur-sm p-1 rounded-2xl flex items-center border border-slate-200/70 text-xs font-bold text-slate-600">
-            <button
-              type="button"
-              onClick={() => setViewMode('week')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all duration-200 ${
-                viewMode === 'week' ? 'bg-white text-[#0F172A] shadow-xs' : 'hover:text-slate-900'
-              }`}
-            >
-              Semaine
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('month')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all duration-200 ${
-                viewMode === 'month' ? 'bg-white text-[#0F172A] shadow-xs' : 'hover:text-slate-900'
-              }`}
-            >
-              Mois
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('list')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all duration-200 ${
-                viewMode === 'list' ? 'bg-white text-[#0F172A] shadow-xs' : 'hover:text-slate-900'
-              }`}
-            >
-              Liste
-            </button>
-          </div>
-
-          {/* Bouton WhatsApp Validation (#10B981) */}
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
+          {/* Bouton Validation WhatsApp */}
           <button
             type="button"
             onClick={() => setIsValidationModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#10B981]/10 hover:bg-[#10B981]/20 text-[#059669] border border-[#10B981]/30 transition-all duration-200 active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold bg-[#10B981]/10 hover:bg-[#10B981]/20 text-[#059669] border border-[#10B981]/30 transition-all duration-200 active:scale-[0.98] cursor-pointer"
           >
-            <Send className="w-3.5 h-3.5 text-[#10B981]" />
-            <span className="hidden sm:inline">Envoyer pour validation</span>
-            <span className="sm:hidden">WhatsApp</span>
+            <Send className="w-4 h-4 text-[#10B981]" />
+            <span>Envoyer pour validation</span>
           </button>
 
-          {/* Bouton Principal Orange Électrique (#F94F06) */}
+          {/* Bouton Nouveau Post Principal */}
           <button
             type="button"
             onClick={() => setIsCreatePostModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold bg-[#F94F06] hover:bg-[#e04605] text-white shadow-lg shadow-[#F94F06]/25 hover:shadow-[#F94F06]/40 active:scale-[0.98] transition-all duration-200"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] text-white shadow-md shadow-orange-500/20 active:scale-[0.98] transition-all duration-200 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>+ Nouveau post</span>
           </button>
-
         </div>
       </div>
 
       {/* =======================================================================
-          B. CARTES KPIS RAPIDES (4 CARTES COMPACTES)
+          B. BARRE DE FILTRES ET KPIS
           ======================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        
-        {/* KPI 1 : Posts ce mois */}
-        <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/70 shadow-xs hover:shadow-md transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Posts ce mois</span>
-            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60">+4 vs m-1</span>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Semaine</div>
+            <div className="text-xl font-bold text-slate-900 mt-0.5">{filteredPosts.length} posts</div>
           </div>
-          <div className="text-xl font-extrabold text-[#0F172A] mt-1">
-            {totalPostsMonth} publications
-          </div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            Rythme régulier maintenu
+          <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 font-bold">
+            <CalendarIcon className="w-5 h-5" />
           </div>
         </div>
 
-        {/* KPI 2 : En attente retour client */}
-        <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/70 shadow-xs hover:shadow-md transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">En attente retour</span>
-            <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-              WhatsApp
-            </span>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-semibold text-amber-600 uppercase tracking-wider">En attente WhatsApp</div>
+            <div className="text-xl font-bold text-amber-700 mt-0.5">{pendingPostsCount} posts</div>
           </div>
-          <div className="text-xl font-extrabold text-amber-600 mt-1">
-            {pendingPostsCount} posts
-          </div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            En cours d'examen client
+          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+            <Clock className="w-5 h-5" />
           </div>
         </div>
 
-        {/* KPI 3 : Validés par le client */}
-        <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/70 shadow-xs hover:shadow-md transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Validés client</span>
-            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">94% Succès</span>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider">Validés Client</div>
+            <div className="text-xl font-bold text-emerald-700 mt-0.5">{validatedPostsCount} posts</div>
           </div>
-          <div className="text-xl font-extrabold text-emerald-600 mt-1">
-            {validatedPostsCount} posts
-          </div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            Prêts pour diffusion
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+            <CheckCheck className="w-5 h-5" />
           </div>
         </div>
 
-        {/* KPI 4 : Prêts à publier */}
-        <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/70 shadow-xs hover:shadow-md transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Prêts à publier</span>
-            <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200/60">Automatique</span>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between">
+          <div>
+            <div className="text-[11px] font-semibold text-blue-600 uppercase tracking-wider">Prêts Publication</div>
+            <div className="text-xl font-bold text-blue-700 mt-0.5">{scheduledPostsCount} posts</div>
           </div>
-          <div className="text-xl font-extrabold text-purple-600 mt-1">
-            {scheduledPostsCount} posts
-          </div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            File d'attente synchronisée
+          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+            <Send className="w-5 h-5" />
           </div>
         </div>
-
       </div>
 
       {/* =======================================================================
-          C. BARRE D'OUTILS & FILTRES CALENDRIER
+          C. GRILLE HEBDOMADAIRE DU PLANNING
           ======================================================================= */}
-      <div className="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 shadow-xs">
-        
-        {/* Navigation Date */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 bg-slate-100/80 border border-slate-200/80 rounded-xl p-1">
-            <button
-              type="button"
-              onClick={() => triggerToast('Semaine précédente')}
-              className="p-1.5 hover:bg-white rounded-lg text-slate-600 transition-all"
-              title="Précédent"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              className="px-2.5 py-1 text-xs font-bold text-slate-800 hover:bg-white rounded-lg transition-all"
-            >
-              Aujourd'hui
-            </button>
-            <button
-              type="button"
-              onClick={() => triggerToast('Semaine suivante')}
-              className="p-1.5 hover:bg-white rounded-lg text-slate-600 transition-all"
-              title="Suivant"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
+        {DAYS_OF_WEEK.map((day) => {
+          const dayPosts = filteredPosts.filter((p) => p.scheduledDate === day.key);
+          const isToday = day.dateNum === '24';
 
-          <div className="text-xs sm:text-sm font-extrabold text-[#0F172A]">
-            Semaine du 24 au 30 Août 2026
-          </div>
-        </div>
-
-        {/* Filtres Réseaux & Statuts */}
-        <div className="flex items-center flex-wrap gap-2 text-xs">
-          
-          {/* Onglets Pilules Réseaux */}
-          <div className="flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200/70">
-            {[
-              { key: 'all', label: 'Tous' },
-              { key: 'instagram', label: 'Instagram', icon: Instagram },
-              { key: 'facebook', label: 'Facebook', icon: Facebook },
-              { key: 'tiktok', label: 'TikTok' },
-              { key: 'linkedin', label: 'LinkedIn', icon: Linkedin },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setSelectedNetworkFilter(tab.key)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
-                  selectedNetworkFilter === tab.key
-                    ? 'bg-white text-[#0F172A] shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900'
+          return (
+            <div
+              key={day.key}
+              className={`rounded-3xl border transition-all duration-300 ${
+                isToday
+                  ? 'bg-white border-[#0066FF]/40 shadow-sm ring-2 ring-[#0066FF]/10'
+                  : 'bg-white/90 backdrop-blur-sm border-slate-200/70'
+              }`}
+            >
+              <div
+                className={`p-3.5 border-b flex items-center justify-between rounded-t-3xl ${
+                  isToday ? 'bg-blue-50/70 border-blue-100' : 'bg-slate-50/60 border-slate-100'
                 }`}
               >
-                {tab.icon && <tab.icon className="w-3 h-3" />}
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Filtre Statut Dropdown */}
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5 shadow-xs">
-            <select
-              value={selectedStatusFilter}
-              onChange={(e) => setSelectedStatusFilter(e.target.value)}
-              className="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
-            >
-              <option value="all">Tous les statuts</option>
-              <option value="draft">Brouillons</option>
-              <option value="pending_validation">En attente WhatsApp</option>
-              <option value="validated">Validés client</option>
-              <option value="scheduled">Programmés</option>
-            </select>
-          </div>
-
-        </div>
-      </div>
-
-      {/* =======================================================================
-          D. LE CALENDRIER 7 JOURS INTERACTIF (LUNDI AU DIMANCHE)
-          ======================================================================= */}
-      {viewMode === 'week' && (
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-4 min-w-full md:min-w-[940px] items-start overflow-x-auto">
-          {DAYS_OF_WEEK.map((day) => {
-            const dayPosts = filteredPosts.filter((p) => p.scheduledDate === day.key);
-            const isToday = day.dateNum === '24';
-
-            return (
-              <div
-                key={day.key}
-                className={`rounded-3xl border transition-all duration-300 ${
-                  isToday
-                    ? 'bg-white border-[#0066FF]/40 shadow-md ring-2 ring-[#0066FF]/10'
-                    : 'bg-white/80 backdrop-blur-sm border-slate-200/70 hover:border-slate-300'
-                }`}
-              >
-                {/* Header du Jour */}
-                <div
-                  className={`p-3.5 border-b flex items-center justify-between rounded-t-3xl ${
-                    isToday
-                      ? 'bg-gradient-to-r from-blue-50/80 to-indigo-50/50 border-blue-100'
-                      : 'bg-slate-50/60 border-slate-100'
-                  }`}
-                >
-                  <div>
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
-                      {day.fullName}
-                    </span>
-                    <span
-                      className={`text-lg font-black tracking-tight ${
-                        isToday ? 'text-[#0066FF]' : 'text-slate-900'
-                      }`}
-                    >
-                      {day.dateNum}
-                    </span>
-                  </div>
-
-                  {isToday && (
-                    <span className="text-[9px] font-black uppercase tracking-wider bg-[#0066FF] text-white px-2 py-0.5 rounded-full shadow-xs">
-                      Aujourd'hui
-                    </span>
-                  )}
-                </div>
-
-                {/* Zone de cartes journalières */}
-                <div className="p-2.5 space-y-3 min-h-[340px]">
-                  {dayPosts.length === 0 ? (
-                    <div className="h-40 flex flex-col items-center justify-center text-center p-3 border border-dashed border-slate-200 rounded-2xl text-slate-400 group hover:border-[#0066FF]/50 transition-colors">
-                      <span className="text-[11px] font-medium text-slate-400">Aucun post</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setNewDate(day.key);
-                          setIsCreatePostModalOpen(true);
-                        }}
-                        className="mt-2 text-[11px] font-extrabold text-[#0066FF] hover:underline flex items-center gap-1"
-                      >
-                        <Plus className="w-3 h-3" />
-                        <span>Planifier</span>
-                      </button>
-                    </div>
-                  ) : (
-                    dayPosts.map((post) => (
-                      <div
-                        key={post.id}
-                        className="group relative bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-                      >
-                        {/* Vignette Média HD */}
-                        <div className="relative h-32 w-full bg-slate-900 overflow-hidden">
-                          <img
-                            src={post.mediaUrl}
-                            alt="Aperçu du visuel"
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-
-                          {/* Badge Réseau Social Glassmorphism */}
-                          <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-md rounded-lg p-1.5 shadow-sm border border-white/20">
-                            {renderNetworkIcon(post.network, 'w-3.5 h-3.5')}
-                          </div>
-
-                          {/* Badge Type Média */}
-                          {post.mediaType === 'carousel' && (
-                            <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-md text-[9px] font-extrabold flex items-center gap-1">
-                              <Layers className="w-3 h-3 text-amber-300" />
-                              <span>1/{post.carouselCount || 3}</span>
-                            </div>
-                          )}
-
-                          {post.mediaType === 'video' && (
-                            <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-md text-[9px] font-extrabold flex items-center gap-1">
-                              <Video className="w-3 h-3 text-sky-400" />
-                              <span>0:45</span>
-                            </div>
-                          )}
-
-                          {/* Heure */}
-                          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/10">
-                            {post.scheduledTime}
-                          </div>
-                        </div>
-
-                        {/* Contenu & Typographie */}
-                        <div className="p-3 space-y-2">
-                          <p className="text-[11px] text-slate-700 line-clamp-2 leading-relaxed font-medium">
-                            {post.caption}
-                          </p>
-
-                          {/* Pied de Carte avec Statut */}
-                          <div className="pt-1 flex items-center justify-between border-t border-slate-100">
-                            {renderStatusBadge(post.status)}
-                          </div>
-                        </div>
-
-                        {/* Actions au survol (Hover Actions) */}
-                        <div className="absolute inset-0 bg-[#0F172A]/90 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-2 p-3 text-white">
-                          <button
-                            type="button"
-                            title="Prévisualiser"
-                            onClick={() => setPreviewPost(post)}
-                            className="p-2 rounded-xl bg-white/20 hover:bg-white text-white hover:text-slate-900 transition-all"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-
-                          <button
-                            type="button"
-                            title="Dupliquer"
-                            onClick={() => handleDuplicatePost(post)}
-                            className="p-2 rounded-xl bg-white/20 hover:bg-white text-white hover:text-slate-900 transition-all"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
-
-                          <button
-                            type="button"
-                            title="Modifier"
-                            onClick={() => triggerToast('Édition de la publication')}
-                            className="p-2 rounded-xl bg-white/20 hover:bg-white text-white hover:text-slate-900 transition-all"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-
-                          <button
-                            type="button"
-                            title="Supprimer"
-                            onClick={() => handleDeletePost(post.id)}
-                            className="p-2 rounded-xl bg-rose-500/40 hover:bg-rose-500 text-rose-200 hover:text-white transition-all"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* =======================================================================
-          VUE LISTE ÉPURÉE (ALTERNATE VIEW)
-          ======================================================================= */}
-      {(viewMode === 'list' || viewMode === 'month') && (
-        <div className="bg-white/90 backdrop-blur-md rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-slate-50/70 font-bold text-[11px] uppercase tracking-wider text-slate-500 grid grid-cols-12 gap-4">
-            <div className="col-span-2">Date & Heure</div>
-            <div className="col-span-2">Canal</div>
-            <div className="col-span-5">Visuel & Légende</div>
-            <div className="col-span-2">Statut</div>
-            <div className="col-span-1 text-right">Actions</div>
-          </div>
-
-          <div className="divide-y divide-slate-100">
-            {filteredPosts.map((post) => (
-              <div
-                key={post.id}
-                className="p-4 grid grid-cols-12 gap-4 items-center hover:bg-slate-50/80 transition-colors text-xs"
-              >
-                <div className="col-span-2 font-bold text-slate-900">
-                  {post.scheduledDate} · {post.scheduledTime}
-                </div>
-
-                <div className="col-span-2 flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-slate-100">
-                    {renderNetworkIcon(post.network)}
-                  </div>
-                  <span className="font-bold capitalize text-slate-700">
-                    {post.network}
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    {day.name}
+                  </span>
+                  <span className={`text-lg font-black tracking-tight ${isToday ? 'text-[#0066FF]' : 'text-slate-900'}`}>
+                    {day.dateNum}
                   </span>
                 </div>
-
-                <div className="col-span-5 flex items-center gap-3">
-                  <img
-                    src={post.mediaUrl}
-                    alt="Thumbnail"
-                    className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
-                  />
-                  <p className="text-slate-700 truncate font-medium">
-                    {post.caption}
-                  </p>
-                </div>
-
-                <div className="col-span-2">
-                  {renderStatusBadge(post.status)}
-                </div>
-
-                <div className="col-span-1 flex items-center justify-end gap-1">
-                  <button
-                    onClick={() => setPreviewPost(post)}
-                    className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
-                    title="Voir"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeletePost(post.id)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50"
-                    title="Supprimer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                {isToday && (
+                  <span className="text-[9px] font-bold uppercase bg-[#0066FF] text-white px-2 py-0.5 rounded-full shadow-xs">
+                    Aujourd'hui
+                  </span>
+                )}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+
+              <div className="p-2.5 space-y-3 min-h-[340px]">
+                {dayPosts.length === 0 ? (
+                  <div className="h-40 flex flex-col items-center justify-center text-center p-3 border border-dashed border-slate-200 rounded-2xl text-slate-400">
+                    <span className="text-[11px] font-medium text-slate-400">Aucun post</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setScheduledDate(day.key);
+                        setIsCreatePostModalOpen(true);
+                      }}
+                      className="mt-2 text-[11px] font-bold text-[#0066FF] hover:underline cursor-pointer"
+                    >
+                      + Planifier
+                    </button>
+                  </div>
+                ) : (
+                  dayPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="group relative bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 hover:shadow-md transition-all duration-200 overflow-hidden"
+                    >
+                      <div className="relative h-28 w-full bg-slate-900 overflow-hidden">
+                        <img
+                          src={post.mediaUrl}
+                          alt="Post Media"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-md rounded-lg px-2 py-0.5 shadow-sm border border-white/20 text-[10px] font-bold text-white uppercase flex items-center gap-1">
+                          {renderNetworkIcon(post.network, 'w-3 h-3')}
+                          <span>{post.network}</span>
+                        </div>
+                        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                          {post.scheduledTime}
+                        </div>
+                      </div>
+
+                      <div className="p-3 space-y-2">
+                        <p className="text-[11px] text-slate-700 line-clamp-2 leading-relaxed font-medium">
+                          {post.caption}
+                        </p>
+                        <div className="pt-1 flex items-center justify-between border-t border-slate-100">
+                          {renderStatusBadge(post.status)}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
       {/* =======================================================================
-          E. MODALE 1 : VALIDATION WHATSAPP
+          D. MODALE 1 : VALIDATION WHATSAPP
           ======================================================================= */}
       {isValidationModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 border border-slate-200 animate-fadeIn">
-            
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 border border-slate-200 animate-in fade-in">
             <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-[#10B981] border border-emerald-500/20 flex items-center justify-center">
                   <Send className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-[#0F172A]">
-                    Lien Magique de Validation
-                  </h3>
-                  <p className="text-xs text-slate-500">Pour {activeClient.name} {activeClient.flag}</p>
+                  <h3 className="text-base font-bold text-[#0F172A]">Lien Magique de Validation</h3>
+                  <p className="text-xs text-slate-500">Pour {currentWorkspaceName} {currentWorkspaceFlag}</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsValidationModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1"
+                className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -781,254 +633,490 @@ export default function CalendarPage() {
               Votre client n'a <strong>pas besoin de mot de passe</strong>. En ouvrant ce lien sécurisé, il accède à une interface mobile fluide pour valider ou commenter chaque visuel en 1 clic.
             </p>
 
-            {/* Lien Magique */}
             <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-4 flex items-center justify-between gap-2">
               <span className="text-xs font-mono text-slate-700 truncate font-semibold">
-                {magicValidationUrl}
+                {magicLink}
               </span>
               <button
                 type="button"
                 onClick={() => {
-                  navigator.clipboard.writeText(magicValidationUrl);
+                  navigator.clipboard.writeText(magicLink);
                   triggerToast('📋 Lien magique copié dans le presse-papier !');
                 }}
-                className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-[#0066FF] rounded-xl shrink-0 font-bold text-xs flex items-center gap-1 shadow-xs transition-all"
+                className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-[#0066FF] rounded-xl shrink-0 font-bold text-xs flex items-center gap-1 shadow-xs transition-all cursor-pointer"
               >
                 <Copy className="w-3.5 h-3.5" />
                 <span>Copier</span>
               </button>
             </div>
 
-            {/* Message Pré-Rempli WhatsApp */}
             <div className="mb-5 p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-xs text-emerald-900 leading-relaxed">
               <span className="font-bold block text-emerald-800 mb-1">Message prêt à envoyer :</span>
               « {whatsappText} »
             </div>
 
-            {/* Actions */}
             <div className="space-y-2">
               <a
-                href={`https://wa.me/${activeClient.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappText)}`}
+                href={`https://wa.me/${currentWorkspaceWhatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappText)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full py-3.5 px-4 rounded-2xl font-extrabold text-sm bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/25 transition-all"
+                className="w-full py-3.5 px-4 rounded-2xl font-bold text-xs bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/25 transition-all"
               >
                 <Send className="w-4 h-4" />
-                <span>Ouvrir sur WhatsApp ({activeClient.whatsapp})</span>
+                <span>Ouvrir sur WhatsApp ({currentWorkspaceWhatsapp})</span>
               </a>
 
               <button
                 type="button"
                 onClick={() => setIsValidationModalOpen(false)}
-                className="w-full py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+                className="w-full py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 Fermer
               </button>
             </div>
-
           </div>
         </div>
       )}
 
       {/* =======================================================================
-          E. MODALE 2 : CRÉATION DE POST
+          E. MODALE 2 : CRÉATION DE POST AVEC ZONE D'UPLOAD ET PREVIEW DIRECTE
           ======================================================================= */}
       {isCreatePostModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 border border-slate-200 animate-fadeIn max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full border border-slate-200/90 overflow-hidden my-auto max-h-[92vh] flex flex-col animate-in fade-in">
             
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-              <div>
-                <h3 className="text-base font-extrabold text-[#0F172A]">
-                  Créer une Publication
-                </h3>
-                <p className="text-xs text-slate-500">Pour {activeClient.name} {activeClient.flag}</p>
+            {/* Header Modale */}
+            <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#F94F06]/10 text-[#F94F06] flex items-center justify-center font-bold">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-bold text-[#0F172A]">
+                    Planifier une Publication
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Pour <strong>{currentWorkspaceName} {currentWorkspaceFlag}</strong> • Multi-canaux & Validation WhatsApp
+                  </p>
+                </div>
               </div>
+
               <button
                 onClick={() => setIsCreatePostModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1"
+                className="text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreatePostSubmit} className="space-y-4">
+            {/* Corps en 2 Colonnes (Formulaire à Gauche / Mockup Feed à Droite) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 min-h-0 overflow-y-auto">
               
-              {/* Choix Réseau */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Réseau Cible
-                </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {(['instagram', 'facebook', 'tiktok', 'linkedin'] as SocialNetwork[]).map((net) => (
-                    <button
-                      key={net}
-                      type="button"
-                      onClick={() => setNewNetwork(net)}
-                      className={`p-2.5 rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all ${
-                        newNetwork === net
-                          ? 'border-[#0066FF] bg-blue-50/70 text-[#0066FF] font-bold shadow-xs'
-                          : 'border-slate-200 hover:bg-slate-50 text-slate-600'
-                      }`}
-                    >
-                      {renderNetworkIcon(net, 'w-4 h-4')}
-                      <span className="text-[10px] capitalize">{net}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Zone Drag & Drop Média */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Visuel ou Vidéo HD
-                </label>
-                <div className="border-2 border-dashed border-slate-200 hover:border-[#0066FF] rounded-2xl p-4 text-center bg-slate-50/50 cursor-pointer transition-colors">
-                  <UploadCloud className="w-6 h-6 text-slate-400 mx-auto mb-1" />
-                  <div className="text-xs font-bold text-slate-700">Glissez-déposez votre visuel ici</div>
-                  <div className="text-[10px] text-slate-400">PNG, JPG, MP4 jusqu'à 50 Mo</div>
-                </div>
-              </div>
-
-              {/* Légende */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                    Légende & Hashtags
+              {/* COLONNE GAUCHE (60% Formulaire) */}
+              <div className="lg:col-span-7 p-5 sm:p-7 space-y-6 border-r border-slate-100 overflow-y-auto">
+                
+                {/* 1. Sélection des Canaux Sociaux */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                    Canaux de Publication
                   </label>
-                  <span className="text-[10px] text-slate-400 font-mono">
-                    {newCaption.length} caractères
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                      { id: 'instagram', label: 'Instagram', icon: <Instagram className="w-4 h-4 text-[#E1306C]" /> },
+                      { id: 'facebook', label: 'Facebook', icon: <Facebook className="w-4 h-4 text-[#1877F2]" /> },
+                      { id: 'tiktok', label: 'TikTok', icon: <Video className="w-4 h-4 text-black" /> },
+                      { id: 'linkedin', label: 'LinkedIn', icon: <Linkedin className="w-4 h-4 text-[#0077B5]" /> },
+                    ].map((platform) => {
+                      const isSelected = targetPlatforms.includes(platform.id as SocialNetwork);
+                      return (
+                        <button
+                          key={platform.id}
+                          type="button"
+                          onClick={() => togglePlatform(platform.id as SocialNetwork)}
+                          className={`p-2.5 rounded-2xl border flex items-center justify-center gap-2 text-xs font-semibold transition-all cursor-pointer ${
+                            isSelected
+                              ? 'border-[#F94F06] bg-orange-50/50 text-[#F94F06] shadow-xs'
+                              : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          {platform.icon}
+                          <span>{platform.label}</span>
+                          {isSelected && <Check className="w-3 h-3 text-[#F94F06] ml-auto" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 2. Zone d'Upload Média Intelligente ou Preview Card */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Média de la Publication ({mediaType})
+                    </label>
+                    {mediaPreviews.length > 0 && (
+                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        ✓ Média prêt
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Input file caché */}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={(e) => e.target.files && handleFilesSelected(e.target.files)}
+                    multiple
+                    accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime"
+                    className="hidden"
+                  />
+
+                  {mediaPreviews.length === 0 ? (
+                    // A. DROPZONE INITIALE
+                    <div className="space-y-2">
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          if (e.dataTransfer.files) handleFilesSelected(e.dataTransfer.files);
+                        }}
+                        className="border-2 border-dashed border-slate-200 hover:border-orange-400 bg-slate-50/50 hover:bg-orange-50/20 rounded-3xl p-6 text-center transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[200px]"
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-[#F94F06] mb-3 group-hover:scale-110 transition-transform">
+                          <UploadCloud className="w-6 h-6" />
+                        </div>
+                        <div className="text-xs font-bold text-slate-800">
+                          Glissez votre image ou vidéo ici, ou <span className="text-[#F94F06] underline">Parcourir vos fichiers</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-2 flex-wrap justify-center">
+                          <span className="px-2 py-0.5 bg-slate-200/60 rounded-md text-[10px] font-semibold text-slate-600">JPG, PNG</span>
+                          <span className="px-2 py-0.5 bg-slate-200/60 rounded-md text-[10px] font-semibold text-slate-600">MP4, MOV</span>
+                          <span className="px-2 py-0.5 bg-slate-200/60 rounded-md text-[10px] font-semibold text-slate-600">Carrousels Multiples</span>
+                          <span className="px-2 py-0.5 bg-slate-200/60 rounded-md text-[10px] font-semibold text-slate-600">Max 50 Mo</span>
+                        </div>
+                      </div>
+
+                      {/* B. BOUTON MÉDIATHÈQUE ASSETS */}
+                      <button
+                        type="button"
+                        onClick={() => setIsAssetLibraryOpen(true)}
+                        className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2 mx-auto cursor-pointer"
+                      >
+                        <FolderOpen className="w-3.5 h-3.5 text-[#0066FF]" />
+                        <span>Choisir depuis la Médiathèque Assets</span>
+                      </button>
+                    </div>
+                  ) : (
+                    // CADRE MÉDIA AVEC APERÇU & SUPPRESSION
+                    <div className="rounded-2xl overflow-hidden relative group border border-slate-200 shadow-sm bg-slate-900">
+                      {mediaType === 'VIDEO' ? (
+                        <div className="relative">
+                          <video
+                            src={mediaPreviews[0]}
+                            controls
+                            className="w-full h-56 object-cover"
+                          />
+                          <span className="absolute top-3 left-3 px-2.5 py-1 bg-purple-600/90 backdrop-blur-md text-white text-[10px] font-bold rounded-lg flex items-center gap-1 shadow-sm">
+                            <Film className="w-3 h-3" />
+                            Reel / Vidéo HD
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <img
+                            src={mediaPreviews[activeCarouselIndex] || mediaPreviews[0]}
+                            alt="Aperçu upload"
+                            className="w-full h-56 object-cover"
+                          />
+                          {mediaPreviews.length > 1 && (
+                            <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
+                              <Layers className="w-3 h-3" />
+                              <span>{activeCarouselIndex + 1} / {mediaPreviews.length}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Bouton de Suppression */}
+                      <button
+                        type="button"
+                        onClick={handleRemoveMedia}
+                        className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transition-transform hover:scale-110 cursor-pointer"
+                        title="Supprimer le média"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+
+                      {/* Bouton Remplacer */}
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute bottom-3 right-3 bg-white/90 hover:bg-white text-slate-800 px-3 py-1.5 rounded-xl text-xs font-semibold shadow-md backdrop-blur-md transition-all cursor-pointer flex items-center gap-1.5"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Remplacer</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Légende & Hashtags */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Légende & Hashtags
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      {caption.length} caractères
+                    </span>
+                  </div>
+                  <textarea
+                    rows={4}
+                    value={caption}
+                    onChange={(e) => setCaption(e.target.value)}
+                    placeholder="Rédigez votre texte captivant avec émojis et hashtags pour votre marque..."
+                    className="w-full p-3.5 bg-slate-50/70 border border-slate-200 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
+                  />
+                  {/* Boutons d'insertion rapide de hashtags */}
+                  <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                    {['#DakarFood', '#TerangaGourmet', '#Senegal', '#Foodie', '#ReelsDakar'].map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => setCaption((prev) => `${prev} ${tag}`.trim())}
+                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-[10px] font-semibold transition-colors cursor-pointer"
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. Date, Heure & Statut */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      value={scheduledDate}
+                      onChange={(e) => setScheduledDate(e.target.value)}
+                      required
+                      className="w-full p-2.5 bg-slate-50/70 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Heure
+                    </label>
+                    <input
+                      type="time"
+                      value={scheduledTime}
+                      onChange={(e) => setScheduledTime(e.target.value)}
+                      required
+                      className="w-full p-2.5 bg-slate-50/70 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Statut
+                    </label>
+                    <select
+                      value={initialStatus}
+                      onChange={(e) => setInitialStatus(e.target.value as PostStatus)}
+                      className="w-full p-2.5 bg-slate-50/70 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20"
+                    >
+                      <option value="pending_validation">Validation WhatsApp</option>
+                      <option value="draft">Brouillon</option>
+                      <option value="validated">Validé client</option>
+                      <option value="scheduled">Programmé</option>
+                    </select>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* COLONNE DROITE (40% Live Feed Preview) */}
+              <div className="lg:col-span-5 p-5 sm:p-7 bg-slate-50/70 flex flex-col items-center justify-center space-y-4">
+                <div className="w-full flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5 text-[#F94F06]" />
+                    <span>Aperçu Live Mobile Feed</span>
+                  </span>
+                  <span className="text-[10px] font-semibold text-slate-500 bg-white px-2.5 py-0.5 rounded-full border border-slate-200">
+                    Instagram & Facebook
                   </span>
                 </div>
-                <textarea
-                  rows={4}
-                  value={newCaption}
-                  onChange={(e) => setNewCaption(e.target.value)}
-                  placeholder="Rédigez votre texte captivant avec emojis et hashtags..."
-                  required
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
-                />
-              </div>
 
-              {/* Date & Heure */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                    Date
-                  </label>
-                  <input
-                    type="date"
-                    value={newDate}
-                    onChange={(e) => setNewDate(e.target.value)}
-                    required
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
-                  />
+                {/* Smartphone Card Mockup */}
+                <div className="w-full max-w-sm bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden transition-all">
+                  
+                  {/* Header Feed */}
+                  <div className="p-3 flex items-center justify-between border-b border-slate-100">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F94F06] to-amber-500 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+                        TG
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                          <span>{currentWorkspaceName}</span>
+                          <span className="text-[10px]">{currentWorkspaceFlag}</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-medium">Dakar, Sénégal • Sponsorisé</div>
+                      </div>
+                    </div>
+                    <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                  </div>
+
+                  {/* Zone Média du Mockup */}
+                  <div className="w-full h-56 bg-slate-900 relative overflow-hidden flex items-center justify-center">
+                    {mediaPreviews.length > 0 ? (
+                      mediaType === 'VIDEO' ? (
+                        <video
+                          src={mediaPreviews[0]}
+                          controls
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <img
+                          src={mediaPreviews[0]}
+                          alt="Feed preview"
+                          className="w-full h-full object-cover"
+                        />
+                      )
+                    ) : (
+                      <div className="text-center p-4 text-slate-400">
+                        <ImageIcon className="w-8 h-8 mx-auto mb-1 opacity-50" />
+                        <span className="text-xs font-semibold">Aucun média sélectionné</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actions Sociales */}
+                  <div className="p-3.5 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Heart className="w-5 h-5 text-slate-700 hover:text-red-500 cursor-pointer transition-colors" />
+                        <MessageSquare className="w-5 h-5 text-slate-700" />
+                        <Share2 className="w-5 h-5 text-slate-700" />
+                      </div>
+                      <Bookmark className="w-5 h-5 text-slate-700" />
+                    </div>
+
+                    <div className="text-[11px] font-bold text-slate-900">
+                      1 428 J'aime
+                    </div>
+
+                    {/* Légende */}
+                    <div className="text-xs text-slate-800 leading-relaxed font-normal">
+                      <strong className="font-bold mr-1.5 text-slate-900">{currentWorkspaceName}</strong>
+                      <span>{caption || 'Votre texte de publication s\'affichera ici en direct avec hashtags et émojis...'}</span>
+                    </div>
+
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider pt-1">
+                      Programmé pour le {scheduledDate} à {scheduledTime}
+                    </div>
+                  </div>
+
                 </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                    Heure
-                  </label>
-                  <input
-                    type="time"
-                    value={newTime}
-                    onChange={(e) => setNewTime(e.target.value)}
-                    required
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900"
-                  />
-                </div>
+
               </div>
 
-              {/* Statut Initial */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Statut Initial
-                </label>
-                <select
-                  value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value as PostStatus)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium"
-                >
-                  <option value="pending_validation">En attente de validation client (WhatsApp)</option>
-                  <option value="draft">Brouillon interne</option>
-                  <option value="validated">Validé par le client</option>
-                  <option value="scheduled">Prêt pour programmation</option>
-                </select>
-              </div>
+            </div>
 
-              {/* Boutons */}
-              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setIsCreatePostModalOpen(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
-                >
-                  Annuler
-                </button>
+            {/* Footer Modale avec Validation */}
+            <div className="p-4 sm:p-5 bg-white border-t border-slate-100 flex items-center justify-between shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsCreatePostModalOpen(false)}
+                className="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              >
+                Annuler
+              </button>
 
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 text-xs font-extrabold bg-[#F94F06] hover:bg-[#e04605] text-white rounded-xl shadow-lg shadow-[#F94F06]/25 transition-all"
-                >
-                  Planifier le post
-                </button>
-              </div>
-
-            </form>
+              <button
+                type="button"
+                onClick={handleCreatePostSubmit}
+                disabled={!caption.trim() && mediaPreviews.length === 0}
+                className="px-6 py-2.5 text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <Send className="w-4 h-4" />
+                <span>Programmer & Envoyer en validation WhatsApp</span>
+              </button>
+            </div>
 
           </div>
         </div>
       )}
 
       {/* =======================================================================
-          E. MODALE 3 : APERÇU HD POST
+          F. MODALE TIROIR : SÉLECTEUR DE LA MÉDIATHÈQUE ASSETS
           ======================================================================= */}
-      {previewPost && (
+      {isAssetLibraryOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 animate-fadeIn">
-            
-            <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {renderNetworkIcon(previewPost.network)}
-                <span className="text-xs font-extrabold capitalize text-slate-900">
-                  Aperçu {previewPost.network}
-                </span>
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full border border-slate-200 p-6 max-h-[85vh] flex flex-col animate-in fade-in">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div>
+                <h3 className="text-base font-bold text-slate-900">
+                  Médiathèque de la Marque ({BRAND_ASSETS_LIBRARY.length} visuels HD)
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Sélectionnez un visuel existant de {currentWorkspaceName} en 1 clic
+                </p>
               </div>
               <button
-                onClick={() => setPreviewPost(null)}
-                className="text-slate-400 hover:text-slate-600 p-1"
+                onClick={() => setIsAssetLibraryOpen(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="h-64 w-full bg-slate-900">
-              <img
-                src={previewPost.mediaUrl}
-                alt="Aperçu"
-                className="w-full h-full object-cover"
-              />
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 my-4 overflow-y-auto p-1">
+              {BRAND_ASSETS_LIBRARY.map((asset) => (
+                <div
+                  key={asset.id}
+                  onClick={() => handleSelectAsset(asset)}
+                  className="group relative rounded-2xl overflow-hidden border border-slate-200 hover:border-[#F94F06] cursor-pointer shadow-xs hover:shadow-md transition-all duration-200"
+                >
+                  <div className="h-32 w-full bg-slate-900 relative">
+                    <img
+                      src={asset.url.endsWith('.mp4') ? 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80' : asset.url}
+                      alt={asset.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    {asset.type === 'video' && (
+                      <span className="absolute top-2 left-2 px-2 py-0.5 bg-purple-600/90 text-white text-[9px] font-bold rounded-md flex items-center gap-1">
+                        <Film className="w-3 h-3" />
+                        {asset.duration}
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-2.5 bg-white">
+                    <div className="text-[11px] font-bold text-slate-900 truncate">
+                      {asset.title}
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-medium">
+                      {asset.category}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div className="p-4 space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-500">
-                  {previewPost.scheduledDate} à {previewPost.scheduledTime}
-                </span>
-                {renderStatusBadge(previewPost.status)}
-              </div>
-
-              <p className="text-xs text-slate-800 leading-relaxed font-medium">
-                {previewPost.caption}
-              </p>
-
+            <div className="pt-3 border-t border-slate-100 flex justify-end">
               <button
-                onClick={() => setPreviewPost(null)}
-                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors"
+                type="button"
+                onClick={() => setIsAssetLibraryOpen(false)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
               >
-                Fermer l'aperçu
+                Fermer
               </button>
             </div>
-
           </div>
         </div>
       )}
