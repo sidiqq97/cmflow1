@@ -5,22 +5,25 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   APP LAYOUT — STRUCTURE GLOBALE
+   APP LAYOUT — STRUCTURE GLOBALE & MASTER LAYOUT THEME
    -------------------------------------------------------------------------- */
 .app-layout {
   display: flex;
   min-height: 100vh;
-  background: var(--bg-body);
+  background: #F8FAFC;
+  color: #0F172A;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* --------------------------------------------------------------------------
-   SIDEBAR
+   SIDEBAR (Master Layout #0F172A Linear / Raycast Style)
    -------------------------------------------------------------------------- */
 .app-sidebar {
-  width: 248px;
-  min-width: 248px;
-  background: var(--bg-surface);
-  border-right: var(--border-light);
+  width: 256px;
+  min-width: 256px;
+  background: #0F172A;
+  color: #F8FAFC;
+  border-right: 1px solid rgba(51, 65, 85, 0.7);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -28,7 +31,7 @@
   left: 0;
   height: 100vh;
   z-index: 200;
-  transition: transform var(--transition-smooth);
+  transition: transform var(--transition-smooth, 0.3s ease);
   overflow-y: auto;
 }
 
@@ -36,7 +39,7 @@
 @media (max-width: 1023px) {
   .app-sidebar {
     transform: translateX(-100%);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
   }
   .app-sidebar.open {
     transform: translateX(0);
@@ -48,36 +51,38 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 22px 20px 18px;
-  border-bottom: var(--border-subtle);
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
 }
 
 .sidebar-logo-icon {
-  width: 34px;
-  height: 34px;
-  background: linear-gradient(135deg, #2563EB, #1D4ED8);
-  border-radius: var(--radius-sm);
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #F94F06, #FF6B2C);
+  border-radius: 10px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 12px rgba(249, 79, 6, 0.3);
 }
 
 .sidebar-logo-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
+  color: #ffffff;
 }
 
 .sidebar-brand-name {
-  font-family: var(--font-heading);
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
   font-weight: 800;
   font-size: 1.15rem;
-  color: var(--text-main);
+  color: #ffffff;
   letter-spacing: -0.03em;
 }
 
 .sidebar-brand-name span {
-  color: var(--color-primary);
+  color: #F94F06;
 }
 
 /* Navigation */
@@ -86,15 +91,15 @@
   padding: 16px 12px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .sidebar-nav-section-label {
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-light);
+  color: #64748B;
   padding: 10px 8px 4px;
   margin-top: 6px;
 }
@@ -104,12 +109,12 @@
   align-items: center;
   gap: 10px;
   padding: 9px 12px;
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  font-weight: 500;
+  border-radius: 12px;
+  color: #94A3B8;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition: all 0.2s ease;
   text-decoration: none;
   position: relative;
   user-select: none;
@@ -119,36 +124,40 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  opacity: 0.7;
-  transition: opacity var(--transition-fast);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
 }
 
 .sidebar-nav-item:hover {
-  background: var(--bg-surface-subtle);
-  color: var(--text-main);
+  background: rgba(30, 41, 59, 0.7);
+  color: #ffffff;
 }
 
 .sidebar-nav-item:hover svg {
   opacity: 1;
+  color: #F94F06;
 }
 
 .sidebar-nav-item.active {
-  background: var(--color-primary-subtle);
-  color: var(--color-primary);
-  font-weight: 600;
+  background: #F94F06;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(249, 79, 6, 0.35);
 }
 
 .sidebar-nav-item.active svg {
   opacity: 1;
+  color: #ffffff;
 }
 
 .sidebar-badge-coming {
-  font-size: 0.6rem;
-  font-weight: 700;
-  background: var(--bg-surface-subtle);
-  color: var(--text-light);
-  padding: 1px 6px;
-  border-radius: var(--radius-pill);
+  font-size: 0.62rem;
+  font-weight: 800;
+  background: rgba(245, 158, 11, 0.15);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 2px 8px;
+  border-radius: 999px;
   margin-left: auto;
   letter-spacing: 0.03em;
   white-space: nowrap;
@@ -157,7 +166,12 @@
 /* Sidebar Footer — User */
 .sidebar-footer {
   padding: 14px 16px;
-  border-top: var(--border-light);
+  border-top: 1px solid rgba(51, 65, 85, 0.6);
+  background: rgba(15, 23, 42, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
   display: flex;
   align-items: center;
   gap: 10px;
