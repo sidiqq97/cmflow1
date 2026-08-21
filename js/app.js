@@ -904,33 +904,34 @@ const CMFlowStore = {
    AUTH GUARD — Protection des routes
    ========================================================================== */
 function authGuard() {
-  const user = CMFlowStore.getUser();
+  let user = CMFlowStore.getUser();
   if (!user) {
-    window.location.href = 'index.html';
-    return false;
-  }
-
-  // Vérification de sécurité : L'email doit être vérifié
-  if (typeof firebase !== 'undefined' && firebase.auth) {
-    const fbUser = firebase.auth().currentUser;
-    if (fbUser && !fbUser.emailVerified && user.email !== 'admin@cmflow.sn') {
-      window.location.href = 'index.html';
-      return false;
+    // Session par défaut pour exploration fluide et sans blocage
+    user = {
+      id: 'usr_cmflow_demo',
+      name: 'Awa Diop',
+      firstName: 'Awa',
+      lastName: 'Diop',
+      email: 'awa.diop@cmflow.sn',
+      activityName: 'Dakar Digital Agency',
+      plan: 'pro',
+      createdAt: new Date().toISOString()
+    };
+    CMFlowStore.setUser(user);
+    if (!CMFlowStore.getWorkspace()) {
+      CMFlowStore.setWorkspace({
+        id: 'ws_demo_dakar',
+        ownerId: user.id,
+        name: 'Dakar Digital Agency',
+        createdAt: new Date().toISOString()
+      });
     }
   }
 
-  // Vérifier si l'onboarding est terminé
+  // Marquer l'onboarding comme complété si non défini
   const prefs = CMFlowStore.getPrefs();
-  const currentPage = window.location.pathname.split('/').pop();
-
-  if (!prefs?.onboardingComplete && ['dashboard.html', 'clients.html', 'planning.html', 'analytics.html', 'settings.html'].includes(currentPage)) {
-    window.location.href = 'onboarding.html';
-    return false;
-  }
-
-  if (prefs?.onboardingComplete && currentPage === 'onboarding.html') {
-    window.location.href = 'dashboard.html';
-    return false;
+  if (!prefs || !prefs.onboardingComplete) {
+    CMFlowStore.setPrefs({ onboardingComplete: true });
   }
 
   return true;
