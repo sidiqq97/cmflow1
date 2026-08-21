@@ -1050,9 +1050,52 @@ function toggleFaqItem(headerEl) {
   item.classList.toggle('active', !isActive);
 }
 
+/* ==========================================================================
+   CALCULATEUR DE GAIN DE TEMPS CM FREELANCE
+   ========================================================================== */
+function openTimeSavingsCalculator() {
+  const modal = document.getElementById('calc-savings-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    updateSavingsCalculation(document.getElementById('calc-slider-input')?.value || 3);
+  }
+}
+
+function closeTimeSavingsCalculator() {
+  const modal = document.getElementById('calc-savings-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+function updateSavingsCalculation(count) {
+  const num = parseInt(count, 10) || 3;
+  const countEl = document.getElementById('calc-client-count');
+  const hoursSavedEl = document.getElementById('calc-hours-saved');
+  const monthlyHoursEl = document.getElementById('calc-monthly-hours');
+  const moneySavedEl = document.getElementById('calc-money-saved');
+
+  if (countEl) countEl.textContent = `${num} ${num > 1 ? 'clients' : 'client'}`;
+  
+  // Hypothèse : 4h économisées par semaine et par client
+  const weeklyHours = num * 4;
+  const monthlyHours = weeklyHours * 4;
+  // Valeur moyenne horaire CM : 3 000 FCFA / heure
+  const moneyVal = monthlyHours * 3000;
+
+  if (hoursSavedEl) hoursSavedEl.textContent = `~${weeklyHours}h / sem`;
+  if (monthlyHoursEl) monthlyHoursEl.textContent = `~${monthlyHours} heures`;
+  if (moneySavedEl) moneySavedEl.textContent = `+${moneyVal.toLocaleString('fr-FR')} FCFA`;
+}
+
 // Expose globally for inline onclick
 window.simulateBentoBrand = simulateBentoBrand;
 window.toggleFaqItem = toggleFaqItem;
+window.openTimeSavingsCalculator = openTimeSavingsCalculator;
+window.closeTimeSavingsCalculator = closeTimeSavingsCalculator;
+window.updateSavingsCalculation = updateSavingsCalculation;
 
 /* ==========================================================================
    12. INITIALISATION GLOBALE (DOMContentLoaded)

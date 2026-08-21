@@ -775,13 +775,14 @@
   </main>
 
   <!-- =========================================================================
-       FOOTER
+       FOOTER SAAS B2B OFFICIEL (4 COLONNES)
        ========================================================================= -->
-  <footer class="footer" id="contact">
-    <div class="container footer-container">
+  <footer class="footer-modern-b2b" id="contact">
+    <div class="container footer-b2b-grid">
       
-      <div class="footer-brand-col">
-        <a href="#" class="brand-logo footer-logo" aria-label="CMFlow Accueil">
+      <!-- Colonne 1 : Identité & Paiements -->
+      <div class="footer-b2b-col identity-col">
+        <a href="index.html" class="brand-logo footer-logo" aria-label="CMFlow Accueil">
           <div class="logo-icon sm" aria-hidden="true">
             <svg viewBox="0 0 36 36" fill="none">
               <rect width="36" height="36" rx="10" fill="#2563EB" />
@@ -790,47 +791,140 @@
               <circle cx="22" cy="18" r="2.2" fill="#93C5FD" />
             </svg>
           </div>
-          <span class="logo-text">CM<span>Flow</span></span>
+          <span class="logo-text" style="color: #FFFFFF;">CM<span style="color: #60A5FA;">Flow</span></span>
         </a>
-        <p class="footer-desc">
-          Le cockpit tout-en-un pensé pour les Community Managers et créateurs de contenu.
+        <p class="footer-slogan">
+          La plateforme de gestion de réseaux sociaux pensée pour les Community Managers et agences d'Afrique francophone.
         </p>
-        <div class="footer-contact-link">
-          <a href="mailto:contact@cmflow.com" class="contact-email">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
-            <span>contact@cmflow.com</span>
+
+        <!-- Trust badges paiements locaux -->
+        <div class="footer-trust-payment-block">
+          <div class="trust-payment-label">
+            <svg viewBox="0 0 20 20" width="13" height="13" fill="#10B981"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+            <span>Paiements locaux sécurisés</span>
+          </div>
+          <div class="trust-payment-badges">
+            <div class="payment-badge-pill wave" title="Paiement instantané Wave">
+              <svg viewBox="0 0 100 32" width="55" height="18" fill="none">
+                <rect width="100" height="32" rx="6" fill="#1DA1F2"/>
+                <path d="M22 20C17 20 15 13 24 13C33 13 31 20 26 20C24 20 23.5 19 23.5 19" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <text x="36" y="21" fill="white" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="14" letter-spacing="-0.5">wave</text>
+              </svg>
+            </div>
+            <div class="payment-badge-pill om" title="Paiement instantané Orange Money">
+              <svg viewBox="0 0 100 32" width="70" height="18" fill="none">
+                <rect width="100" height="32" rx="6" fill="#FF7900"/>
+                <text x="8" y="21" fill="white" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="12">Orange Money</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Colonne 2 : Produit -->
+      <div class="footer-b2b-col">
+        <h4 class="footer-col-title">Produit</h4>
+        <ul class="footer-col-list">
+          <li><a href="#workflow">Calendrier interactif</a></li>
+          <li><a href="#workflow">Validation client WhatsApp</a></li>
+          <li><a href="#bento">Espaces multi-clients isolés</a></li>
+          <li><a href="#bento">Statistiques & Rapports</a></li>
+          <li><a href="#bento">Publication directe Meta</a></li>
+        </ul>
+      </div>
+
+      <!-- Colonne 3 : Ressources & Aides -->
+      <div class="footer-b2b-col">
+        <h4 class="footer-col-title">Ressources</h4>
+        <ul class="footer-col-list">
+          <li><a href="#pricing">Tarifs en FCFA</a></li>
+          <li><a href="#faq">Foire aux questions (FAQ)</a></li>
+          <li><a href="javascript:void(0)" onclick="openTimeSavingsCalculator()">Calculateur de gain de temps</a></li>
+          <li><a href="#bento">Guide du CM Freelance</a></li>
+        </ul>
+      </div>
+
+      <!-- Colonne 4 : Légal & Contact -->
+      <div class="footer-b2b-col">
+        <h4 class="footer-col-title">Légal & Contact</h4>
+        <ul class="footer-col-list">
+          <li><a href="legal.html#cgu">Conditions d'utilisation (CGU)</a></li>
+          <li><a href="legal.html#privacy">Politique de Confidentialité</a></li>
+        </ul>
+
+        <div class="footer-support-block">
+          <a href="https://wa.me/221770000000?text=Bonjour%20CMFlow%2C%20j%27aimerais%20en%20savoir%20plus%20sur%20la%20plateforme" target="_blank" class="footer-whatsapp-btn" title="Discuter directement avec un conseiller CMFlow">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="#FFFFFF"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm0 18.15c-1.5 0-2.97-.39-4.27-1.14l-.31-.18-3.17.83.85-3.09-.2-.32a8.188 8.188 0 0 1-1.25-4.34c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.01 4.54-3.68 8.23-8.12 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.84-.86 2.06 0 1.21.89 2.39 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.18-.47-.3z"/></svg>
+            <span>Discuter sur WhatsApp</span>
+          </a>
+          <a href="mailto:hello@cmflow.sn" class="footer-email-link">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+            <span>hello@cmflow.sn</span>
           </a>
         </div>
       </div>
 
-      <div class="footer-nav-col">
-        <h4 class="footer-heading">Navigation</h4>
-        <ul class="footer-links">
-          <li><a href="#workflow">Comment ça marche</a></li>
-          <li><a href="#bento">Fonctionnalités</a></li>
-          <li><a href="#pricing">Tarifs FCFA</a></li>
-          <li><a href="#faq">FAQ</a></li>
-          <li><a href="#" data-auth-target="login">Se connecter</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-nav-col">
-        <h4 class="footer-heading">Légal & Sécurité</h4>
-        <ul class="footer-links">
-          <li><a href="#">Conditions d'utilisation</a></li>
-          <li><a href="#">Politique de confidentialité</a></li>
-          <li><a href="#">Paiements Wave & OM</a></li>
-        </ul>
-      </div>
-
     </div>
 
-    <div class="footer-bottom">
-      <div class="container footer-bottom-container">
-        <p class="copyright-text">© 2026 CMFlow. Tous droits réservés. Fait avec passion pour les Community Managers. <a href="admin.html" style="color: #64748B; font-size: 0.72rem; text-decoration: none; margin-left: 12px; opacity: 0.5;" title="Accès Fondateur">🔒 Admin</a></p>
+    <!-- Barre Inférieure -->
+    <div class="footer-b2b-bottom">
+      <div class="container footer-bottom-flex">
+        <p class="footer-copy-text">
+          © 2026 CMFlow. Tous droits réservés. <a href="admin.html" style="color: #64748B; font-size: 0.72rem; text-decoration: none; margin-left: 10px; opacity: 0.5;" title="Accès Fondateur">🔒 Admin</a>
+        </p>
+        <p class="footer-local-touch">
+          Conçu avec passion pour les créateurs et agences d'Afrique francophone · <strong>Dakar, Sénégal</strong> 🇸🇳
+        </p>
       </div>
     </div>
   </footer>
+
+  <!-- =========================================================================
+       MODAL CALCULATEUR GAIN DE TEMPS CM
+       ========================================================================= -->
+  <div class="auth-modal-backdrop" id="calc-savings-modal" aria-hidden="true" role="dialog" aria-modal="true" style="display: none;">
+    <div class="calc-modal-card">
+      <button type="button" class="modal-close-btn" onclick="closeTimeSavingsCalculator()" aria-label="Fermer">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div style="text-align: center; margin-bottom: 20px;">
+        <span class="section-tag">Calculateur ROI Freelance</span>
+        <h3 style="font-size: 1.4rem; font-weight: 800; color: #0F172A; margin: 8px 0 4px;">Estimez votre gain de temps & argent</h3>
+        <p style="font-size: 0.88rem; color: #64748B; margin: 0;">Combien de clients ou marques gérez-vous chaque mois ?</p>
+      </div>
+
+      <div class="calc-slider-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 0.9rem; font-weight: 700; color: #334155;">Nombre de marques :</span>
+          <span class="calc-slider-val-badge" id="calc-client-count">3 clients</span>
+        </div>
+        <input type="range" id="calc-slider-input" min="1" max="15" value="3" style="width: 100%; cursor: pointer;" oninput="updateSavingsCalculation(this.value)">
+      </div>
+
+      <div class="calc-results-box">
+        <div class="calc-metric-row">
+          <span style="font-size: 0.9rem; color: #475569; font-weight: 600;">Temps économisé par semaine :</span>
+          <span class="calc-metric-val" id="calc-hours-saved">~12h / sem</span>
+        </div>
+        <div class="calc-metric-row">
+          <span style="font-size: 0.9rem; color: #475569; font-weight: 600;">Temps libéré par mois :</span>
+          <span class="calc-metric-val" id="calc-monthly-hours">~48 heures</span>
+        </div>
+        <div class="calc-metric-row">
+          <span style="font-size: 0.92rem; color: #0F172A; font-weight: 800;">Valeur de temps récupérée :</span>
+          <span class="calc-metric-val" style="color: #2563EB;" id="calc-money-saved">+150 000 FCFA</span>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-block btn-lg" onclick="closeTimeSavingsCalculator(); openAuthModal('register');">
+        Commencer mon essai gratuit 14 jours →
+      </button>
+    </div>
+  </div>
 
   <!-- =========================================================================
        MODAL AUTHENTIFICATION (Connexion / Inscription)

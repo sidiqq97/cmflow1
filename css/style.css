@@ -2610,3 +2610,256 @@ button {
     padding: 40px 20px;
   }
 }
+
+/* ==========================================================================
+   NOUVEAU FOOTER SAAS B2B MODERNE & SÉCURISÉ (4 COLONNES)
+   ========================================================================== */
+.footer-modern-b2b {
+  background-color: #0B132B;
+  color: #94A3B8;
+  padding: 80px 0 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-main);
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-b2b-grid {
+  display: grid;
+  grid-template-columns: 2.2fr 1.3fr 1.3fr 1.8fr;
+  gap: 48px;
+  padding-bottom: 60px;
+}
+
+.footer-b2b-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-b2b-col.identity-col {
+  padding-right: 20px;
+}
+
+.footer-slogan {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #94A3B8;
+  margin: 16px 0 24px 0;
+  max-width: 320px;
+}
+
+.footer-trust-payment-block {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px 18px;
+  max-width: 320px;
+}
+
+.trust-payment-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #E2E8F0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.trust-payment-badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.payment-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.payment-badge-pill:hover {
+  transform: translateY(-2px);
+}
+
+.footer-col-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #FFFFFF;
+  margin-bottom: 20px;
+}
+
+.footer-col-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-col-list li a {
+  font-size: 0.88rem;
+  color: #94A3B8;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-col-list li a:hover {
+  color: #FFFFFF;
+  transform: translateX(3px);
+}
+
+.footer-support-block {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-whatsapp-btn {
+  background: #16A34A;
+  color: #FFFFFF !important;
+  font-size: 0.86rem;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+  transition: all 0.25s ease;
+}
+
+.footer-whatsapp-btn:hover {
+  background: #15803D;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.45);
+}
+
+.footer-email-link {
+  font-size: 0.86rem;
+  color: #60A5FA;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.footer-email-link:hover {
+  color: #93C5FD;
+  text-decoration: underline;
+}
+
+.footer-b2b-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 24px 0;
+  background: #070D1F;
+}
+
+.footer-bottom-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-copy-text {
+  font-size: 0.82rem;
+  color: #64748B;
+  margin: 0;
+}
+
+.footer-local-touch {
+  font-size: 0.82rem;
+  color: #94A3B8;
+  margin: 0;
+}
+
+.footer-local-touch strong {
+  color: #F1F5F9;
+}
+
+/* ==========================================================================
+   MODAL CALCULATEUR GAIN DE TEMPS CM
+   ========================================================================== */
+.calc-modal-card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  max-width: 520px;
+  width: 90%;
+  padding: 36px;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.3);
+  position: relative;
+  animation: modalScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.calc-slider-wrapper {
+  margin: 28px 0;
+}
+
+.calc-slider-val-badge {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #2563EB;
+}
+
+.calc-results-box {
+  background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%);
+  border: 1px solid #BFDBFE;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 24px 0;
+}
+
+.calc-metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.calc-metric-row:last-child {
+  margin-bottom: 0;
+  padding-top: 12px;
+  border-top: 1px dashed #CBD5E1;
+}
+
+.calc-metric-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #059669;
+}
+
+@media (max-width: 1024px) {
+  .footer-b2b-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer-b2b-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    padding-bottom: 40px;
+  }
+  .footer-bottom-flex {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+}
