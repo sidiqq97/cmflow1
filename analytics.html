@@ -162,160 +162,410 @@
         <div class="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#0F172A]">
           <span class="text-slate-400 font-medium">CMFlow</span>
           <span class="text-slate-300">/</span>
-          <span>Statistiques & Bilan ROI</span>
+          <span>Performances & Reporting Client</span>
         </div>
       </div>
 
-      <button type="button" onclick="openReportModal()" class="px-4 py-2 bg-[#F94F06] hover:bg-[#e04605] text-white text-xs font-black rounded-xl shadow-lg shadow-[#F94F06]/25 flex items-center gap-1.5">
-        <span>Générer Bilan WhatsApp (1 Clic)</span>
-      </button>
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="copyWhatsAppReport()" class="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300/60 text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-all">
+          <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="hidden sm:inline">Bilan Flash WhatsApp</span>
+        </button>
+        <button type="button" onclick="openPdfModal()" class="px-4 py-2 bg-[#F94F06] hover:bg-[#e04605] text-white text-xs font-bold rounded-xl shadow-lg shadow-[#F94F06]/25 flex items-center gap-1.5 transition-all active:scale-[0.98]">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Télécharger le Rapport PDF</span>
+        </button>
+      </div>
     </header>
 
-    <!-- Corps de Page -->
-    <main class="p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl">
+    <!-- Corps de Page Standardisé -->
+    <main class="p-6 md:p-8 max-w-7xl mx-auto space-y-8 w-full">
       
-      <!-- En-tête -->
-      <div class="bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200/70 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <!-- En-tête de Section Aérée -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div>
-          <div class="flex items-center gap-2.5">
-            <h1 class="text-xl sm:text-2xl font-black text-[#0F172A]">Performances & Impact</h1>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-orange-50 text-[#F94F06] border border-orange-200">Teranga Gourmet 🇸🇳</span>
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">
+              Performances & Reporting Client
+            </h1>
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200 shadow-2xs">
+              <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+              Teranga Gourmet 🇸🇳
+            </span>
           </div>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1">Suivez la portée, l'engagement et l'efficacité de vos publications multi-canaux.</p>
+          <p className="text-sm text-slate-500 mt-1.5">
+            Suivi temps réel de la croissance, du taux d'engagement et génération du rapport mensuel marque blanche.
+          </p>
         </div>
 
-        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200 text-xs font-bold">
-          <button class="px-3 py-1.5 rounded-xl bg-white text-[#0F172A] shadow-xs">30 jours</button>
-          <button class="px-3 py-1.5 rounded-xl text-slate-500 hover:text-slate-900">7 jours</button>
-        </div>
-      </div>
-
-      <!-- 4 KPIS -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white/90 backdrop-blur-md p-5 rounded-3xl border border-slate-200/80 shadow-xs">
-          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Portée Totale (Reach)</div>
-          <div class="text-2xl sm:text-3xl font-black text-[#0F172A] mt-1">48.2K</div>
-          <div class="text-xs text-emerald-600 font-extrabold mt-1">↑ +14.2% ce mois</div>
-        </div>
-
-        <div class="bg-white/90 backdrop-blur-md p-5 rounded-3xl border border-slate-200/80 shadow-xs">
-          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Engagement Moyen</div>
-          <div class="text-2xl sm:text-3xl font-black text-[#0F172A] mt-1">5.8%</div>
-          <div class="text-xs text-emerald-600 font-extrabold mt-1">Au-dessus de la moyenne</div>
-        </div>
-
-        <div class="bg-white/90 backdrop-blur-md p-5 rounded-3xl border border-slate-200/80 shadow-xs">
-          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Croissance Communauté</div>
-          <div class="text-2xl sm:text-3xl font-black text-[#0F172A] mt-1">+340</div>
-          <div class="text-xs text-slate-500 font-bold mt-1">Total : 12.4K abonnés</div>
-        </div>
-
-        <div class="bg-white/90 backdrop-blur-md p-5 rounded-3xl border border-slate-200/80 shadow-xs">
-          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Fluidité Validation CM</div>
-          <div class="text-2xl sm:text-3xl font-black text-[#0F172A] mt-1">94%</div>
-          <div class="text-xs text-emerald-600 font-extrabold mt-1">Réponse moy. 42 min</div>
+        <div class="flex items-center gap-1 bg-white p-1 rounded-2xl border border-slate-200/80 shadow-2xs text-xs font-semibold text-slate-600">
+          <button class="px-3 py-1.5 rounded-xl hover:text-slate-900 hover:bg-slate-100">7 jours</button>
+          <button class="px-3 py-1.5 rounded-xl bg-slate-900 text-white shadow-xs font-bold">30 derniers jours</button>
+          <button class="px-3 py-1.5 rounded-xl hover:text-slate-900 hover:bg-slate-100">Mois précédent</button>
         </div>
       </div>
 
-      <!-- SECTION GRAPHIQUE SVG + RÉPARTITION -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <div class="lg:col-span-7 bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+      <!-- 4 KPIS GLOBAUX MINI-BENTO -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="bg-white border border-slate-200/70 rounded-3xl p-5 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_30px_-6px_rgba(15,23,42,0.08)] transition-all duration-300">
           <div class="flex items-center justify-between">
-            <h2 class="text-sm font-black text-[#0F172A]">Évolution de la Portée</h2>
-            <div class="flex gap-2 text-xs font-bold text-[#F94F06]">
-              <span>● Portée Quotidienne</span>
-            </div>
+            <span class="text-xs font-medium text-slate-500">Audience Cumulée</span>
+            <div class="w-9 h-9 rounded-2xl bg-orange-500/10 flex items-center justify-center text-[#F94F06] font-bold text-xs">👥</div>
           </div>
-
-          <div class="h-56 w-full relative pt-2">
-            <svg viewBox="0 0 500 200" class="w-full h-full overflow-visible">
-              <defs>
-                <linearGradient id="gReach" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#F94F06" stop-opacity="0.3" />
-                  <stop offset="100%" stop-color="#F94F06" stop-opacity="0.0" />
-                </linearGradient>
-              </defs>
-              <path d="M 0,160 Q 60,130 120,110 T 250,70 T 380,40 T 500,20 L 500,200 L 0,200 Z" fill="url(#gReach)" />
-              <path d="M 0,160 Q 60,130 120,110 T 250,70 T 380,40 T 500,20" fill="none" stroke="#F94F06" stroke-width="3" stroke-linecap="round" />
-            </svg>
-            <div class="flex justify-between text-[10px] text-slate-400 pt-2 border-t border-slate-100">
-              <span>01 Août</span><span>08 Août</span><span>15 Août</span><span>22 Août</span><span>30 Août</span>
+          <div class="mt-3">
+            <div class="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">53.7K</div>
+            <div class="flex items-center gap-1.5 mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2.5 py-0.5 rounded-full border border-emerald-200/60">
+              <span>+1.8K ce mois (+3.4%)</span>
             </div>
           </div>
         </div>
 
-        <div class="lg:col-span-5 bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <h2 class="text-sm font-black text-[#0F172A]">Répartition par Réseau</h2>
-          
-          <div class="space-y-3">
-            <div>
-              <div class="flex justify-between text-xs font-bold mb-1">
-                <span class="text-purple-600">📸 Instagram</span>
-                <span>55%</span>
-              </div>
-              <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" style="width: 55%;"></div>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex justify-between text-xs font-bold mb-1">
-                <span class="text-blue-600">📘 Facebook</span>
-                <span>28%</span>
-              </div>
-              <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-blue-600 rounded-full" style="width: 28%;"></div>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex justify-between text-xs font-bold mb-1">
-                <span class="text-slate-800">🎵 TikTok</span>
-                <span>12%</span>
-              </div>
-              <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-slate-900 rounded-full" style="width: 12%;"></div>
-              </div>
-            </div>
+        <div class="bg-white border border-slate-200/70 rounded-3xl p-5 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_30px_-6px_rgba(15,23,42,0.08)] transition-all duration-300">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">Impressions Totales</span>
+            <div class="w-9 h-9 rounded-2xl bg-blue-500/10 flex items-center justify-center text-[#0066FF] font-bold text-xs">👁️</div>
           </div>
-
-          <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-800 font-bold">
-            ✨ Instagram & TikTok génèrent 84% des commandes WhatsApp !
+          <div class="mt-3">
+            <div class="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">164.4K</div>
+            <div class="flex items-center gap-1.5 mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2.5 py-0.5 rounded-full border border-emerald-200/60">
+              <span>+22.4% vs M-1</span>
+            </div>
           </div>
         </div>
 
+        <div class="bg-white border border-slate-200/70 rounded-3xl p-5 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_30px_-6px_rgba(15,23,42,0.08)] transition-all duration-300">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">Taux d'Engagement Global</span>
+            <div class="w-9 h-9 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold text-xs">💬</div>
+          </div>
+          <div class="mt-3">
+            <div class="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">5.8%</div>
+            <div class="flex items-center gap-1.5 mt-2 text-xs font-medium text-emerald-700 bg-emerald-50 w-fit px-2.5 py-0.5 rounded-full border border-emerald-200/60">
+              <span>⭐ Performant (Moy. 3.2%)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200/70 rounded-3xl p-5 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_30px_-6px_rgba(15,23,42,0.08)] transition-all duration-300">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">Publications Réalisées</span>
+            <div class="w-9 h-9 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-600 font-bold text-xs">⚡</div>
+          </div>
+          <div class="mt-3">
+            <div class="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A]">24 posts</div>
+            <div class="flex items-center gap-1.5 mt-2 text-xs font-medium text-purple-700 bg-purple-50 w-fit px-2.5 py-0.5 rounded-full border border-purple-200/60">
+              <span>✓ 100% validés WhatsApp</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- TOP 3 POSTS BENTO -->
-      <div class="space-y-3">
-        <h2 class="text-base font-black text-[#0F172A]">Top 3 des Publications du Mois</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
-            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80" alt="Thiéboudienne" class="h-40 w-full object-cover">
-            <div class="p-4 space-y-1">
-              <span class="text-[10px] font-black uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">🏆 #1 Meilleur Reach</span>
-              <div class="text-xs font-extrabold text-[#0F172A] mt-1">Reel Thiéboudienne Royal</div>
-              <div class="text-xs text-emerald-600 font-bold">48.2k vues · 8.4% eng.</div>
+      <!-- BENTO GRID PAR RÉSEAU (4 CARTES) -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold tracking-tight text-[#0F172A] flex items-center gap-2">
+            <span>Répartition & Performances par Canal</span>
+          </h2>
+          <span class="text-xs font-medium text-slate-400">4 comptes connectés</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- Instagram -->
+          <div class="bg-white border border-slate-200/70 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs">IG</div>
+                  <div>
+                    <div class="text-xs font-bold text-[#0F172A]">Instagram</div>
+                    <div class="text-[10px] text-slate-400">+420 ce mois</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 border border-pink-200">Connecté</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3 my-4">
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div class="text-[10px] text-slate-500">Abonnés</div>
+                  <div class="text-base font-bold text-[#0F172A]">14.2K</div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div class="text-[10px] text-slate-500">Impressions</div>
+                  <div class="text-base font-bold text-[#0F172A]">82.4K</div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs font-semibold py-1.5 px-2 bg-emerald-50 rounded-xl text-emerald-800 border border-emerald-100">
+                <span>Taux d'Engagement</span>
+                <span class="font-bold">5.6%</span>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100">
+              <div class="text-[10px] text-slate-400 mb-1.5 flex justify-between">
+                <span>Format dominant</span>
+                <span class="text-slate-700 font-semibold">Reels (50%)</span>
+              </div>
+              <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden flex gap-0.5">
+                <div class="h-full bg-pink-500" style="width: 50%;"></div>
+                <div class="h-full bg-purple-400" style="width: 30%;"></div>
+                <div class="h-full bg-slate-300" style="width: 20%;"></div>
+              </div>
             </div>
           </div>
 
-          <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
-            <img src="https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=600&auto=format&fit=crop&q=80" alt="Brunch" class="h-40 w-full object-cover">
-            <div class="p-4 space-y-1">
-              <span class="text-[10px] font-black uppercase text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">🥈 #2 Plus Partagé</span>
-              <div class="text-xs font-extrabold text-[#0F172A] mt-1">Carrousel Brunch Dimanche</div>
-              <div class="text-xs text-emerald-600 font-bold">24.1k portées · 6.9% eng.</div>
+          <!-- Facebook -->
+          <div class="bg-white border border-slate-200/70 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-[#1877F2] text-white flex items-center justify-center font-bold text-xs">FB</div>
+                  <div>
+                    <div class="text-xs font-bold text-[#0F172A]">Facebook</div>
+                    <div class="text-[10px] text-slate-400">+180 mentions J'aime</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">Connecté</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3 my-4">
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div class="text-[10px] text-slate-500">Mentions J'aime</div>
+                  <div class="text-base font-bold text-[#0F172A]">28.5K</div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div class="text-[10px] text-slate-500">Impressions</div>
+                  <div class="text-base font-bold text-[#0F172A]">45.1K</div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs font-semibold py-1.5 px-2 bg-emerald-50 rounded-xl text-emerald-800 border border-emerald-100">
+                <span>Taux d'Engagement</span>
+                <span class="font-bold">4.2%</span>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100">
+              <div class="text-[10px] text-slate-400 mb-1.5 flex justify-between">
+                <span>Format dominant</span>
+                <span class="text-slate-700 font-semibold">Photos (45%)</span>
+              </div>
+              <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden flex gap-0.5">
+                <div class="h-full bg-blue-600" style="width: 45%;"></div>
+                <div class="h-full bg-blue-400" style="width: 35%;"></div>
+                <div class="h-full bg-slate-300" style="width: 20%;"></div>
+              </div>
             </div>
           </div>
 
-          <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
-            <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&auto=format&fit=crop&q=80" alt="Pastels" class="h-40 w-full object-cover">
-            <div class="p-4 space-y-1">
-              <span class="text-[10px] font-black uppercase text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md">🥉 #3 Plus Viral</span>
-              <div class="text-xs font-extrabold text-[#0F172A] mt-1">Vidéo Coulisses Chef & Pastels</div>
-              <div class="text-xs text-emerald-600 font-bold">62.4k vues · 7.5% eng.</div>
+          <!-- TikTok -->
+          <div class="bg-white border border-slate-200/70 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-[#0F172A] text-white flex items-center justify-center font-bold text-xs">TT</div>
+                  <div>
+                    <div class="text-xs font-bold text-[#0F172A]">TikTok</div>
+                    <div class="text-[10px] text-slate-400">+1.2K followers</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 border border-slate-300">Connecté</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3 my-4">
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div class="text-[10px] text-slate-500">Abonnés</div>
+                  <div class="text-base font-bold text-[#0F172A]">8.9K</div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div class="text-[10px] text-slate-500">Impressions</div>
+                  <div class="text-base font-bold text-[#0F172A]">124.0K</div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs font-semibold py-1.5 px-2 bg-emerald-50 rounded-xl text-emerald-800 border border-emerald-100">
+                <span>Taux d'Engagement</span>
+                <span class="font-bold">8.1%</span>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100">
+              <div class="text-[10px] text-slate-400 mb-1.5 flex justify-between">
+                <span>Format dominant</span>
+                <span class="text-slate-700 font-semibold">Recettes (65%)</span>
+              </div>
+              <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden flex gap-0.5">
+                <div class="h-full bg-slate-900" style="width: 65%;"></div>
+                <div class="h-full bg-emerald-500" style="width: 35%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LinkedIn -->
+          <div class="bg-white border border-slate-200/70 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-[#0A66C2] text-white flex items-center justify-center font-bold text-xs">IN</div>
+                  <div>
+                    <div class="text-xs font-bold text-[#0F172A]">LinkedIn</div>
+                    <div class="text-[10px] text-slate-400">+64 abonnés B2B</div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-sky-600 border border-sky-200">Connecté</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3 my-4">
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div class="text-[10px] text-slate-500">Abonnés B2B</div>
+                  <div class="text-base font-bold text-[#0F172A]">2.1K</div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div class="text-[10px] text-slate-500">Impressions</div>
+                  <div class="text-base font-bold text-[#0F172A]">12.8K</div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs font-semibold py-1.5 px-2 bg-emerald-50 rounded-xl text-emerald-800 border border-emerald-100">
+                <span>Taux d'Engagement</span>
+                <span class="font-bold">3.9%</span>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100">
+              <div class="text-[10px] text-slate-400 mb-1.5 flex justify-between">
+                <span>Format dominant</span>
+                <span class="text-slate-700 font-semibold">Corporate (55%)</span>
+              </div>
+              <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden flex gap-0.5">
+                <div class="h-full bg-sky-600" style="width: 55%;"></div>
+                <div class="h-full bg-slate-300" style="width: 45%;"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION GRAPHIQUE DOUBLE COURBE SVG -->
+      <div class="bg-white border border-slate-200/70 rounded-3xl p-6 sm:p-7 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_30px_-6px_rgba(15,23,42,0.08)] transition-all duration-300 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-bold tracking-tight text-[#0F172A]">
+              Courbes de Portée Globale & Fréquence de Vues
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+              Volume d'impressions totales (Orange) et portée unique touchée (Bleu Ardoise).
+            </p>
+          </div>
+
+          <div class="flex items-center gap-4 text-xs font-semibold">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-[#F94F06] shadow-sm"></span>
+              <span class="text-slate-700">Impressions Totales (164.4K)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-[#0F172A] shadow-sm"></span>
+              <span class="text-slate-700">Portée Unique (82.1K)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative w-full overflow-hidden pt-4 pb-2">
+          <svg viewBox="0 0 800 220" class="w-full h-48 sm:h-64 overflow-visible">
+            <defs>
+              <linearGradient id="gImp" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#F94F06" stop-opacity="0.35" />
+                <stop offset="100%" stop-color="#F94F06" stop-opacity="0.0" />
+              </linearGradient>
+              <linearGradient id="gReach" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#0F172A" stop-opacity="0.25" />
+                <stop offset="100%" stop-color="#0F172A" stop-opacity="0.0" />
+              </linearGradient>
+            </defs>
+
+            <line x1="20" y1="40" x2="780" y2="40" stroke="#E2E8F0" stroke-dasharray="4 4" />
+            <line x1="20" y1="100" x2="780" y2="100" stroke="#E2E8F0" stroke-dasharray="4 4" />
+            <line x1="20" y1="160" x2="780" y2="160" stroke="#E2E8F0" stroke-dasharray="4 4" />
+
+            <polygon points="20,200 20,150 90,135 160,140 230,105 300,118 370,55 440,95 510,65 580,30 650,85 720,75 780,50 780,200" fill="url(#gImp)" />
+            <polygon points="20,200 20,165 90,150 160,155 230,130 300,140 370,90 440,120 510,100 580,70 650,115 720,105 780,85 780,200" fill="url(#gReach)" />
+
+            <polyline fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="20,165 90,150 160,155 230,130 300,140 370,90 440,120 510,100 580,70 650,115 720,105 780,85" />
+            <polyline fill="none" stroke="#F94F06" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" points="20,150 90,135 160,140 230,105 300,118 370,55 440,95 510,65 580,30 650,85 720,75 780,50" />
+
+            <circle cx="370" cy="55" r="6" fill="#F94F06" stroke="#FFFFFF" stroke-width="2" />
+            <circle cx="580" cy="30" r="7" fill="#F94F06" stroke="#FFFFFF" stroke-width="3" />
+          </svg>
+
+          <div class="flex justify-between text-[11px] font-semibold text-slate-400 px-2 mt-2">
+            <span>01 Août</span>
+            <span>09 Août</span>
+            <span>14 Août (Pic Thiéb 48.2K)</span>
+            <span>21 Août (Pic TikTok 62.4K)</span>
+            <span>30 Août</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP 3 POSTS DU MOIS -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold tracking-tight text-[#0F172A]">
+            Top 3 des Publications les Plus Performantes
+          </h2>
+          <span class="text-xs font-medium text-slate-400">Classées par engagement & vues</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="bg-white border border-slate-200/70 rounded-3xl overflow-hidden shadow-xs hover:shadow-md transition-all group">
+            <div class="relative h-44 w-full bg-slate-900">
+              <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80" alt="Thiéboudienne" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+              <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-[#0F172A] shadow-md">
+                🏆 #1 Meilleur Reach
+              </div>
+              <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-pink-50 text-pink-600 border border-pink-200">
+                Instagram Reel
+              </div>
+            </div>
+            <div class="p-4 space-y-2">
+              <div class="text-[10px] font-semibold text-slate-400">Publié le 14 Août 2026</div>
+              <h3 class="text-xs font-bold text-[#0F172A] line-clamp-2">Reel : La véritable recette du Thiéboudienne Royal Penda Mbaye</h3>
+              <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs text-slate-500 font-semibold">
+                <span class="text-emerald-600 font-bold">48.2k vues</span>
+                <span>8.4% eng.</span>
+                <span>2 420 likes</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-200/70 rounded-3xl overflow-hidden shadow-xs hover:shadow-md transition-all group">
+            <div class="relative h-44 w-full bg-slate-900">
+              <img src="https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=600&auto=format&fit=crop&q=80" alt="Brunch" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+              <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-[#0F172A] shadow-md">
+                🥈 #2 Plus Partagé
+              </div>
+              <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">
+                Facebook & IG
+              </div>
+            </div>
+            <div class="p-4 space-y-2">
+              <div class="text-[10px] font-semibold text-slate-400">Publié le 18 Août 2026</div>
+              <h3 class="text-xs font-bold text-[#0F172A] line-clamp-2">Carrousel : Formule Brunch Dimanche & Cocktails Bissap Frais</h3>
+              <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs text-slate-500 font-semibold">
+                <span class="text-emerald-600 font-bold">24.1k vues</span>
+                <span>6.9% eng.</span>
+                <span>1 280 likes</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-200/70 rounded-3xl overflow-hidden shadow-xs hover:shadow-md transition-all group">
+            <div class="relative h-44 w-full bg-slate-900">
+              <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&auto=format&fit=crop&q=80" alt="Pastels" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+              <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-[#0F172A] shadow-md">
+                🥉 #3 Plus Viral
+              </div>
+              <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-300">
+                TikTok Video
+              </div>
+            </div>
+            <div class="p-4 space-y-2">
+              <div class="text-[10px] font-semibold text-slate-400">Publié le 20 Août 2026</div>
+              <h3 class="text-xs font-bold text-[#0F172A] line-clamp-2">Vidéo : Coulisses de la préparation des pastels au mérou frais</h3>
+              <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs text-slate-500 font-semibold">
+                <span class="text-emerald-600 font-bold">62.4k vues</span>
+                <span>7.5% eng.</span>
+                <span>4 850 likes</span>
+              </div>
             </div>
           </div>
         </div>
@@ -324,34 +574,136 @@
     </main>
   </div>
 
-  <!-- MODALE BILAN WHATSAPP -->
-  <div id="modal-report" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 border border-slate-200 space-y-4">
-      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-        <h3 class="text-sm font-black text-[#0F172A]">Bilan Mensuel Client (WhatsApp)</h3>
-        <button onclick="closeReportModal()" class="text-slate-400 hover:text-slate-600">✕</button>
-      </div>
-
-      <div class="bg-[#0F172A] p-5 rounded-2xl text-white space-y-3">
-        <div class="flex items-center justify-between text-xs">
-          <span class="font-bold">Teranga Gourmet 🇸🇳</span>
-          <span class="text-[9px] bg-[#F94F06] px-2 py-0.5 rounded">Rapport Août 2026</span>
-        </div>
-        <div class="grid grid-cols-2 gap-2 text-center">
-          <div class="bg-white/10 p-2.5 rounded-xl">
-            <div class="text-[10px] text-slate-300">Portée Totale</div>
-            <div class="text-lg font-black text-amber-300">48.2K</div>
-          </div>
-          <div class="bg-white/10 p-2.5 rounded-xl">
-            <div class="text-[10px] text-slate-300">Engagement</div>
-            <div class="text-lg font-black text-emerald-400">5.8%</div>
+  <!-- MODALE PRÉVISUALISATION DU RAPPORT PDF MARQUE BLANCHE -->
+  <div id="modal-pdf" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 sm:p-6">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 animate-scaleUp">
+      
+      <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-orange-500/10 flex items-center justify-center text-[#F94F06] font-bold">📄</div>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-[#0F172A]">Rapport PDF Mensuel Marque Blanche</h3>
+            <p class="text-xs text-slate-500">Prêt à télécharger et transmettre au client.</p>
           </div>
         </div>
+        <button onclick="closePdfModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors">✕</button>
       </div>
 
-      <a href="https://wa.me/221778001234?text=Bonjour%20!%20Voici%20le%20r%C3%A9capitulatif%20des%20performances%20de%20Teranga%20Gourmet%20%F0%9F%93%8A" target="_blank" class="block w-full py-2.5 bg-[#10B981] hover:bg-[#059669] text-white font-extrabold text-xs rounded-xl text-center shadow-md">
-        💬 Envoyer directement sur WhatsApp
-      </a>
+      <div class="flex-1 overflow-y-auto p-6 sm:p-8 bg-slate-100/60 space-y-6">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 text-[#0F172A]">
+          
+          <!-- En-tête Marque Blanche -->
+          <div class="flex items-center justify-between pb-5 border-b-2 border-slate-100">
+            <div class="flex items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80" alt="Teranga" class="w-12 h-12 rounded-2xl object-cover ring-2 ring-slate-100">
+              <div>
+                <h2 class="text-lg font-black text-[#0F172A]">Teranga Gourmet 🇸🇳</h2>
+                <p class="text-xs text-slate-500">Rapport Mensuel de Performance Digitale • Août 2026</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-900 text-white rounded-xl text-xs font-black">
+                ⚡ CMFlow <span class="text-[#F94F06]">PRO</span>
+              </div>
+              <div class="text-[10px] text-slate-400 mt-1">Édition Agence Certifiée</div>
+            </div>
+          </div>
+
+          <!-- Synthèse Exécutive -->
+          <div>
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">Synthèse des KPI Globaux</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                <div class="text-[11px] text-slate-500">Abonnés Cumulés</div>
+                <div class="text-lg font-extrabold text-[#0F172A]">53.7K</div>
+                <div class="text-[10px] font-semibold text-emerald-600">+1.8K (+3.4%)</div>
+              </div>
+              <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                <div class="text-[11px] text-slate-500">Impressions Vues</div>
+                <div class="text-lg font-extrabold text-[#0F172A]">164.4K</div>
+                <div class="text-[10px] font-semibold text-emerald-600">+22.4% vs M-1</div>
+              </div>
+              <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                <div class="text-[11px] text-slate-500">Engagement Moyen</div>
+                <div class="text-lg font-extrabold text-[#0F172A]">5.8%</div>
+                <div class="text-[10px] font-semibold text-emerald-600">⭐ Excellent</div>
+              </div>
+              <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                <div class="text-[11px] text-slate-500">Posts Réalisés</div>
+                <div class="text-lg font-extrabold text-[#0F172A]">24 posts</div>
+                <div class="text-[10px] font-semibold text-purple-600">100% WhatsApp</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tableau par Canal -->
+          <div>
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">Détail par Canal</div>
+            <table class="w-full text-left text-xs border border-slate-200 rounded-xl overflow-hidden">
+              <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                <tr>
+                  <th class="p-2.5">Canal</th>
+                  <th class="p-2.5">Abonnés</th>
+                  <th class="p-2.5">Impressions</th>
+                  <th class="p-2.5">Taux d'Engagement</th>
+                  <th class="p-2.5">Statut ROI</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="p-2.5 font-bold">📸 Instagram</td>
+                  <td class="p-2.5">14 200</td>
+                  <td class="p-2.5">82 400</td>
+                  <td class="p-2.5 font-semibold text-emerald-600">5.6%</td>
+                  <td class="p-2.5 text-emerald-600 font-bold">Optimal</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold">📘 Facebook</td>
+                  <td class="p-2.5">28 500</td>
+                  <td class="p-2.5">45 100</td>
+                  <td class="p-2.5 font-semibold text-emerald-600">4.2%</td>
+                  <td class="p-2.5 text-emerald-600 font-bold">Stable</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold">🎵 TikTok</td>
+                  <td class="p-2.5">8 900</td>
+                  <td class="p-2.5">124 000</td>
+                  <td class="p-2.5 font-semibold text-emerald-600">8.1%</td>
+                  <td class="p-2.5 text-orange-600 font-bold">Forte Croissance</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold">💼 LinkedIn</td>
+                  <td class="p-2.5">2 100</td>
+                  <td class="p-2.5">12 800</td>
+                  <td class="p-2.5 font-semibold text-emerald-600">3.9%</td>
+                  <td class="p-2.5 text-sky-600 font-bold">B2B Qualifié</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Notes du CM -->
+          <div class="p-4 bg-orange-50/60 rounded-2xl border border-orange-200/60 text-xs text-slate-700">
+            <strong class="text-[#F94F06] block mb-1">Recommandations & Analyse de l'Agence :</strong>
+            Excellente dynamique ce mois-ci sur les formats vidéos verticaux (Reels & TikTok) avec une hausse de +22.4% des impressions globales. Le taux d'engagement moyen (5.8%) dépasse largement les standards du secteur gastronomique.
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex justify-between text-[11px] text-slate-400">
+            <div>Responsable : <strong class="text-slate-700">Awa Diop (Lead CM · Dakar 🇸🇳)</strong></div>
+            <div>Généré le 21 Août 2026 via CMFlow</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 border-t border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="text-xs text-slate-500">✓ Format compatible A4 & impression HD</div>
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="closePdfModal()" class="px-4 py-2.5 rounded-2xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200">Fermer</button>
+          <button type="button" onclick="downloadPdfSim()" class="px-5 py-2.5 rounded-2xl text-xs font-semibold bg-[#F94F06] hover:bg-[#e04605] text-white shadow-lg shadow-orange-500/25">Confirmer & Télécharger le fichier PDF</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -363,17 +715,28 @@
       toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
       setTimeout(() => {
         toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
-      }, 3000);
+      }, 3500);
     }
 
-    function openReportModal() {
-      document.getElementById('modal-report').classList.remove('hidden');
-      document.getElementById('modal-report').classList.add('flex');
+    function openPdfModal() {
+      document.getElementById('modal-pdf').classList.remove('hidden');
+      document.getElementById('modal-pdf').classList.add('flex');
     }
 
-    function closeReportModal() {
-      document.getElementById('modal-report').classList.add('hidden');
-      document.getElementById('modal-report').classList.remove('flex');
+    function closePdfModal() {
+      document.getElementById('modal-pdf').classList.add('hidden');
+      document.getElementById('modal-pdf').classList.remove('flex');
+    }
+
+    function copyWhatsAppReport() {
+      const text = "📊 BILAN MENSUEL DE PERFORMANCE — TERANGA GOURMET 🇸🇳\n📅 Période : 30 Derniers Jours (Août 2026)\n\n👥 Audience Cumulée : 53 700 abonnés (+1 800 ce mois)\n👁️ Impressions Totales : 164 400 vues (+22.4% 🚀)\n💬 Taux d'Engagement Moyen : 5.8% (Performant ⭐)\n⚡ Publications Réalisées : 24 posts validés\n\n🏆 Top Publication : Reel 'Thiéboudienne Royal' (48.2k vues · 2 420 likes)\n\n_Rapport officiel généré par votre Community Manager via CMFlow._";
+      navigator.clipboard.writeText(text);
+      showToast("💬 Bilan Flash WhatsApp copié avec succès !");
+    }
+
+    function downloadPdfSim() {
+      closePdfModal();
+      showToast("📄 Rapport PDF généré et téléchargé avec succès !");
     }
   </script>
 </body>
