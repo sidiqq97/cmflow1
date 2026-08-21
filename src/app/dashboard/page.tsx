@@ -24,28 +24,25 @@ import {
   Eye,
   Edit2,
   Trash2,
+  Copy,
   CheckCircle2,
   Clock,
-  FileText,
   Video,
+  Layers,
   Instagram,
   Facebook,
   Linkedin,
-  Copy,
-  ExternalLink,
   Menu,
   X,
   Sparkles,
-  Search,
-  UploadCloud,
-  Check,
-  ArrowRight,
-  Smartphone,
   TrendingUp,
   Link2,
-  Layers,
-  Smile,
-  Hash
+  UploadCloud,
+  Check,
+  ArrowUpRight,
+  Flame,
+  Search,
+  MoreHorizontal
 } from 'lucide-react';
 
 // Types
@@ -69,6 +66,7 @@ export interface Client {
     linkedin?: string;
   };
   approvalRate: number;
+  monthlyGoal: number;
 }
 
 export interface Post {
@@ -81,33 +79,36 @@ export interface Post {
   caption: string;
   mediaUrl: string;
   mediaType: 'image' | 'video' | 'carousel';
+  carouselCount?: number;
+  likesEst?: number;
 }
 
-// Données Mockées Initiales (Clients & Publications)
-const INITIAL_CLIENTS: Client[] = [
+// Données Mockées Haut de Gamme
+const MOCK_CLIENTS: Client[] = [
   {
     id: 'teranga-gourmet',
     name: 'Teranga Gourmet',
     country: 'Sénégal',
     flag: '🇸🇳',
-    category: 'Restaurant & Traiteur',
-    avatar: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=160&auto=format&fit=crop&q=80',
+    category: 'Haute Gastronomie & Traiteur',
+    avatar: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&auto=format&fit=crop&q=80',
     color: '#F94F06',
     whatsapp: '+221 77 842 19 02',
     connectedAccounts: {
       instagram: '@teranga_gourmet_dakar',
-      facebook: 'Teranga Gourmet Officiel',
-      tiktok: '@terangagourmet',
+      facebook: 'Teranga Gourmet Dakar',
+      tiktok: '@terangafood',
     },
-    approvalRate: 96,
+    approvalRate: 98,
+    monthlyGoal: 24,
   },
   {
     id: 'sira-cosmetiques',
     name: 'Sira Cosmétiques Bio',
     country: 'Côte d\'Ivoire',
     flag: '🇨🇮',
-    category: 'Beauté & Skincare Africain',
-    avatar: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=160&auto=format&fit=crop&q=80',
+    category: 'Skincare & Beauté Naturelle',
+    avatar: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=200&auto=format&fit=crop&q=80',
     color: '#0066FF',
     whatsapp: '+225 07 48 92 10 33',
     connectedAccounts: {
@@ -115,22 +116,24 @@ const INITIAL_CLIENTS: Client[] = [
       facebook: 'Sira Cosmétiques',
       linkedin: 'Sira Group CI',
     },
-    approvalRate: 92,
+    approvalRate: 94,
+    monthlyGoal: 18,
   },
   {
     id: 'baobab-tech',
     name: 'Baobab Tech Hub',
     country: 'Sénégal',
     flag: '🇸🇳',
-    category: 'SaaS & Incubateur Tech',
-    avatar: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=160&auto=format&fit=crop&q=80',
+    category: 'Incubateur & SaaS FinTech',
+    avatar: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&auto=format&fit=crop&q=80',
     color: '#10B981',
     whatsapp: '+221 78 112 45 88',
     connectedAccounts: {
       linkedin: 'Baobab Tech Dakar',
       facebook: 'Baobab Tech Hub',
     },
-    approvalRate: 98,
+    approvalRate: 100,
+    monthlyGoal: 16,
   },
 ];
 
@@ -142,9 +145,11 @@ const INITIAL_POSTS: Post[] = [
     status: 'validated',
     scheduledDate: '2026-08-24', // Lundi
     scheduledTime: '18:30',
-    caption: 'Ce soir, découvrez notre nouveau Thiéboudienne revisité aux fruits de mer frais de Soumbédioune 🐟✨ Réservez votre table pour le week-end ! #DakarFood #SenegalGourmet',
-    mediaUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80',
+    caption: 'Ce soir, découvrez notre nouveau Thiéboudienne royal revisité aux fruits de mer frais de Soumbédioune 🐟✨ Réservez votre table en terrasse ! #DakarFood #SenegalGourmet',
+    mediaUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80',
     mediaType: 'carousel',
+    carouselCount: 3,
+    likesEst: 342,
   },
   {
     id: 'post-2',
@@ -153,9 +158,10 @@ const INITIAL_POSTS: Post[] = [
     status: 'pending_validation',
     scheduledDate: '2026-08-25', // Mardi
     scheduledTime: '12:15',
-    caption: 'Dans les coulisses avec notre Chef Moussa qui prépare les fameux pastels croustillants 🔥 Vous êtes plutôt sauce pimentée ou douce ? #DakarFood #Foodie #CuisineAfricaine',
-    mediaUrl: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&auto=format&fit=crop&q=80',
+    caption: 'Dans les coulisses avec notre Chef Moussa qui prépare les fameux pastels croustillants 🔥 Vous êtes plutôt sauce pimentée ou douce ? #DakarFood #Foodie',
+    mediaUrl: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80',
     mediaType: 'video',
+    likesEst: 1250,
   },
   {
     id: 'post-3',
@@ -165,8 +171,9 @@ const INITIAL_POSTS: Post[] = [
     scheduledDate: '2026-08-26', // Mercredi
     scheduledTime: '09:00',
     caption: 'Offre spéciale déjeuner d\'entreprise : -15% sur toutes vos commandes de groupe du mercredi au vendredi 💼🍽️ Livraison express au Plateau et aux Almadies.',
-    mediaUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
     mediaType: 'image',
+    likesEst: 89,
   },
   {
     id: 'post-4',
@@ -176,8 +183,9 @@ const INITIAL_POSTS: Post[] = [
     scheduledDate: '2026-08-27', // Jeudi
     scheduledTime: '19:45',
     caption: 'Ambiance feutrée et musique acoustique en terrasse ce week-end. Qui vous accompagne ? Mentionnez-les en commentaire ! 🥂🎷 #DakarNight #TerangaGourmet',
-    mediaUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&auto=format&fit=crop&q=80',
     mediaType: 'image',
+    likesEst: 215,
   },
   {
     id: 'post-5',
@@ -187,35 +195,35 @@ const INITIAL_POSTS: Post[] = [
     scheduledDate: '2026-08-28', // Vendredi
     scheduledTime: '10:30',
     caption: 'Fier d\'accueillir les délégations du Sommet Tech Afrique de l\'Ouest pour leurs déjeuners et dîners officiels d\'affaires. L\'excellence du service au cœur de notre engagement.',
-    mediaUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=600&auto=format&fit=crop&q=80',
+    mediaUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=80',
     mediaType: 'image',
+    likesEst: 178,
   },
 ];
 
 // Jours de la semaine
 const DAYS_OF_WEEK = [
-  { key: '2026-08-24', name: 'Lundi', dateNum: '24' },
-  { key: '2026-08-25', name: 'Mardi', dateNum: '25' },
-  { key: '2026-08-26', name: 'Mercredi', dateNum: '26' },
-  { key: '2026-08-27', name: 'Jeudi', dateNum: '27' },
-  { key: '2026-08-28', name: 'Vendredi', dateNum: '28' },
-  { key: '2026-08-29', name: 'Samedi', dateNum: '29' },
-  { key: '2026-08-30', name: 'Dimanche', dateNum: '30' },
+  { key: '2026-08-24', name: 'Lun', fullName: 'Lundi', dateNum: '24' },
+  { key: '2026-08-25', name: 'Mar', fullName: 'Mardi', dateNum: '25' },
+  { key: '2026-08-26', name: 'Mer', fullName: 'Mercredi', dateNum: '26' },
+  { key: '2026-08-27', name: 'Jeu', fullName: 'Jeudi', dateNum: '27' },
+  { key: '2026-08-28', name: 'Ven', fullName: 'Vendredi', dateNum: '28' },
+  { key: '2026-08-29', name: 'Sam', fullName: 'Samedi', dateNum: '29' },
+  { key: '2026-08-30', name: 'Dim', fullName: 'Dimanche', dateNum: '30' },
 ];
 
-export default function DashboardCockpit() {
-  // Gestion des États
-  const [clients, setClients] = useState<Client[]>(INITIAL_CLIENTS);
-  const [selectedClient, setSelectedClient] = useState<Client>(INITIAL_CLIENTS[0]);
+export default function UltraDashboard() {
+  // États
+  const [clients, setClients] = useState<Client[]>(MOCK_CLIENTS);
+  const [selectedClient, setSelectedClient] = useState<Client>(MOCK_CLIENTS[0]);
   const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
 
-  // Filtres et Vues
+  // Vues et Filtres
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [filterNetwork, setFilterNetwork] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [isClientDropdownOpen, setIsClientDropdownOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [showOnboardingBanner, setShowOnboardingBanner] = useState(true);
 
   // Modales
   const [isValidationModalOpen, setIsValidationModalOpen] = useState(false);
@@ -230,7 +238,7 @@ export default function DashboardCockpit() {
   const [newDate, setNewDate] = useState('2026-08-24');
   const [newTime, setNewTime] = useState('18:00');
   const [newStatus, setNewStatus] = useState<PostStatus>('pending_validation');
-  const [newMediaUrl, setNewMediaUrl] = useState('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80');
+  const [newMediaUrl, setNewMediaUrl] = useState('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80');
 
   // Formulaire Ajout Client
   const [newClientName, setNewClientName] = useState('');
@@ -238,13 +246,13 @@ export default function DashboardCockpit() {
   const [newClientCountry, setNewClientCountry] = useState('Sénégal 🇸🇳');
   const [newClientWhatsapp, setNewClientWhatsapp] = useState('');
 
-  // Toast Notification
+  // Toast
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3200);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Publications filtrées pour le client actif
+  // Filtrage des posts pour le client actif
   const clientPosts = useMemo(() => {
     return posts.filter((p) => p.clientId === selectedClient.id);
   }, [posts, selectedClient.id]);
@@ -257,10 +265,7 @@ export default function DashboardCockpit() {
     });
   }, [clientPosts, filterNetwork, filterStatus]);
 
-  // Comptes connectés du client
-  const connectedPlatformsCount = Object.keys(selectedClient.connectedAccounts || {}).length;
-
-  // Création d'un post
+  // Ajouter un post
   const handleCreatePost = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCaption.trim()) return;
@@ -275,15 +280,16 @@ export default function DashboardCockpit() {
       caption: newCaption,
       mediaUrl: newMediaUrl,
       mediaType: 'image',
+      likesEst: 150,
     };
 
     setPosts([newPost, ...posts]);
     setIsCreatePostModalOpen(false);
     setNewCaption('');
-    triggerToast('✨ Publication programmée avec succès dans le calendrier !');
+    triggerToast('✨ Publication ajoutée au calendrier avec succès !');
   };
 
-  // Ajout d'un nouveau client
+  // Ajouter un client
   const handleAddClient = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newClientName.trim()) return;
@@ -294,8 +300,8 @@ export default function DashboardCockpit() {
       name: newClientName,
       country: newClientCountry,
       flag: flag,
-      category: newClientCategory || 'Commerce & Services',
-      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=160&auto=format&fit=crop&q=80',
+      category: newClientCategory || 'Commerce & Agence',
+      avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=200&auto=format&fit=crop&q=80',
       color: '#F94F06',
       whatsapp: newClientWhatsapp || '+221 77 000 00 00',
       connectedAccounts: {
@@ -303,6 +309,7 @@ export default function DashboardCockpit() {
         facebook: newClientName,
       },
       approvalRate: 100,
+      monthlyGoal: 20,
     };
 
     setClients([...clients, newClient]);
@@ -310,21 +317,32 @@ export default function DashboardCockpit() {
     setIsAddClientModalOpen(false);
     setNewClientName('');
     setNewClientWhatsapp('');
-    triggerToast(`🎉 Client « ${newClient.name} » ajouté et activé !`);
+    triggerToast(`🎉 Marque « ${newClient.name} » créée et activée !`);
   };
 
-  // Suppression d'un post
+  // Supprimer un post
   const handleDeletePost = (id: string) => {
     setPosts(posts.filter((p) => p.id !== id));
     triggerToast('🗑️ Publication supprimée.');
   };
 
-  // Lien magique généré pour le client
+  // Dupliquer un post
+  const handleDuplicatePost = (post: Post) => {
+    const duplicated: Post = {
+      ...post,
+      id: `post-${Date.now()}`,
+      caption: `[Copie] ${post.caption}`,
+      status: 'draft',
+    };
+    setPosts([duplicated, ...posts]);
+    triggerToast('📋 Publication dupliquée en brouillon.');
+  };
+
   const magicValidationUrl = `https://cmflow.sn/v/${selectedClient.id}-a8f9`;
   const whatsappPreFilledText = `Bonjour ! Votre planning de la semaine pour ${selectedClient.name} est prêt pour validation : ${magicValidationUrl} 🚀`;
 
-  // Icône Réseau Social
-  const renderNetworkIcon = (network: SocialNetwork, className = 'w-4 h-4') => {
+  // Rendu de l'icône de réseau
+  const renderNetworkIcon = (network: SocialNetwork, className = 'w-3.5 h-3.5') => {
     switch (network) {
       case 'instagram':
         return <Instagram className={`${className} text-[#E1306C]`} />;
@@ -334,79 +352,86 @@ export default function DashboardCockpit() {
         return <Linkedin className={`${className} text-[#0A66C2]`} />;
       case 'tiktok':
         return (
-          <span className={`${className} font-black text-black inline-flex items-center justify-center text-[10px] leading-none bg-slate-100 rounded px-1`}>
+          <span className={`${className} font-black text-slate-900 inline-flex items-center justify-center text-[10px] leading-none`}>
             TT
           </span>
         );
     }
   };
 
-  // Badge de Statut
-  const renderStatusBadge = (status: PostStatus) => {
+  // Badge de Statut Glassmorphism
+  const renderStatusPill = (status: PostStatus) => {
     switch (status) {
       case 'draft':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-            <Clock className="w-2.5 h-2.5" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-500/10 text-slate-600 border border-slate-200/80">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
             Brouillon
           </span>
         );
       case 'pending_validation':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/25 shadow-xs">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
             En attente WhatsApp
           </span>
         );
       case 'validated':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <CheckCircle2 className="w-2.5 h-2.5 text-[#10B981]" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/25 shadow-xs">
+            <CheckCircle2 className="w-3 h-3 text-[#10B981]" />
             Validé client
           </span>
         );
       case 'scheduled':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-            <Send className="w-2.5 h-2.5 text-[#0066FF]" />
-            Programmé / Publié
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-600 border border-blue-500/25 shadow-xs">
+            <Send className="w-3 h-3 text-[#0066FF]" />
+            Programmé
           </span>
         );
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex font-sans antialiased text-[#0F172A]">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans antialiased flex selection:bg-[#F94F06]/20 selection:text-[#F94F06]">
       
+      {/* Texture de fond & lueurs ambiantes style Vercel / Linear */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-blue-100/40 via-purple-50/20 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-gradient-to-tr from-orange-100/30 via-amber-50/20 to-transparent rounded-full blur-3xl"></div>
+      </div>
+
       {/* Toast Notification Flottante */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A] text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-bounce">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-bounce">
           <Sparkles className="w-4 h-4 text-[#F94F06]" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* =======================================================================
-          A. BARRE LATÉRALE (Sidebar Gauche - #0F172A)
+          A. SIDEBAR ÉLÉGANTE (#0F172A - Linear Style)
           ======================================================================= */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#0F172A] text-white flex flex-col justify-between transition-transform duration-300 ease-in-out border-r border-slate-800 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#0F172A] text-white flex flex-col justify-between transition-transform duration-300 ease-out border-r border-slate-800/80 lg:translate-x-0 ${
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="overflow-y-auto">
-          {/* En-tête : Logo & Badge Pro */}
-          <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
-            <Link href="/dashboard" className="inline-flex items-center gap-2 transition-opacity hover:opacity-90">
+          
+          {/* Logo Brand & Header */}
+          <div className="p-5 border-b border-slate-800/60 flex items-center justify-between">
+            <Link href="/dashboard" className="inline-flex items-center gap-2.5 transition-opacity hover:opacity-90">
               <Image
                 src="/images/logo-white.svg"
                 alt="CMFlow Logo"
-                width={115}
+                width={118}
                 height={28}
                 className="h-6 w-auto object-contain"
                 priority
               />
-              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#F94F06]/20 text-[#F94F06] border border-[#F94F06]/30">
+              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#F94F06]/20 text-[#F94F06] border border-[#F94F06]/30 tracking-wider">
                 PRO
               </span>
             </Link>
@@ -418,39 +443,47 @@ export default function DashboardCockpit() {
             </button>
           </div>
 
-          {/* Sélecteur de Marque / Client (Dropdown interactif) */}
+          {/* Sélecteur de Marque & Workspace (Mini-carte Premium) */}
           <div className="p-3.5 relative">
-            <label className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 px-2 block mb-1.5">
-              Client Actif
-            </label>
+            <div className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 px-2 block mb-1.5 flex items-center justify-between">
+              <span>Espace Client</span>
+              <span className="text-emerald-400 flex items-center gap-1 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                Actif
+              </span>
+            </div>
 
             <button
               type="button"
               onClick={() => setIsClientDropdownOpen(!isClientDropdownOpen)}
-              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-800 border border-slate-700/80 transition-all text-left group"
+              className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-gradient-to-b from-slate-800/90 to-slate-800/50 hover:from-slate-800 hover:to-slate-800/80 border border-slate-700/70 hover:border-slate-600 transition-all text-left group shadow-sm"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <img
-                  src={selectedClient.avatar}
-                  alt={selectedClient.name}
-                  className="w-7 h-7 rounded-lg object-cover ring-2 ring-[#0066FF]/40 shrink-0"
-                />
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="relative shrink-0">
+                  <img
+                    src={selectedClient.avatar}
+                    alt={selectedClient.name}
+                    className="w-8 h-8 rounded-xl object-cover ring-2 ring-[#0066FF]/40"
+                  />
+                  <span className="absolute -bottom-1 -right-1 text-[10px] bg-slate-900 rounded-full px-0.5">
+                    {selectedClient.flag}
+                  </span>
+                </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
-                    <span>{selectedClient.name}</span>
-                    <span className="text-xs">{selectedClient.flag}</span>
+                  <div className="text-xs font-bold text-white truncate group-hover:text-sky-300 transition-colors">
+                    {selectedClient.name}
                   </div>
                   <div className="text-[10px] text-slate-400 truncate">
                     {selectedClient.category}
                   </div>
                 </div>
               </div>
-              <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-white shrink-0 ml-1" />
+              <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-white shrink-0 ml-1 transition-transform duration-200 ${isClientDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Menu Dropdown Clients */}
             {isClientDropdownOpen && (
-              <div className="absolute top-full left-3.5 right-3.5 mt-1.5 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl py-2 z-50 max-h-60 overflow-y-auto">
+              <div className="absolute top-full left-3.5 right-3.5 mt-2 bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl py-2 z-50 max-h-64 overflow-y-auto animate-fadeIn">
                 <div className="text-[9px] font-bold text-slate-400 px-3 py-1 uppercase tracking-wider">
                   Changer de marque
                 </div>
@@ -462,11 +495,11 @@ export default function DashboardCockpit() {
                       setIsClientDropdownOpen(false);
                       triggerToast(`Espace commuté sur « ${client.name} »`);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-slate-800 transition-colors ${
-                      selectedClient.id === client.id ? 'bg-slate-800/80 font-bold text-[#F94F06]' : 'text-slate-300'
+                    className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-slate-800/80 transition-colors ${
+                      selectedClient.id === client.id ? 'bg-slate-800/90 font-bold text-[#F94F06]' : 'text-slate-300'
                     }`}
                   >
-                    <div className="flex items-center gap-2 truncate">
+                    <div className="flex items-center gap-2.5 truncate">
                       <img src={client.avatar} alt={client.name} className="w-5 h-5 rounded-md object-cover" />
                       <span className="truncate text-xs">{client.name}</span>
                     </div>
@@ -490,93 +523,84 @@ export default function DashboardCockpit() {
             )}
           </div>
 
-          {/* Navigation Principale (9 Modules) */}
-          <nav className="px-2.5 space-y-0.5">
+          {/* Navigation Latérale (9 Modules Raycast/Linear Style) */}
+          <nav className="px-3 space-y-1 mt-1">
             
-            {/* 1. Calendrier */}
             <Link
               href="/dashboard"
-              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold bg-[#F94F06] text-white shadow-md shadow-[#F94F06]/20"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold bg-[#F94F06] text-white shadow-lg shadow-[#F94F06]/25 transition-all"
             >
               <CalendarIcon className="w-4 h-4" />
               <span>1. Calendrier & Queue</span>
             </Link>
 
-            {/* 2. Espaces Clients */}
             <Link
               href="/clients"
-              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
             >
               <Users className="w-4 h-4 text-slate-400" />
               <span>2. Espaces Clients</span>
             </Link>
 
-            {/* 3. Médiathèque */}
             <Link
               href="/media"
-              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
             >
               <ImageIcon className="w-4 h-4 text-slate-400" />
-              <span>3. Médiathèque & Assets</span>
+              <span>3. Médiathèque Assets</span>
             </Link>
 
-            {/* 4. Messagerie Unifiée */}
             <Link
               href="/inbox"
-              className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
             >
               <div className="flex items-center gap-3">
                 <MessageSquare className="w-4 h-4 text-slate-400" />
                 <span>4. Inbox Unifiée</span>
               </div>
-              <span className="w-2 h-2 rounded-full bg-[#10B981]"></span>
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
             </Link>
 
-            {/* 5. Start Page */}
             <Link
               href="/startpage"
-              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
             >
               <Globe className="w-4 h-4 text-slate-400" />
               <span>5. Start Page (Bio)</span>
             </Link>
 
-            {/* 6. Analytics & Rapports */}
             <Link
               href="/analytics"
-              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
             >
               <BarChart3 className="w-4 h-4 text-slate-400" />
-              <span>6. Analytics & Rapports</span>
+              <span>6. Analytics & Bilans</span>
             </Link>
 
-            {/* 7. Portail Validation */}
             <button
               onClick={() => setIsValidationModalOpen(true)}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors text-left"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all text-left"
             >
               <ShieldCheck className="w-4 h-4 text-[#10B981]" />
               <span>7. Portail Validation</span>
             </button>
 
-            {/* 8. Facturation & Forfaits */}
             <Link
               href="/billing"
-              className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
             >
               <div className="flex items-center gap-3">
                 <CreditCard className="w-4 h-4 text-slate-400" />
-                <span>8. Forfait & Paiements</span>
+                <span>8. Facturation & Forfaits</span>
               </div>
-              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
                 Wave
               </span>
             </Link>
 
-            {/* 9. Paramètres */}
             <Link
               href="/settings"
-              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
             >
               <Settings className="w-4 h-4 text-slate-400" />
               <span>9. Paramètres Agence</span>
@@ -585,12 +609,12 @@ export default function DashboardCockpit() {
           </nav>
         </div>
 
-        {/* Pied de Sidebar : Profil CM & Déconnexion */}
-        <div className="p-3.5 border-t border-slate-800/80 bg-slate-900/60">
+        {/* Profil CM connecté */}
+        <div className="p-3.5 border-t border-slate-800/70 bg-slate-900/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="relative">
-                <div className="w-8 h-8 rounded-full bg-[#0066FF] flex items-center justify-center font-bold text-xs text-white">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0066FF] to-sky-400 flex items-center justify-center font-black text-xs text-white shadow-sm">
                   AD
                 </div>
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#10B981] border-2 border-[#0F172A] rounded-full"></span>
@@ -604,12 +628,12 @@ export default function DashboardCockpit() {
             <button
               type="button"
               onClick={() => {
-                if (confirm('Voulez-vous vous déconnecter de CMFlow ?')) {
+                if (confirm('Se déconnecter de CMFlow ?')) {
                   window.location.href = '/login';
                 }
               }}
               title="Déconnexion"
-              className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition-colors"
+              className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800/80 transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -617,25 +641,25 @@ export default function DashboardCockpit() {
         </div>
       </aside>
 
-      {/* Fond sombre pour mobile */}
+      {/* Fond sombre Mobile */}
       {isMobileSidebarOpen && (
         <div
           onClick={() => setIsMobileSidebarOpen(false)}
-          className="fixed inset-0 bg-black/60 z-30 lg:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 z-30 lg:hidden backdrop-blur-xs"
         />
       )}
 
       {/* =======================================================================
-          ZONE CENTRALE DU DASHBOARD (HEADER + KPIS + CALENDRIER)
+          ZONE DE CONTENU PRINCIPALE (Top Bar + KPIs + Calendrier)
           ======================================================================= */}
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
+      <div className="flex-1 flex flex-col min-w-0 lg:pl-64 z-10">
         
         {/* =====================================================================
-            B. EN-TÊTE SUPÉRIEUR (TOP BAR)
+            B. TOP BAR AÉRÉE & GLASSMORPHISM (Floating Style)
             ===================================================================== */}
-        <header className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 sm:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
+        <header className="sticky top-0 z-30 backdrop-blur-xl bg-white/80 border-b border-slate-200/60 px-4 sm:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-all">
           
-          {/* Titre & Bouton Hamburger */}
+          {/* Fil d'Ariane Minimaliste & Hamburger */}
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -646,28 +670,28 @@ export default function DashboardCockpit() {
             </button>
 
             <div>
-              <h1 className="text-base sm:text-lg font-extrabold text-[#0F172A] tracking-tight flex items-center gap-2">
-                <span>Planning de publication</span>
-                <span className="text-slate-300 font-normal">/</span>
-                <span className="text-[#0066FF] flex items-center gap-1.5">
+              <div className="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#0F172A] tracking-tight">
+                <span className="text-slate-400 font-medium">Planning</span>
+                <span className="text-slate-300">/</span>
+                <span className="text-[#0F172A] flex items-center gap-1.5">
                   {selectedClient.name} {selectedClient.flag}
                 </span>
-              </h1>
-              <p className="text-[11px] text-slate-500">
-                {clientPosts.length} publication{clientPosts.length > 1 ? 's' : ''} planifiée{clientPosts.length > 1 ? 's' : ''} ce mois-ci
+              </div>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                {clientPosts.length} publications planifiées pour ce client
               </p>
             </div>
           </div>
 
-          {/* Sélecteur de vue & Boutons d'Action Rapide */}
-          <div className="flex items-center flex-wrap gap-2">
+          {/* Segmented Control & Actions Rapides */}
+          <div className="flex items-center flex-wrap gap-2.5">
             
-            {/* Boutons Pilules de Vue */}
-            <div className="bg-slate-100 p-0.5 rounded-xl flex items-center border border-slate-200 text-xs font-bold text-slate-600">
+            {/* Segmented-Control Moderne */}
+            <div className="bg-slate-100/80 backdrop-blur-sm p-1 rounded-xl flex items-center border border-slate-200/70 text-xs font-bold text-slate-600">
               <button
                 type="button"
                 onClick={() => setViewMode('week')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`px-3 py-1.5 rounded-lg transition-all duration-200 ${
                   viewMode === 'week' ? 'bg-white text-[#0F172A] shadow-xs' : 'hover:text-slate-900'
                 }`}
               >
@@ -676,7 +700,7 @@ export default function DashboardCockpit() {
               <button
                 type="button"
                 onClick={() => setViewMode('month')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`px-3 py-1.5 rounded-lg transition-all duration-200 ${
                   viewMode === 'month' ? 'bg-white text-[#0F172A] shadow-xs' : 'hover:text-slate-900'
                 }`}
               >
@@ -685,7 +709,7 @@ export default function DashboardCockpit() {
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`px-3 py-1.5 rounded-lg transition-all duration-200 ${
                   viewMode === 'list' ? 'bg-white text-[#0F172A] shadow-xs' : 'hover:text-slate-900'
                 }`}
               >
@@ -697,182 +721,147 @@ export default function DashboardCockpit() {
             <button
               type="button"
               onClick={() => setIsValidationModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#10B981]/10 text-[#059669] border border-[#10B981]/30 hover:bg-[#10B981]/20 transition-all"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#10B981]/10 hover:bg-[#10B981]/20 text-[#059669] border border-[#10B981]/30 transition-all duration-200 active:scale-[0.98]"
             >
-              <Send className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Envoyer pour validation</span>
+              <Send className="w-3.5 h-3.5 text-[#10B981]" />
+              <span className="hidden sm:inline">Validation WhatsApp</span>
               <span className="sm:hidden">WhatsApp</span>
             </button>
 
-            {/* Bouton Principal Orange (+ Créer un post) */}
+            {/* Bouton Principal Orange Électrique (#F94F06) */}
             <button
               type="button"
               onClick={() => setIsCreatePostModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] text-white shadow-md shadow-[#F94F06]/25 active:scale-[0.98] transition-all"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold bg-[#F94F06] hover:bg-[#e04605] text-white shadow-lg shadow-[#F94F06]/25 hover:shadow-[#F94F06]/40 active:scale-[0.98] transition-all duration-200"
             >
               <Plus className="w-4 h-4" />
-              <span>+ Créer un post</span>
+              <span>+ Nouveau Post</span>
             </button>
 
           </div>
         </header>
 
         {/* =====================================================================
-            BANNIÈRE ONBOARDING (DISMISSIBLE)
+            CORPS DU COCKPIT (KPIS + BARRE FILTRES + GRILLE)
             ===================================================================== */}
-        {showOnboardingBanner && (
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 sm:px-8 py-3 flex items-center justify-between gap-4 text-xs">
-            <div className="flex items-center gap-3 overflow-x-auto">
-              <span className="font-extrabold text-white flex items-center gap-1 shrink-0">
-                👋 Bienvenue sur CMFlow !
-              </span>
-              <span className="text-blue-100 hidden md:inline">Lancez votre campagne en 3 étapes :</span>
-              <div className="flex items-center gap-2 font-medium shrink-0">
-                <button
-                  onClick={() => setIsAddClientModalOpen(true)}
-                  className="px-2 py-0.5 bg-white/15 hover:bg-white/25 rounded-md border border-white/20"
-                >
-                  1. Ajouter une marque
-                </button>
-                <span>➔</span>
-                <button
-                  onClick={() => setIsCreatePostModalOpen(true)}
-                  className="px-2 py-0.5 bg-white/15 hover:bg-white/25 rounded-md border border-white/20"
-                >
-                  2. Créer un post
-                </button>
-                <span>➔</span>
-                <button
-                  onClick={() => setIsValidationModalOpen(true)}
-                  className="px-2 py-0.5 bg-white/15 hover:bg-white/25 rounded-md border border-white/20 font-bold text-amber-300"
-                >
-                  3. Tester validation WhatsApp
-                </button>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setShowOnboardingBanner(false)}
-              className="text-blue-200 hover:text-white p-1 shrink-0"
-              title="Fermer la bannière"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
         <div className="p-4 sm:p-6 lg:p-8 space-y-6">
           
           {/* ===================================================================
-              C. CARTES DE MÉTRIQUES CLÉS (4 KPIS CONTEXTUALISÉES)
+              D. CARTES KPIS COMPACTES AVEC MICRO-SPARKLINES
               =================================================================== */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
-            {/* KPI 1 : Espace Client */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Marque Active
+            {/* KPI 1 : Marque Active & Sync */}
+            <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/70 shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden group">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  Client Actif
                 </span>
-                <div className="text-base font-extrabold text-slate-900 mt-1 flex items-center gap-1.5">
-                  <span className="truncate">{selectedClient.name}</span>
-                  <span>{selectedClient.flag}</span>
-                </div>
-                <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1 mt-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Espace synchronisé
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                  En ligne
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-[#F94F06]">
-                <Users className="w-5 h-5" />
+              <div className="text-base font-extrabold text-[#0F172A] mt-2 flex items-center gap-1.5">
+                <span className="truncate">{selectedClient.name}</span>
+                <span>{selectedClient.flag}</span>
+              </div>
+              <div className="text-[11px] text-slate-500 mt-1 flex items-center justify-between">
+                <span>{selectedClient.category}</span>
+                <span className="font-semibold text-slate-700">Dakar 🇸🇳</span>
               </div>
             </div>
 
-            {/* KPI 2 : Comptes connectés */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Comptes Liés
+            {/* KPI 2 : Comptes Connectés */}
+            <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/70 shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden group">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  Canaux Liés
                 </span>
-                <div className="text-lg font-extrabold text-slate-900 mt-1">
-                  {connectedPlatformsCount} Réseaux
-                </div>
-                <div className="flex items-center gap-1.5 mt-1">
-                  {selectedClient.connectedAccounts.instagram && <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />}
-                  {selectedClient.connectedAccounts.facebook && <Facebook className="w-3.5 h-3.5 text-[#1877F2]" />}
-                  {selectedClient.connectedAccounts.tiktok && <span className="text-[9px] font-bold">TT</span>}
-                  {selectedClient.connectedAccounts.linkedin && <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" />}
-                </div>
+                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60">
+                  API Connectées
+                </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF]">
-                <Link2 className="w-5 h-5" />
+              <div className="text-xl font-extrabold text-[#0F172A] mt-1">
+                {Object.keys(selectedClient.connectedAccounts || {}).length} Réseaux
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                {selectedClient.connectedAccounts.instagram && <Instagram className="w-4 h-4 text-[#E1306C]" />}
+                {selectedClient.connectedAccounts.facebook && <Facebook className="w-4 h-4 text-[#1877F2]" />}
+                {selectedClient.connectedAccounts.tiktok && <span className="text-[10px] font-black bg-slate-100 rounded px-1">TT</span>}
+                {selectedClient.connectedAccounts.linkedin && <Linkedin className="w-4 h-4 text-[#0A66C2]" />}
               </div>
             </div>
 
             {/* KPI 3 : Posts ce mois */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+            <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/70 shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden group">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                   Volume Ce Mois
                 </span>
-                <div className="text-lg font-extrabold text-slate-900 mt-1">
-                  {clientPosts.length} Publications
-                </div>
-                <span className="text-[10px] text-slate-500 font-medium block mt-1">
-                  Tous statuts confondus
+                <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200/60">
+                  Objectif {selectedClient.monthlyGoal}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
-                <CalendarIcon className="w-5 h-5" />
+              <div className="text-xl font-extrabold text-[#0F172A] mt-1">
+                {clientPosts.length} / {selectedClient.monthlyGoal} Posts
+              </div>
+              <div className="w-full h-1.5 bg-slate-100 rounded-full mt-2 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"
+                  style={{ width: `${Math.min(100, Math.round((clientPosts.length / selectedClient.monthlyGoal) * 100))}%` }}
+                ></div>
               </div>
             </div>
 
             {/* KPI 4 : Taux d'approbation client */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Taux d'Approbation
+            <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/70 shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden group">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  Approbation 1er Envoi
                 </span>
-                <div className="text-lg font-extrabold text-emerald-600 mt-1 flex items-center gap-1">
-                  <span>{selectedClient.approvalRate}%</span>
-                  <span className="text-[10px] text-slate-400 font-normal">au 1er envoi</span>
-                </div>
-                <span className="text-[10px] text-slate-500 font-medium block mt-1">
-                  Validation WhatsApp fluide
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 flex items-center gap-1">
+                  <Flame className="w-3 h-3 text-[#F94F06]" />
+                  98% Efficace
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-                <TrendingUp className="w-5 h-5" />
+              <div className="text-xl font-extrabold text-emerald-600 mt-1 flex items-baseline gap-1">
+                <span>{selectedClient.approvalRate}%</span>
+                <span className="text-xs text-slate-400 font-normal">validés sans retouches</span>
+              </div>
+              <div className="text-[11px] text-slate-500 mt-1">
+                Validation WhatsApp en 1 clic
               </div>
             </div>
 
           </div>
 
           {/* ===================================================================
-              D. BARRE D'OUTILS ET FILTRES DU CALENDRIER
+              BARRE D'OUTILS & FILTRES DE CALENDRIER (RAYCAST / LINEAR STYLE)
               =================================================================== */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 shadow-xs">
+          <div className="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl p-3 sm:p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 shadow-xs">
             
-            {/* Navigation Temporelle */}
+            {/* Navigation Date */}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl p-1">
+              <div className="flex items-center gap-1 bg-slate-100/80 border border-slate-200/80 rounded-xl p-1">
                 <button
                   type="button"
                   onClick={() => triggerToast('Semaine précédente chargée')}
-                  className="p-1.5 hover:bg-white rounded-lg text-slate-600 transition-colors"
+                  className="p-1.5 hover:bg-white rounded-lg text-slate-600 transition-all"
+                  title="Précédent"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   type="button"
-                  className="px-2.5 py-1 text-xs font-bold text-slate-800 hover:bg-white rounded-lg transition-colors"
+                  className="px-2.5 py-1 text-xs font-bold text-slate-800 hover:bg-white rounded-lg transition-all"
                 >
                   Aujourd'hui
                 </button>
                 <button
                   type="button"
                   onClick={() => triggerToast('Semaine suivante chargée')}
-                  className="p-1.5 hover:bg-white rounded-lg text-slate-600 transition-colors"
+                  className="p-1.5 hover:bg-white rounded-lg text-slate-600 transition-all"
+                  title="Suivant"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -883,11 +872,11 @@ export default function DashboardCockpit() {
               </div>
             </div>
 
-            {/* Filtres Combinés (Réseaux & Statuts) */}
+            {/* Filtres par Réseau & Statut */}
             <div className="flex items-center flex-wrap gap-2 text-xs">
               
               {/* Filtre Réseau */}
-              <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5">
+              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5 shadow-xs">
                 <Filter className="w-3.5 h-3.5 text-slate-400" />
                 <select
                   value={filterNetwork}
@@ -903,7 +892,7 @@ export default function DashboardCockpit() {
               </div>
 
               {/* Filtre Statut */}
-              <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5">
+              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5 shadow-xs">
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
@@ -921,10 +910,10 @@ export default function DashboardCockpit() {
           </div>
 
           {/* ===================================================================
-              VUE SEMAINE : GRILLE DU CALENDRIER MULTI-RÉSEAUX
+              C. GRILLE DU CALENDRIER 7 JOURS (MODERN TIMELINE CARD VIEW)
               =================================================================== */}
           {viewMode === 'week' && (
-            <div className="grid grid-cols-1 md:grid-cols-7 gap-4 min-w-full md:min-w-[920px] items-start">
+            <div className="grid grid-cols-1 md:grid-cols-7 gap-4 min-w-full md:min-w-[940px] items-start">
               {DAYS_OF_WEEK.map((day) => {
                 const dayPosts = filteredPosts.filter((p) => p.scheduledDate === day.key);
                 const isToday = day.dateNum === '24';
@@ -932,24 +921,24 @@ export default function DashboardCockpit() {
                 return (
                   <div
                     key={day.key}
-                    className={`rounded-2xl border transition-all ${
+                    className={`rounded-3xl border transition-all duration-300 ${
                       isToday
-                        ? 'bg-white border-[#0066FF]/50 shadow-md ring-2 ring-[#0066FF]/10'
-                        : 'bg-white border-slate-200/80 hover:border-slate-300'
+                        ? 'bg-white border-[#0066FF]/40 shadow-md ring-2 ring-[#0066FF]/10'
+                        : 'bg-white/80 backdrop-blur-sm border-slate-200/70 hover:border-slate-300'
                     }`}
                   >
                     {/* Header du Jour */}
                     <div
-                      className={`p-3 border-b flex items-center justify-between rounded-t-2xl ${
-                        isToday ? 'bg-blue-50/70 border-blue-100' : 'bg-slate-50/70 border-slate-100'
+                      className={`p-3.5 border-b flex items-center justify-between rounded-t-3xl ${
+                        isToday ? 'bg-gradient-to-r from-blue-50/80 to-indigo-50/50 border-blue-100' : 'bg-slate-50/60 border-slate-100'
                       }`}
                     >
                       <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
-                          {day.name}
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                          {day.fullName}
                         </span>
                         <span
-                          className={`text-base font-extrabold ${
+                          className={`text-lg font-black tracking-tight ${
                             isToday ? 'text-[#0066FF]' : 'text-slate-900'
                           }`}
                         >
@@ -958,89 +947,106 @@ export default function DashboardCockpit() {
                       </div>
 
                       {isToday && (
-                        <span className="text-[9px] font-extrabold bg-[#0066FF] text-white px-2 py-0.5 rounded-full">
+                        <span className="text-[9px] font-black uppercase tracking-wider bg-[#0066FF] text-white px-2 py-0.5 rounded-full shadow-xs">
                           Aujourd'hui
                         </span>
                       )}
                     </div>
 
-                    {/* Zone de cartes de publication */}
-                    <div className="p-2 space-y-2.5 min-h-[300px]">
+                    {/* Zone de cartes de posts */}
+                    <div className="p-2.5 space-y-3 min-h-[340px]">
                       {dayPosts.length === 0 ? (
-                        <div className="h-36 flex flex-col items-center justify-center text-center p-3 border border-dashed border-slate-200 rounded-xl text-slate-400">
-                          <span className="text-[11px] font-medium">Aucun post</span>
+                        <div className="h-40 flex flex-col items-center justify-center text-center p-3 border border-dashed border-slate-200 rounded-2xl text-slate-400 group hover:border-[#0066FF]/50 transition-colors">
+                          <span className="text-[11px] font-medium text-slate-400">Aucun post</span>
                           <button
                             type="button"
                             onClick={() => {
                               setNewDate(day.key);
                               setIsCreatePostModalOpen(true);
                             }}
-                            className="mt-1.5 text-[11px] font-bold text-[#0066FF] hover:underline"
+                            className="mt-2 text-[11px] font-extrabold text-[#0066FF] hover:underline flex items-center gap-1"
                           >
-                            + Planifier
+                            <Plus className="w-3 h-3" />
+                            <span>Planifier</span>
                           </button>
                         </div>
                       ) : (
                         dayPosts.map((post) => (
                           <div
                             key={post.id}
-                            className="group relative bg-white rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-200 overflow-hidden"
+                            className="group relative bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                           >
-                            {/* Vignette Média */}
-                            <div className="relative h-28 w-full bg-slate-100 overflow-hidden">
+                            {/* Preview Média HD avec Glassmorphism Badge */}
+                            <div className="relative h-32 w-full bg-slate-900 overflow-hidden">
                               <img
                                 src={post.mediaUrl}
-                                alt="Aperçu visuel"
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                alt="Aperçu du visuel"
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                               />
 
-                              {/* Badge Réseau Social */}
-                              <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-md rounded-lg p-1.5 shadow-sm border border-slate-200/60">
-                                {renderNetworkIcon(post.network)}
+                              {/* Badge Réseau Social en Glassmorphism */}
+                              <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-md rounded-lg p-1.5 shadow-sm border border-white/20">
+                                {renderNetworkIcon(post.network, 'w-3.5 h-3.5')}
                               </div>
 
-                              {/* Badge Type Média */}
+                              {/* Type Média (Carrousel ou Vidéo) */}
+                              {post.mediaType === 'carousel' && (
+                                <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-md text-[9px] font-extrabold flex items-center gap-1">
+                                  <Layers className="w-3 h-3 text-amber-300" />
+                                  <span>1/{post.carouselCount || 3}</span>
+                                </div>
+                              )}
+
                               {post.mediaType === 'video' && (
-                                <div className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm text-white px-1.5 py-0.5 rounded text-[9px] font-bold flex items-center gap-1">
-                                  <Video className="w-3 h-3" />
-                                  <span>Vidéo</span>
+                                <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-md text-[9px] font-extrabold flex items-center gap-1">
+                                  <Video className="w-3 h-3 text-sky-400" />
+                                  <span>0:45</span>
                                 </div>
                               )}
 
                               {/* Heure */}
-                              <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                              <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/10">
                                 {post.scheduledTime}
                               </div>
                             </div>
 
-                            {/* Contenu & Légende */}
-                            <div className="p-2.5 space-y-2">
+                            {/* Contenu & Typographie */}
+                            <div className="p-3 space-y-2.5">
                               <p className="text-[11px] text-slate-700 line-clamp-2 leading-relaxed font-medium">
                                 {post.caption}
                               </p>
 
-                              {/* Badge Statut */}
-                              <div className="pt-0.5 flex items-center justify-between">
-                                {renderStatusBadge(post.status)}
+                              {/* Pied de Carte avec Statut */}
+                              <div className="pt-1 flex items-center justify-between border-t border-slate-100">
+                                {renderStatusPill(post.status)}
                               </div>
                             </div>
 
-                            {/* Actions Rapides au Survol */}
-                            <div className="absolute inset-0 bg-[#0F172A]/85 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-3 text-white">
+                            {/* Overlay d'Actions Rapides au Survol (Raycast Style) */}
+                            <div className="absolute inset-0 bg-[#0F172A]/90 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-2 p-3 text-white">
                               <button
                                 type="button"
                                 title="Prévisualiser"
                                 onClick={() => setPreviewPost(post)}
-                                className="p-2 rounded-lg bg-white/20 hover:bg-white text-white hover:text-slate-900 transition-colors"
+                                className="p-2 rounded-xl bg-white/20 hover:bg-white text-white hover:text-slate-900 transition-all"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
 
                               <button
                                 type="button"
+                                title="Dupliquer"
+                                onClick={() => handleDuplicatePost(post)}
+                                className="p-2 rounded-xl bg-white/20 hover:bg-white text-white hover:text-slate-900 transition-all"
+                              >
+                                <Copy className="w-4 h-4" />
+                              </button>
+
+                              <button
+                                type="button"
                                 title="Modifier"
                                 onClick={() => triggerToast('Édition du post ouverte')}
-                                className="p-2 rounded-lg bg-white/20 hover:bg-white text-white hover:text-slate-900 transition-colors"
+                                className="p-2 rounded-xl bg-white/20 hover:bg-white text-white hover:text-slate-900 transition-all"
                               >
                                 <Edit2 className="w-4 h-4" />
                               </button>
@@ -1049,7 +1055,7 @@ export default function DashboardCockpit() {
                                 type="button"
                                 title="Supprimer"
                                 onClick={() => handleDeletePost(post.id)}
-                                className="p-2 rounded-lg bg-rose-500/30 hover:bg-rose-500 text-rose-200 hover:text-white transition-colors"
+                                className="p-2 rounded-xl bg-rose-500/40 hover:bg-rose-500 text-rose-200 hover:text-white transition-all"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -1065,13 +1071,13 @@ export default function DashboardCockpit() {
           )}
 
           {/* ===================================================================
-              VUE LISTE ALTERNATIVE
+              VUE LISTE ÉPURÉE (ALTERNATE VIEW)
               =================================================================== */}
           {(viewMode === 'list' || viewMode === 'month') && (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-slate-200 bg-slate-50 font-bold text-[11px] uppercase tracking-wider text-slate-500 grid grid-cols-12 gap-4">
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+              <div className="p-4 border-b border-slate-200 bg-slate-50/70 font-bold text-[11px] uppercase tracking-wider text-slate-500 grid grid-cols-12 gap-4">
                 <div className="col-span-2">Date & Heure</div>
-                <div className="col-span-2">Réseau</div>
+                <div className="col-span-2">Canal</div>
                 <div className="col-span-5">Visuel & Légende</div>
                 <div className="col-span-2">Statut</div>
                 <div className="col-span-1 text-right">Actions</div>
@@ -1088,7 +1094,7 @@ export default function DashboardCockpit() {
                     </div>
 
                     <div className="col-span-2 flex items-center gap-2">
-                      <div className="p-1 rounded-lg bg-slate-100">
+                      <div className="p-1.5 rounded-lg bg-slate-100">
                         {renderNetworkIcon(post.network)}
                       </div>
                       <span className="font-bold capitalize text-slate-700">
@@ -1100,7 +1106,7 @@ export default function DashboardCockpit() {
                       <img
                         src={post.mediaUrl}
                         alt="Thumbnail"
-                        className="w-10 h-10 rounded-lg object-cover border border-slate-200 shrink-0"
+                        className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
                       />
                       <p className="text-slate-700 truncate font-medium">
                         {post.caption}
@@ -1108,7 +1114,7 @@ export default function DashboardCockpit() {
                     </div>
 
                     <div className="col-span-2">
-                      {renderStatusBadge(post.status)}
+                      {renderStatusPill(post.status)}
                     </div>
 
                     <div className="col-span-1 flex items-center justify-end gap-1">
@@ -1117,14 +1123,14 @@ export default function DashboardCockpit() {
                         className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
                         title="Voir"
                       >
-                        <Eye className="w-3.5 h-3.5" />
+                        <Eye className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeletePost(post.id)}
                         className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50"
                         title="Supprimer"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -1137,15 +1143,15 @@ export default function DashboardCockpit() {
       </div>
 
       {/* =======================================================================
-          MODALE 1 : ENVOYER POUR VALIDATION WHATSAPP
+          MODALE 1 : ENVOYER POUR VALIDATION WHATSAPP (MAGIQUE)
           ======================================================================= */}
       {isValidationModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-8 border border-slate-200 animate-fadeIn">
+        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 border border-slate-200 animate-fadeIn">
             
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-full bg-[#10B981]/20 text-[#10B981] flex items-center justify-center">
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-[#10B981] border border-emerald-500/20 flex items-center justify-center">
                   <Send className="w-5 h-5" />
                 </div>
                 <div>
@@ -1168,7 +1174,7 @@ export default function DashboardCockpit() {
             </p>
 
             {/* Lien Magique */}
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl mb-4 flex items-center justify-between gap-2">
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-4 flex items-center justify-between gap-2">
               <span className="text-xs font-mono text-slate-700 truncate font-semibold">
                 {magicValidationUrl}
               </span>
@@ -1178,26 +1184,26 @@ export default function DashboardCockpit() {
                   navigator.clipboard.writeText(magicValidationUrl);
                   triggerToast('📋 Lien magique copié dans le presse-papier !');
                 }}
-                className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200 text-[#0066FF] rounded-lg shrink-0 font-bold text-xs flex items-center gap-1 shadow-xs"
+                className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-[#0066FF] rounded-xl shrink-0 font-bold text-xs flex items-center gap-1 shadow-xs transition-all"
               >
                 <Copy className="w-3.5 h-3.5" />
                 <span>Copier</span>
               </button>
             </div>
 
-            {/* Aperçu Message WhatsApp */}
-            <div className="mb-4 p-3 bg-emerald-50/60 border border-emerald-100 rounded-xl text-xs text-emerald-900 leading-relaxed">
-              <span className="font-bold block text-emerald-800 mb-1">Message prêt pour WhatsApp :</span>
+            {/* Message Pré-Rempli WhatsApp */}
+            <div className="mb-5 p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-xs text-emerald-900 leading-relaxed">
+              <span className="font-bold block text-emerald-800 mb-1">Message prêt à envoyer :</span>
               « {whatsappPreFilledText} »
             </div>
 
-            {/* Boutons d'Action */}
+            {/* Actions */}
             <div className="space-y-2">
               <a
                 href={`https://wa.me/${selectedClient.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappPreFilledText)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full py-3 px-4 rounded-xl font-bold text-xs sm:text-sm bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/25 transition-all"
+                className="w-full py-3.5 px-4 rounded-2xl font-extrabold text-sm bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/25 transition-all"
               >
                 <Send className="w-4 h-4" />
                 <span>Ouvrir sur WhatsApp ({selectedClient.whatsapp})</span>
@@ -1217,11 +1223,11 @@ export default function DashboardCockpit() {
       )}
 
       {/* =======================================================================
-          MODALE 2 : CRÉATION / PROGRAMMATION DE POST
+          MODALE 2 : CRÉER UN POST (+ NOUVEAU POST)
           ======================================================================= */}
       {isCreatePostModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-8 border border-slate-200 animate-fadeIn max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 border border-slate-200 animate-fadeIn max-h-[90vh] overflow-y-auto">
             
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
               <div>
@@ -1240,7 +1246,7 @@ export default function DashboardCockpit() {
 
             <form onSubmit={handleCreatePost} className="space-y-4">
               
-              {/* Choix Réseau Social */}
+              {/* Choix Réseau */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                   Réseau Cible
@@ -1251,9 +1257,9 @@ export default function DashboardCockpit() {
                       key={net}
                       type="button"
                       onClick={() => setNewNetwork(net)}
-                      className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${
+                      className={`p-2.5 rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all ${
                         newNetwork === net
-                          ? 'border-[#0066FF] bg-blue-50/60 text-[#0066FF] font-bold shadow-xs'
+                          ? 'border-[#0066FF] bg-blue-50/70 text-[#0066FF] font-bold shadow-xs'
                           : 'border-slate-200 hover:bg-slate-50 text-slate-600'
                       }`}
                     >
@@ -1267,16 +1273,16 @@ export default function DashboardCockpit() {
               {/* Zone Drag & Drop Média */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Visuel ou Vidéo
+                  Visuel ou Vidéo HD
                 </label>
-                <div className="border-2 border-dashed border-slate-200 hover:border-[#0066FF] rounded-xl p-4 text-center bg-slate-50/50 cursor-pointer transition-colors">
+                <div className="border-2 border-dashed border-slate-200 hover:border-[#0066FF] rounded-2xl p-4 text-center bg-slate-50/50 cursor-pointer transition-colors">
                   <UploadCloud className="w-6 h-6 text-slate-400 mx-auto mb-1" />
                   <div className="text-xs font-bold text-slate-700">Glissez-déposez votre visuel ici</div>
                   <div className="text-[10px] text-slate-400">PNG, JPG, MP4 jusqu'à 50 Mo</div>
                 </div>
               </div>
 
-              {/* Légende & Compteur */}
+              {/* Légende */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
@@ -1292,7 +1298,7 @@ export default function DashboardCockpit() {
                   onChange={(e) => setNewCaption(e.target.value)}
                   placeholder="Rédigez votre texte captivant avec emojis et hashtags..."
                   required
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
                 />
               </div>
 
@@ -1341,7 +1347,7 @@ export default function DashboardCockpit() {
                 </select>
               </div>
 
-              {/* Boutons d'Action */}
+              {/* Boutons */}
               <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
                 <button
                   type="button"
@@ -1353,7 +1359,7 @@ export default function DashboardCockpit() {
 
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] text-white rounded-xl shadow-md shadow-[#F94F06]/20 transition-all"
+                  className="px-5 py-2.5 text-xs font-extrabold bg-[#F94F06] hover:bg-[#e04605] text-white rounded-xl shadow-lg shadow-[#F94F06]/25 transition-all"
                 >
                   Planifier le post
                 </button>
@@ -1366,15 +1372,15 @@ export default function DashboardCockpit() {
       )}
 
       {/* =======================================================================
-          MODALE 3 : AJOUTER UN NOUVEAU CLIENT
+          MODALE 3 : AJOUTER UNE MARQUE
           ======================================================================= */}
       {isAddClientModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-slate-200 animate-fadeIn">
+        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-slate-200 animate-fadeIn">
             
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-orange-100 text-[#F94F06] flex items-center justify-center font-bold">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-orange-100 text-[#F94F06] flex items-center justify-center font-bold">
                   +
                 </div>
                 <div>
@@ -1461,7 +1467,7 @@ export default function DashboardCockpit() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] text-white rounded-xl shadow-md shadow-[#F94F06]/20 transition-all"
+                  className="px-5 py-2.5 text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] text-white rounded-xl shadow-md shadow-[#F94F06]/20 transition-all"
                 >
                   Créer l'espace client
                 </button>
@@ -1473,13 +1479,12 @@ export default function DashboardCockpit() {
       )}
 
       {/* =======================================================================
-          MODALE 4 : APERÇU DÉTAILLÉ D'UNE PUBLICATION
+          MODALE 4 : APERÇU HD D'UN POST
           ======================================================================= */}
       {previewPost && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 animate-fadeIn">
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 animate-fadeIn">
             
-            {/* Header */}
             <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {renderNetworkIcon(previewPost.network)}
@@ -1495,8 +1500,7 @@ export default function DashboardCockpit() {
               </button>
             </div>
 
-            {/* Média */}
-            <div className="h-64 w-full bg-slate-100">
+            <div className="h-64 w-full bg-slate-900">
               <img
                 src={previewPost.mediaUrl}
                 alt="Aperçu"
@@ -1504,22 +1508,21 @@ export default function DashboardCockpit() {
               />
             </div>
 
-            {/* Contenu */}
             <div className="p-4 space-y-3">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-500">
                   {previewPost.scheduledDate} à {previewPost.scheduledTime}
                 </span>
-                {renderStatusBadge(previewPost.status)}
+                {renderStatusPill(previewPost.status)}
               </div>
 
-              <p className="text-xs text-slate-800 leading-relaxed">
+              <p className="text-xs text-slate-800 leading-relaxed font-medium">
                 {previewPost.caption}
               </p>
 
               <button
                 onClick={() => setPreviewPost(null)}
-                className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors"
+                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors"
               >
                 Fermer l'aperçu
               </button>
