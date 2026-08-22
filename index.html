@@ -550,7 +550,7 @@
         <div class="pricing-cards-grid">
           
           <!-- Plan 1 : Starter Solo -->
-          <div class="pricing-card-modern">
+          <div class="pricing-card-modern" style="cursor: pointer;" onclick="openPricingCheckoutModal('starter', 'Starter Solo', 0, 'Essai 14j Gratuit 🌱')">
             <h3 class="pricing-plan-title">Starter Solo</h3>
             <p class="pricing-plan-desc">Pour tester la plateforme et débuter avec vos premiers clients.</p>
             
@@ -577,13 +577,13 @@
               </div>
             </div>
 
-            <button type="button" class="btn btn-secondary btn-block" onclick="openPricingCheckoutModal('starter', 'Starter Solo', 0, 'Essai 14j Gratuit 🌱')">
+            <button type="button" class="btn btn-secondary btn-block" onclick="event.stopPropagation(); openPricingCheckoutModal('starter', 'Starter Solo', 0, 'Essai 14j Gratuit 🌱')">
               Démarrer l'essai gratuit
             </button>
           </div>
 
           <!-- Plan 2 : Pro Agency (Le plus populaire) -->
-          <div class="pricing-card-modern popular">
+          <div class="pricing-card-modern popular" style="cursor: pointer;" onclick="openPricingCheckoutModal('pro', 'Pro Agency', 15000, 'Le Plus Populaire 🔥')">
             <div class="pricing-popular-badge" style="display: inline-flex; align-items: center; gap: 6px;">
               <svg viewBox="0 0 20 20" width="13" height="13" fill="#FFFFFF"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
               Le plus populaire 🔥
@@ -619,13 +619,13 @@
               </div>
             </div>
 
-            <button type="button" class="btn btn-orange-glow btn-block" onclick="openPricingCheckoutModal('pro', 'Pro Agency', 15000, 'Le Plus Populaire 🔥')">
+            <button type="button" class="btn btn-orange-glow btn-block" onclick="event.stopPropagation(); openPricingCheckoutModal('pro', 'Pro Agency', 15000, 'Le Plus Populaire 🔥')">
               Choisir Pro Agency
             </button>
           </div>
 
           <!-- Plan 3 : Scale & Franchise -->
-          <div class="pricing-card-modern">
+          <div class="pricing-card-modern" style="cursor: pointer;" onclick="openPricingCheckoutModal('scale', 'Scale & Franchise', 35000, 'Grandes Équipes 🚀')">
             <h3 class="pricing-plan-title">Scale & Franchise</h3>
             <p class="pricing-plan-desc">Pour les agences digitales et équipes de CMs.</p>
             
@@ -652,7 +652,7 @@
               </div>
             </div>
 
-            <button type="button" class="btn btn-primary btn-block" onclick="openPricingCheckoutModal('scale', 'Scale & Franchise', 35000, 'Grandes Équipes 🚀')">
+            <button type="button" class="btn btn-primary btn-block" onclick="event.stopPropagation(); openPricingCheckoutModal('scale', 'Scale & Franchise', 35000, 'Grandes Équipes 🚀')">
               Passer au Plan Scale
             </button>
           </div>
@@ -1126,10 +1126,10 @@
   <!-- =========================================================================
        MODALE DE CHECKOUT TARIFAIRE INTERACTIVE (WAVE & ORANGE MONEY)
        ========================================================================= -->
-  <div id="pricing-checkout-modal" class="auth-modal-backdrop" style="display: none; align-items: center; justify-content: center; z-index: 10000;" aria-hidden="true" role="dialog" aria-modal="true">
-    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 28px; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25); max-width: 440px; width: 90%; padding: 24px; position: relative; font-family: inherit;">
+  <div id="pricing-checkout-modal" class="auth-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" onclick="if(event.target === this) closePricingCheckoutModal()">
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 28px; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25); max-width: 440px; width: 90%; padding: 24px; position: relative; font-family: inherit; transform: scale(1); transition: transform 0.2s ease;">
       
-      <button type="button" onclick="closePricingCheckoutModal()" style="position: absolute; top: 16px; right: 16px; background: #F1F5F9; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748B;">
+      <button type="button" onclick="closePricingCheckoutModal()" aria-label="Fermer" style="position: absolute; top: 16px; right: 16px; background: #F1F5F9; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748B; font-weight: bold; font-size: 1rem;">
         ✕
       </button>
 
@@ -1142,7 +1142,7 @@
           <h3 id="pcm-plan-name" style="font-size: 1.35rem; font-weight: 900; color: #0F172A; margin: 0;">Pro Agency</h3>
           <div style="text-align: right;">
             <span id="pcm-plan-price" style="font-size: 1.35rem; font-weight: 900; color: #0F172A;">15 000 FCFA</span>
-            <span style="font-size: 0.75rem; color: #94A3B8; font-weight: 600;"> / mois</span>
+            <span id="pcm-plan-period" style="font-size: 0.75rem; color: #94A3B8; font-weight: 600;"> / mois</span>
           </div>
         </div>
       </div>
@@ -1220,12 +1220,14 @@
       const badgeEl = document.getElementById('pcm-plan-badge');
       const nameEl = document.getElementById('pcm-plan-name');
       const priceEl = document.getElementById('pcm-plan-price');
+      const periodEl = document.getElementById('pcm-plan-period');
       const payContainer = document.getElementById('pcm-payment-method-container');
       const submitBtn = document.getElementById('pcm-submit-btn');
 
       if (badgeEl) badgeEl.textContent = badge || 'Formule Choisie';
       if (nameEl) nameEl.textContent = planName || 'Pro Agency';
       if (priceEl) priceEl.textContent = amount === 0 ? '0 FCFA' : (amount.toLocaleString() + ' FCFA');
+      if (periodEl) periodEl.textContent = amount === 0 ? ' / 14 jours' : ' / mois';
       
       if (amount === 0) {
         if (payContainer) payContainer.style.display = 'none';
@@ -1237,16 +1239,27 @@
 
       const modal = document.getElementById('pricing-checkout-modal');
       if (modal) {
-        modal.style.display = 'flex';
+        modal.classList.add('active');
+        modal.removeAttribute('aria-hidden');
+        document.body.style.overflow = 'hidden';
       }
     }
 
     function closePricingCheckoutModal() {
       const modal = document.getElementById('pricing-checkout-modal');
       if (modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
       }
     }
+
+    // Fermeture avec la touche Échap
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closePricingCheckoutModal();
+      }
+    });
 
     function setPcmMethod(method) {
       currentPcmMethod = method;
