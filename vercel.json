@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/v/:token",
+      "destination": "/client-review.html"
+    },
+    {
+      "source": "/approve/:token",
+      "destination": "/client-review.html"
+    }
+  ]
+}
