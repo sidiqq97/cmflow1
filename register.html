@@ -69,11 +69,11 @@
         <div class="space-y-1.5">
           <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Changer d'offre :</span>
           <div class="grid grid-cols-3 gap-1.5">
-            <button type="button" onclick="setPlan('starter')" id="btn-switch-starter" class="p-2 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10">
-              Découverte
+            <button type="button" onclick="setPlan('solo')" id="btn-switch-solo" class="p-2 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10">
+              Solo
             </button>
             <button type="button" onclick="setPlan('pro')" id="btn-switch-pro" class="p-2 rounded-xl text-center text-xs font-bold transition-all border border-orange-500 bg-orange-500/20 text-orange-300">
-              Pro
+              Pro 🔥
             </button>
             <button type="button" onclick="setPlan('scale')" id="btn-switch-scale" class="p-2 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10">
               Scale
@@ -176,57 +176,59 @@
 
   <script>
     const PLANS = {
-      starter: {
-        name: 'Découverte (Starter Solo)',
-        badge: 'Essai 14j 🌱',
-        tagline: 'Pour tester la plateforme avec vos 2 premiers clients.',
-        priceMonthly: 0,
-        priceYearly: 0,
-        isFree: true,
+      solo: {
+        name: 'Solo / Freelance',
+        badge: 'Démarrage 🌱',
+        tagline: 'Idéal pour les freelances et CM indépendants gérant leurs premiers clients.',
+        priceMonthly: 3500,
+        priceYearly: 35000,
+        isFree: false,
         features: [
-          '✓ Jusqu’à 2 Marques / Clients',
-          '✓ Validation WhatsApp en 1 clic',
-          '✓ Calendrier & Médias HD (50 Mo)',
-          '✓ Assistant IA Illimité',
+          '✓ 2 Workspaces clients inclus',
+          '✓ Publications & médias illimités',
+          '✓ Validation WhatsApp interactive',
+          '✓ Auto-Publish Instagram & Facebook',
         ],
       },
       pro: {
         name: 'Pro Agency',
-        badge: 'Le Plus Populaire 🔥',
-        tagline: 'L’arme ultime pour gérer jusqu’à 10 marques sereinement.',
+        badge: 'Recommandé 🔥',
+        tagline: 'La solution complète pour les agences et CM avec un portefeuille actif.',
         priceMonthly: 15000,
         priceYearly: 150000,
         isFree: false,
         features: [
-          '✓ Jusqu’à 10 Marques & Clients',
-          '✓ Auto-Publish Meta (Instagram & FB)',
-          '✓ Validation WhatsApp & Liens Magiques',
-          '✓ Export Bilans & Rapports PDF',
+          '✓ Jusqu’à 10 Workspaces clients',
+          '✓ Publication Reels, Carrousels & Stories',
+          '✓ Rapports analytiques PDF automatisés',
           '✓ Support prioritaire WhatsApp 7j/7',
         ],
       },
       scale: {
         name: 'Scale Agence',
-        badge: 'Grandes Équipes 🚀',
-        tagline: 'Pour les agences digitales et équipes de CMs.',
+        badge: 'Grands Comptes 🚀',
+        tagline: 'Pour les agences en forte croissance gérant de multiples marques.',
         priceMonthly: 35000,
         priceYearly: 350000,
         isFree: false,
         features: [
-          '✓ Marques & Clients illimités',
-          '✓ Marque Blanche (White-label complet)',
-          '✓ Multi-comptes CM & Rôles',
-          '✓ Accès API REST & Webhooks',
+          '✓ Workspaces clients illimités',
+          '✓ Gestion d’équipe & rôles CM illimités',
+          '✓ Marque blanche totale (votre logo)',
+          '✓ Intégration API & Webhooks sur mesure',
         ],
       },
     };
 
+    // Alias pour rétrocompatibilité
+    PLANS.starter = PLANS.solo;
+
     const urlParams = new URLSearchParams(window.location.search);
-    let currentPlanId = urlParams.get('plan') || 'pro';
+    let currentPlanId = urlParams.get('plan') || 'solo';
     let currentCycle = urlParams.get('cycle') || 'monthly';
     let currentMethod = 'WAVE';
 
-    if (!PLANS[currentPlanId]) currentPlanId = 'pro';
+    if (!PLANS[currentPlanId]) currentPlanId = 'solo';
 
     function renderPlan() {
       const plan = PLANS[currentPlanId];
@@ -237,14 +239,14 @@
       document.getElementById('recap-plan-name').textContent = plan.name;
       document.getElementById('recap-plan-tagline').textContent = plan.tagline;
       document.getElementById('recap-plan-price').textContent = price === 0 ? '0' : price.toLocaleString('fr-FR');
-      document.getElementById('recap-plan-period').textContent = price === 0 ? 'FCFA / 14 jours' : (isYearly ? 'FCFA / an' : 'FCFA / mois');
+      document.getElementById('recap-plan-period').textContent = isYearly ? 'FCFA / an' : 'FCFA / mois';
 
       // Update features list
       const listEl = document.getElementById('recap-features-list');
       listEl.innerHTML = plan.features.map(f => `<li>${f}</li>`).join('');
 
       // Update Switch Buttons
-      ['starter', 'pro', 'scale'].forEach(p => {
+      ['solo', 'pro', 'scale'].forEach(p => {
         const btn = document.getElementById('btn-switch-' + p);
         if (!btn) return;
         if (p === currentPlanId) {

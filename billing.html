@@ -293,32 +293,38 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          <!-- PLAN 1 : STARTER -->
+          <!-- PLAN 1 : SOLO / FREELANCE -->
           <div class="bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase text-slate-400">Starter Solo</span>
+                <span class="text-xs font-bold uppercase text-slate-400">Solo / Freelance</span>
               </div>
               <div>
-                <div class="text-3xl font-black text-slate-900">0 <span class="text-sm font-bold text-slate-400">FCFA</span></div>
-                <p class="text-xs text-slate-500 mt-1">Pour tester CMFlow avec votre premier client.</p>
+                <div class="text-3xl font-black text-slate-900">3 500 <span class="text-sm font-bold text-slate-400">FCFA / mois</span></div>
+                <p class="text-xs text-slate-500 mt-1">Idéal pour les freelances et CM indépendants gérant leurs premiers clients.</p>
               </div>
               <ul class="space-y-2.5 text-xs text-slate-600 pt-2 border-t border-slate-100">
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> 1 Marque client active</li>
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> 5 Publications / mois</li>
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Liens de validation WhatsApp</li>
-                <li class="flex items-center gap-2 text-slate-400"><span class="text-slate-300 font-bold">✕</span> Publication automatique Meta</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> 2 Workspaces clients</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Publications & médias illimités</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Portail de validation WhatsApp interactif</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Publication automatique Instagram & Facebook</li>
               </ul>
             </div>
-            <button type="button" class="mt-6 w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
-              Forfait Actuel
-            </button>
+            <div class="mt-6 space-y-2">
+              <button
+                type="button"
+                onclick="startWavePayment('SOLO', 3500)"
+                class="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-[#1E90FF] hover:bg-[#1873cc] text-white shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+              >
+                <span>🌊 Payer via Wave (3 500 F)</span>
+              </button>
+            </div>
           </div>
 
           <!-- PLAN 2 : PRO AGENCY (RECOMMANDÉ) -->
           <div class="bg-gradient-to-b from-white to-orange-50/30 rounded-3xl p-6 border-2 border-[#F94F06] shadow-lg shadow-orange-500/10 flex flex-col justify-between relative transform hover:-translate-y-1 transition-all">
             <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#F94F06] text-white px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">
-              Le Plus Populaire 🔥
+              Recommandé 🔥
             </div>
             <div class="space-y-4">
               <div class="flex items-center justify-between">
@@ -327,14 +333,13 @@
               </div>
               <div>
                 <div class="text-3xl font-black text-slate-900">15 000 <span class="text-sm font-bold text-slate-400">FCFA / mois</span></div>
-                <p class="text-xs text-slate-500 mt-1">L'arme ultime des Community Managers indépendants.</p>
+                <p class="text-xs text-slate-500 mt-1">La solution complète pour les agences et CM avec un portefeuille actif.</p>
               </div>
               <ul class="space-y-2.5 text-xs text-slate-700 pt-2 border-t border-orange-100">
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> <strong>Marques illimitées</strong></li>
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> <strong>Auto-Publish Meta (Instagram & FB)</strong></li>
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Notifications WhatsApp & Toasts direct</li>
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Stockage médias HD illimité</li>
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Support WhatsApp prioritaire 7j/7</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> <strong>Jusqu'à 10 Workspaces clients</strong></li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> <strong>Publication Reels, Carrousels & Stories</strong></li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> <strong>Rapports analytiques PDF automatisés</strong></li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Support prioritaire WhatsApp 7j/7</li>
               </ul>
             </div>
             <div class="mt-6 space-y-2">
@@ -355,23 +360,22 @@
             </div>
           </div>
 
-          <!-- PLAN 3 : SCALE & FRANCHISE -->
+          <!-- PLAN 3 : SCALE AGENCE -->
           <div class="bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-all">
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase text-indigo-600">Scale & Franchise</span>
-                <span class="text-[10px] font-bold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">Équipe</span>
+                <span class="text-xs font-bold uppercase text-indigo-600">Scale Agence</span>
+                <span class="text-[10px] font-bold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">Grands Comptes</span>
               </div>
               <div>
                 <div class="text-3xl font-black text-slate-900">35 000 <span class="text-sm font-bold text-slate-400">FCFA / mois</span></div>
-                <p class="text-xs text-slate-500 mt-1">Pour les agences digitales et équipes de CMs.</p>
+                <p class="text-xs text-slate-500 mt-1">Pour les agences en forte croissance gérant de multiples marques.</p>
               </div>
               <ul class="space-y-2.5 text-xs text-slate-600 pt-2 border-t border-slate-100">
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Tout le forfait Pro Agency</li>
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Multi-comptes CM & Rôles</li>
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> <strong>Marque Blanche (White-label)</strong></li>
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Rapports PDF personnalisés avec logo</li>
-                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Accès API REST CMFlow</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> <strong>Workspaces clients illimités</strong></li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> <strong>Gestion d'équipe & rôles CM illimités</strong></li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> <strong>Marque blanche totale (votre logo)</strong></li>
+                <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Intégration API & Webhooks sur mesure</li>
               </ul>
             </div>
             <div class="mt-6 space-y-2">
