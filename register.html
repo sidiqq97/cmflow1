@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inscription & Choix du Forfait — CMFlow</title>
-  <meta name="description" content="Créez votre compte agence CMFlow, choisissez votre forfait et démarrez sereinement.">
+  <meta name="description" content="Créez votre compte agence CMFlow, démarrez votre essai gratuit ou choisissez votre forfait Mobile Money.">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -26,148 +26,213 @@
 <body class="min-h-full bg-[#F8FAFC] flex items-center justify-center p-4 sm:p-6 lg:p-8 antialiased text-[#0F172A]">
 
   <!-- Conteneur Carte SaaS -->
-  <div class="w-full max-w-5xl bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[660px]">
+  <div class="w-full max-w-5xl bg-white rounded-3xl shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[680px]">
     
     <!-- =========================================================================
-        COLONNE 1 : ENCADRÉ RÉCAPITULATIF DYNAMIQUE
+        COLONNE 1 : ENCADRÉ RÉCAPITULATIF DYNAMIQUE (DROITE SUR DESKTOP / GAUCHE VISUELLE)
         ========================================================================= -->
-    <div class="md:col-span-5 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 p-6 sm:p-8 text-white flex flex-col justify-between relative overflow-hidden">
+    <div id="recap-column" class="lg:col-span-5 bg-gradient-to-br from-[#0F172A] via-slate-900 to-[#0F172A] p-6 sm:p-8 text-white flex flex-col justify-between relative overflow-hidden order-2 lg:order-2">
       
-      <!-- Halo décoratif -->
-      <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <!-- Halos décoratifs -->
+      <div id="recap-halo" class="absolute -bottom-20 -right-20 w-64 h-64 bg-[#F94F06]/15 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="relative z-10 space-y-6">
+      <div class="relative z-10 space-y-5">
         <!-- Logo -->
         <a href="index.html" class="inline-flex items-center gap-2">
-          <div class="w-8 h-8 rounded-xl bg-[#F94F06] flex items-center justify-center text-white font-black text-sm">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#F94F06] to-orange-400 flex items-center justify-center text-white font-black text-sm shadow-md shadow-orange-500/30">
             CM
           </div>
           <span class="text-xl font-black tracking-tight text-white">CM<span class="text-[#F94F06]">Flow</span></span>
         </a>
 
+        <!-- Badge Mode Essai (si actif) -->
+        <div id="trial-mode-badge" class="hidden flex items-center gap-3 bg-emerald-500/15 border border-emerald-500/30 rounded-2xl px-4 py-3">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-lg">
+            🎁
+          </div>
+          <div>
+            <div class="text-xs font-black text-emerald-400 uppercase tracking-wider">Essai Gratuit 14 Jours</div>
+            <div class="text-[11px] text-emerald-300/70 font-semibold">Sans carte bancaire requise</div>
+          </div>
+        </div>
+
+        <!-- Sélecteur Rapide d'Offres (en mode achat direct) -->
+        <div id="plan-switcher-container" class="space-y-1.5">
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Votre formule :</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" onclick="setPlan('solo')" id="btn-switch-solo" class="py-2 px-1 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 cursor-pointer">
+              ⚡ Solo
+            </button>
+            <button type="button" onclick="setPlan('pro')" id="btn-switch-pro" class="py-2 px-1 rounded-xl text-center text-xs font-bold transition-all border border-[#F94F06] bg-orange-500/20 text-orange-200 cursor-pointer">
+              🔥 Pro
+            </button>
+            <button type="button" onclick="setPlan('scale')" id="btn-switch-scale" class="py-2 px-1 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 cursor-pointer">
+              👑 Scale
+            </button>
+          </div>
+        </div>
+
         <!-- Carte Forfait Dynamique -->
-        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 space-y-3">
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 space-y-3 relative z-10">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-black uppercase tracking-wider text-orange-400">Votre Forfait</span>
-            <span id="recap-plan-badge" class="text-[10px] font-black bg-orange-500 text-white px-2.5 py-0.5 rounded-full">
-              Le Plus Populaire 🔥
+            <span id="recap-plan-header" class="text-[10px] font-black uppercase tracking-widest text-orange-400">Forfait Choisi</span>
+            <span id="recap-plan-badge" class="text-[10px] font-black bg-[#F94F06] text-white px-2.5 py-0.5 rounded-full">
+              Recommandé 🔥
             </span>
           </div>
 
           <div>
             <h2 id="recap-plan-name" class="text-2xl font-black text-white">Pro Agency</h2>
-            <p id="recap-plan-tagline" class="text-xs text-slate-300 mt-1">L'arme ultime pour gérer jusqu'à 10 marques sereinement.</p>
+            <p id="recap-plan-tagline" class="text-xs text-slate-300 mt-1 leading-relaxed">La formule clé en main pour gérer 10 marques sereinement.</p>
           </div>
 
-          <div class="pt-2 border-t border-white/10 flex items-baseline gap-1.5">
-            <span id="recap-plan-price" class="text-3xl font-black text-white">15 000</span>
-            <span id="recap-plan-period" class="text-xs font-bold text-slate-400">FCFA / mois</span>
-          </div>
-        </div>
-
-        <!-- Boutons de Changement Rapide -->
-        <div class="space-y-1.5">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Changer d'offre :</span>
-          <div class="grid grid-cols-3 gap-1.5">
-            <button type="button" onclick="setPlan('solo')" id="btn-switch-solo" class="p-2 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10">
-              Solo
-            </button>
-            <button type="button" onclick="setPlan('pro')" id="btn-switch-pro" class="p-2 rounded-xl text-center text-xs font-bold transition-all border border-orange-500 bg-orange-500/20 text-orange-300">
-              Pro 🔥
-            </button>
-            <button type="button" onclick="setPlan('scale')" id="btn-switch-scale" class="p-2 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10">
-              Scale
+          <div class="pt-3 border-t border-white/10 flex items-end justify-between">
+            <div class="flex items-baseline gap-1">
+              <span id="recap-plan-price" class="text-3xl font-black text-white">15 000</span>
+              <span id="recap-plan-period" class="text-xs font-bold text-slate-400">FCFA / mois</span>
+            </div>
+            <button
+              type="button"
+              id="btn-toggle-cycle"
+              onclick="toggleCycle()"
+              class="text-[10px] font-black bg-white/10 hover:bg-white/20 text-slate-300 px-3 py-1.5 rounded-xl border border-white/10 transition-all cursor-pointer"
+            >
+              Annuel (-2 mois)
             </button>
           </div>
         </div>
 
         <!-- Liste des Inclusions -->
-        <div class="space-y-2.5 pt-2">
-          <span class="text-xs font-bold text-white">Inclus dans votre offre :</span>
+        <div class="space-y-2.5 pt-1">
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Inclus dans votre offre :</span>
           <ul id="recap-features-list" class="space-y-2 text-xs text-slate-300">
             <!-- Injecté dynamiquement par JS -->
           </ul>
         </div>
       </div>
 
-      <div class="relative z-10 pt-4 text-[11px] text-slate-400 flex items-center gap-2 border-t border-white/10">
-        <span>🔒 Paiement sécurisé Wave & Orange Money</span>
+      <!-- Pied du récapitulatif -->
+      <div id="recap-footer" class="relative z-10 pt-4 text-[11px] text-slate-400 flex items-center gap-2 border-t border-white/10 mt-6">
+        <span>🔒 Paiement 100% sécurisé Wave 🌊 & Orange Money 🍊</span>
       </div>
 
     </div>
 
     <!-- =========================================================================
-        COLONNE 2 : FORMULAIRE D'INSCRIPTION & PAIEMENT
+        COLONNE 2 : FORMULAIRE D'INSCRIPTION & VALIDATION
         ========================================================================= -->
-    <div class="md:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col justify-between">
+    <div class="lg:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col justify-between order-1 lg:order-1">
       <div>
         
-        <div class="mb-6">
-          <h1 class="text-2xl font-black text-[#0F172A] tracking-tight">
-            Finalisez votre inscription
-          </h1>
-          <p class="text-xs text-slate-500 mt-1">
-            Créez votre espace en 30 secondes et connectez vos marques.
-          </p>
+        <div class="mb-6 pb-4 border-b border-slate-100 flex items-start justify-between">
+          <div>
+            <h1 id="form-main-title" class="text-2xl font-black text-[#0F172A] tracking-tight">
+              Créer mon espace agence
+            </h1>
+            <p id="form-subtitle" class="text-xs text-slate-500 mt-1 font-medium">
+              Opérationnel en 2 minutes — 14 jours d'essai inclus.
+            </p>
+          </div>
+          <span id="mode-badge-pill" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-orange-50 text-[#F94F06] border border-orange-200 shrink-0">
+            ⚡ Achat direct
+          </span>
         </div>
 
-        <form id="reg-form" class="space-y-3.5" onsubmit="handleRegistrationSubmit(event)">
+        <form id="reg-form" class="space-y-4" onsubmit="handleRegistrationSubmit(event)">
           
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Nom de votre Agence / Studio <span class="text-[#F94F06]">*</span></label>
-            <input type="text" id="reg-agency" required placeholder="Ex: Teranga Digital Studio" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Nom complet du CM <span class="text-[#F94F06]">*</span></label>
-            <input type="text" id="reg-name" required placeholder="Ex: Awa Diop" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Email Professionnel <span class="text-[#F94F06]">*</span></label>
-              <input type="email" id="reg-email" required placeholder="awa@teranga.sn" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
+              <label class="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-1.5">Nom de l'Agence / Studio <span class="text-[#F94F06]">*</span></label>
+              <input type="text" id="reg-agency" required placeholder="Ex: Teranga Digital Studio" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Mot de passe <span class="text-[#F94F06]">*</span></label>
-              <input type="password" id="reg-password" required minlength="6" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
+              <label class="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-1.5">Nom complet du CM <span class="text-[#F94F06]">*</span></label>
+              <input type="text" id="reg-name" required placeholder="Ex: Awa Diop" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-1.5">Email Professionnel <span class="text-[#F94F06]">*</span></label>
+              <input type="email" id="reg-email" required placeholder="awa@teranga.sn" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-1.5">Mot de passe (6+ car.) <span class="text-[#F94F06]">*</span></label>
+              <input type="password" id="reg-password" required minlength="6" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Numéro WhatsApp (pour alertes & validations) <span class="text-[#F94F06]">*</span></label>
-            <input type="tel" id="reg-phone" required placeholder="+221 77 000 00 00" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
+            <label class="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-1.5">Numéro WhatsApp (pour alertes & validations) <span class="text-[#F94F06]">*</span></label>
+            <input type="tel" id="reg-phone" required placeholder="+221 77 800 12 34" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
           </div>
 
-          <!-- Sélecteur Mobile Money -->
+          <!-- =========================================================================
+              SÉLECTEUR DE MÉTHODE DE PAIEMENT (Visible seulement en Mode Achat Direct)
+              ========================================================================= -->
           <div id="reg-payment-section" class="pt-2">
-            <label class="block text-xs font-bold text-slate-700 mb-2">Mode de Paiement Mobile Money 🇸🇳 🇨🇮</label>
+            <label class="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-2">Passerelle de Paiement Sécurisée :</label>
             <div class="grid grid-cols-2 gap-3">
-              <button type="button" id="btn-pay-wave" onclick="setPaymentMethod('WAVE')" class="p-3 rounded-xl border-2 border-[#1E90FF] bg-blue-50/50 text-[#1E90FF] font-bold text-xs flex items-center justify-between cursor-pointer">
-                <span>🌊 Wave</span>
-                <span class="text-[10px] font-normal text-slate-500">1-clic</span>
+              <!-- Wave -->
+              <button type="button" id="btn-pay-wave" onclick="setPaymentMethod('WAVE')" class="p-3 rounded-2xl border-2 border-[#1DC2EC] bg-cyan-50/60 text-slate-800 font-bold text-xs flex items-center gap-2.5 cursor-pointer transition-all">
+                <svg width="28" height="28" viewBox="0 0 48 48" fill="none" class="shrink-0">
+                  <rect width="48" height="48" rx="12" fill="#1DC2EC"/>
+                  <path d="M6 28 C10 22, 16 34, 22 28 C28 22, 34 34, 42 28" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                  <circle cx="36" cy="14" r="4.5" fill="#FFD700"/>
+                </svg>
+                <div class="text-left leading-tight">
+                  <div class="text-xs font-black">Wave</div>
+                  <div class="text-[10px] text-slate-500 font-normal">1% frais • 1-clic</div>
+                </div>
               </button>
-              <button type="button" id="btn-pay-om" onclick="setPaymentMethod('ORANGE_MONEY')" class="p-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-xs flex items-center justify-between cursor-pointer">
-                <span>🍊 Orange Money</span>
-                <span class="text-[10px] font-normal text-slate-500">OTP</span>
+
+              <!-- Orange Money -->
+              <button type="button" id="btn-pay-om" onclick="setPaymentMethod('ORANGE_MONEY')" class="p-3 rounded-2xl border border-slate-200 bg-white text-slate-700 font-bold text-xs flex items-center gap-2.5 cursor-pointer transition-all hover:border-slate-300">
+                <svg width="28" height="28" viewBox="0 0 48 48" fill="none" class="shrink-0">
+                  <rect width="48" height="48" rx="12" fill="#FF7900"/>
+                  <circle cx="24" cy="22" r="10" stroke="white" stroke-width="4" fill="none"/>
+                  <rect x="12" y="34" width="24" height="3.5" rx="1.75" fill="white"/>
+                  <path d="M26 17 L22 23 L25 23 L22 29 L28 21 L25 21 Z" fill="white"/>
+                </svg>
+                <div class="text-left leading-tight">
+                  <div class="text-xs font-black">Orange Money</div>
+                  <div class="text-[10px] text-slate-500 font-normal">UEMOA • Code OTP</div>
+                </div>
               </button>
+            </div>
+          </div>
+
+          <!-- Bannière Essai Gratuit (Visible seulement en Mode Trial) -->
+          <div id="trial-assurance-banner" class="hidden rounded-2xl bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3">
+            <div class="text-emerald-600 font-bold text-base mt-0.5">🛡️</div>
+            <div class="text-xs text-emerald-800">
+              <p class="font-black mb-0.5">Aucun paiement requis aujourd'hui</p>
+              <p class="font-medium text-emerald-700">
+                Votre compte est immédiatement créé avec 3 Workspaces inclus. Vous pourrez choisir votre forfait dans 14 jours.
+              </p>
             </div>
           </div>
 
           <!-- Bouton CTA -->
-          <div class="pt-3">
-            <button type="submit" id="btn-reg-submit" class="w-full py-3.5 px-4 bg-[#F94F06] hover:bg-[#e04605] text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-orange-500/25 active:scale-[0.98] transition-all cursor-pointer">
-              Créer mon compte & Payer 15 000 FCFA →
+          <div class="pt-2">
+            <button type="submit" id="btn-reg-submit" class="w-full py-4 px-6 bg-[#F94F06] hover:bg-[#e04605] text-white font-black text-sm rounded-2xl shadow-xl shadow-orange-500/25 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2">
+              Créer mon compte & Démarrer l'essai →
             </button>
           </div>
+
+          <!-- Basculer entre essai et achat -->
+          <p id="mode-toggle-link" class="text-center text-[11px] text-slate-500 pt-1">
+            <!-- Injecté dynamiquement par JS -->
+          </p>
 
         </form>
 
       </div>
 
-      <div class="text-center pt-4 border-t border-slate-100 text-xs text-slate-500">
-        Déjà inscrit ? <a href="login.html" class="font-bold text-[#F94F06] hover:underline">Se connecter</a>
+      <div class="text-center pt-5 border-t border-slate-100 text-xs text-slate-500 mt-6">
+        Déjà inscrit ? <a href="login.html" class="font-bold text-[#F94F06] hover:underline">Se connecter →</a>
       </div>
 
     </div>
@@ -175,102 +240,201 @@
   </div>
 
   <script>
+    // Configuration Officielle des Forfaits CMFlow
     const PLANS = {
       solo: {
+        id: 'solo',
         name: 'Solo / Freelance',
-        badge: 'Démarrage 🌱',
-        tagline: 'Idéal pour les freelances et CM indépendants gérant leurs premiers clients.',
+        badge: 'Offre Populaire ⚡',
+        tagline: 'Tout le nécessaire pour gérer vos premiers clients et automatiser vos validations.',
         priceMonthly: 3500,
         priceYearly: 35000,
-        isFree: false,
+        workspacesMax: 3,
         features: [
-          '✓ 2 Workspaces clients inclus',
-          '✓ Publications & médias illimités',
-          '✓ Validation WhatsApp interactive',
-          '✓ Auto-Publish Instagram & Facebook',
+          '3 Workspaces clients inclus',
+          'Publications illimitées (Carrousels, Reels, Posts)',
+          'Portail de validation WhatsApp interactif',
+          'Publication automatique Instagram & Facebook',
+          'Rapports d\'analyse PDF mensuels automatiques',
+          'Support réactif par WhatsApp',
         ],
       },
       pro: {
+        id: 'pro',
         name: 'Pro Agency',
         badge: 'Recommandé 🔥',
-        tagline: 'La solution complète pour les agences et CM avec un portefeuille actif.',
+        tagline: 'La formule clé en main pour les agences gérant un portefeuille actif de marques.',
         priceMonthly: 15000,
         priceYearly: 150000,
-        isFree: false,
+        workspacesMax: 10,
         features: [
-          '✓ Jusqu’à 10 Workspaces clients',
-          '✓ Publication Reels, Carrousels & Stories',
-          '✓ Rapports analytiques PDF automatisés',
-          '✓ Support prioritaire WhatsApp 7j/7',
+          '10 Workspaces clients inclus',
+          'Tout ce qui est dans Solo',
+          'Publication TikTok & LinkedIn',
+          '3 Comptes collaborateurs / CM inclus',
+          'Rapports PDF personnalisés avec stats avancées',
+          'Support prioritaire 7j/7',
         ],
       },
       scale: {
+        id: 'scale',
         name: 'Scale Agence',
         badge: 'Grands Comptes 🚀',
-        tagline: 'Pour les agences en forte croissance gérant de multiples marques.',
+        tagline: 'Pour les structures et agences en forte croissance avec besoins multi-équipes.',
         priceMonthly: 35000,
         priceYearly: 350000,
-        isFree: false,
+        workspacesMax: 999,
         features: [
-          '✓ Workspaces clients illimités',
-          '✓ Gestion d’équipe & rôles CM illimités',
-          '✓ Marque blanche totale (votre logo)',
-          '✓ Intégration API & Webhooks sur mesure',
+          'Workspaces clients illimités',
+          'Tout ce qui est dans Pro',
+          'Marque Blanche Totale (votre logo sur WhatsApp)',
+          'Équipe & rôles CM illimités',
+          'Intégration API & Webhooks sur mesure',
+          'Onboarding VIP & Responsable dédié',
         ],
       },
     };
 
-    // Alias pour rétrocompatibilité
+    // Alias rétrocompatibilité
     PLANS.starter = PLANS.solo;
 
+    // Analyse des paramètres d'URL
     const urlParams = new URLSearchParams(window.location.search);
-    let currentPlanId = urlParams.get('plan') || 'solo';
+    const hasTrialParam = urlParams.get('trial') === 'true';
+    const planParam = urlParams.get('plan');
+    
+    // Détection du mode : Trial si ?trial=true OU si aucun paramètre de plan payant
+    let isTrialMode = hasTrialParam || !planParam;
+    let currentPlanId = (planParam && PLANS[planParam]) ? planParam : 'solo';
     let currentCycle = urlParams.get('cycle') || 'monthly';
     let currentMethod = 'WAVE';
 
-    if (!PLANS[currentPlanId]) currentPlanId = 'solo';
-
-    function renderPlan() {
-      const plan = PLANS[currentPlanId];
+    function renderUI() {
+      const plan = PLANS[currentPlanId] || PLANS.solo;
       const isYearly = currentCycle === 'yearly';
       const price = isYearly ? plan.priceYearly : plan.priceMonthly;
 
-      document.getElementById('recap-plan-badge').textContent = plan.badge;
-      document.getElementById('recap-plan-name').textContent = plan.name;
-      document.getElementById('recap-plan-tagline').textContent = plan.tagline;
-      document.getElementById('recap-plan-price').textContent = price === 0 ? '0' : price.toLocaleString('fr-FR');
-      document.getElementById('recap-plan-period').textContent = isYearly ? 'FCFA / an' : 'FCFA / mois';
-
-      // Update features list
-      const listEl = document.getElementById('recap-features-list');
-      listEl.innerHTML = plan.features.map(f => `<li>${f}</li>`).join('');
-
-      // Update Switch Buttons
-      ['solo', 'pro', 'scale'].forEach(p => {
-        const btn = document.getElementById('btn-switch-' + p);
-        if (!btn) return;
-        if (p === currentPlanId) {
-          btn.className = 'p-2 rounded-xl text-center text-xs font-bold transition-all border border-orange-500 bg-orange-500/20 text-orange-300';
-        } else {
-          btn.className = 'p-2 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10';
-        }
-      });
-
-      // Update payment section & submit button text
-      const paySec = document.getElementById('reg-payment-section');
+      const trialBadge = document.getElementById('trial-mode-badge');
+      const planSwitcher = document.getElementById('plan-switcher-container');
+      const paySection = document.getElementById('reg-payment-section');
+      const trialAssurance = document.getElementById('trial-assurance-banner');
       const submitBtn = document.getElementById('btn-reg-submit');
-      if (plan.isFree || price === 0) {
-        if (paySec) paySec.style.display = 'none';
-        if (submitBtn) submitBtn.textContent = "Créer mon compte & Démarrer l'essai gratuit →";
+      const toggleCycleBtn = document.getElementById('btn-toggle-cycle');
+      const modePill = document.getElementById('mode-badge-pill');
+      const mainTitle = document.getElementById('form-main-title');
+      const subTitle = document.getElementById('form-subtitle');
+      const modeToggleLink = document.getElementById('mode-toggle-link');
+      const recapHeader = document.getElementById('recap-plan-header');
+
+      if (isTrialMode) {
+        // ── MODE ESSAI GRATUIT ──
+        if (trialBadge) trialBadge.classList.remove('hidden');
+        if (planSwitcher) planSwitcher.classList.add('hidden');
+        if (paySection) paySection.classList.add('hidden');
+        if (trialAssurance) trialAssurance.classList.remove('hidden');
+        if (toggleCycleBtn) toggleCycleBtn.classList.add('hidden');
+
+        document.getElementById('recap-plan-badge').textContent = '14 Jours Offerts 🎁';
+        document.getElementById('recap-plan-name').textContent = 'Essai Gratuit 14 Jours';
+        document.getElementById('recap-plan-tagline').textContent = 'Accès complet sans engagement, sans carte bancaire.';
+        document.getElementById('recap-plan-price').textContent = '0';
+        document.getElementById('recap-plan-period').textContent = 'FCFA';
+        if (recapHeader) recapHeader.textContent = 'Formule d\'essai';
+
+        if (modePill) {
+          modePill.className = 'hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0';
+          modePill.innerHTML = '🎁 14 jours gratuits';
+        }
+        if (mainTitle) mainTitle.textContent = 'Démarrer votre essai gratuit';
+        if (subTitle) subTitle.textContent = '14 jours offerts · Aucune carte bancaire · Annulation libre';
+
+        submitBtn.className = 'w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-2xl shadow-xl shadow-emerald-500/25 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2';
+        submitBtn.innerHTML = '🎁 Créer mon compte & Démarrer l\'essai →';
+
+        if (modeToggleLink) {
+          modeToggleLink.innerHTML = 'Vous souhaitez démarrer directement avec un forfait ? <a href="javascript:void(0)" onclick="switchToPurchase(\'pro\')" class="font-black text-[#F94F06] hover:underline">Voir les forfaits payants →</a>';
+        }
+
+        // Features en mode essai
+        const listEl = document.getElementById('recap-features-list');
+        listEl.innerHTML = [
+          '✓ 3 Workspaces clients (Forfait Solo inclus)',
+          '✓ Publications illimitées (Carrousels, Reels, Posts)',
+          '✓ Portail de validation WhatsApp interactif',
+          '✓ Publication automatique Instagram & Facebook',
+          '✓ Rapports PDF mensuels inclus',
+        ].map(f => `<li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> <span>${f.replace('✓ ', '')}</span></li>`).join('');
+
       } else {
-        if (paySec) paySec.style.display = 'block';
-        if (submitBtn) submitBtn.textContent = `Confirmer et Payer ${price.toLocaleString('fr-FR')} FCFA via ${currentMethod === 'WAVE' ? 'Wave 🌊' : 'Orange Money 🍊'} →`;
+        // ── MODE ACHAT DIRECT ──
+        if (trialBadge) trialBadge.classList.add('hidden');
+        if (planSwitcher) planSwitcher.classList.remove('hidden');
+        if (paySection) paySection.classList.remove('hidden');
+        if (trialAssurance) trialAssurance.classList.add('hidden');
+        if (toggleCycleBtn) {
+          toggleCycleBtn.classList.remove('hidden');
+          toggleCycleBtn.textContent = isYearly ? 'Passer mensuel' : 'Annuel (-2 mois)';
+        }
+
+        document.getElementById('recap-plan-badge').textContent = plan.badge;
+        document.getElementById('recap-plan-name').textContent = plan.name;
+        document.getElementById('recap-plan-tagline').textContent = plan.tagline;
+        document.getElementById('recap-plan-price').textContent = price.toLocaleString('fr-FR');
+        document.getElementById('recap-plan-period').textContent = isYearly ? 'FCFA / an' : 'FCFA / mois';
+        if (recapHeader) recapHeader.textContent = 'Forfait Choisi';
+
+        if (modePill) {
+          modePill.className = 'hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-orange-50 text-[#F94F06] border border-orange-200 shrink-0';
+          modePill.innerHTML = '⚡ Achat direct';
+        }
+        if (mainTitle) mainTitle.textContent = 'Créer mon espace agence';
+        if (subTitle) subTitle.textContent = 'Opérationnel en 2 minutes — Activation immédiate.';
+
+        submitBtn.className = 'w-full py-4 px-6 bg-[#F94F06] hover:bg-[#e04605] text-white font-black text-sm rounded-2xl shadow-xl shadow-orange-500/25 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2';
+        submitBtn.innerHTML = `Valider & Payer ${price.toLocaleString('fr-FR')} FCFA via ${currentMethod === 'WAVE' ? 'Wave 🌊' : 'Orange Money 🍊'} →`;
+
+        if (modeToggleLink) {
+          modeToggleLink.innerHTML = 'Pas prêt à payer maintenant ? <a href="javascript:void(0)" onclick="switchToTrial()" class="font-black text-emerald-600 hover:underline">Démarrer l\'essai gratuit 14j →</a>';
+        }
+
+        // Features du plan
+        const listEl = document.getElementById('recap-features-list');
+        listEl.innerHTML = plan.features.map(f => `<li class="flex items-start gap-2"><span class="text-emerald-400 font-bold mt-0.5">✓</span> <span>${f}</span></li>`).join('');
+
+        // Switch Buttons Style
+        ['solo', 'pro', 'scale'].forEach(p => {
+          const btn = document.getElementById('btn-switch-' + p);
+          if (!btn) return;
+          if (p === currentPlanId) {
+            btn.className = 'py-2 px-1 rounded-xl text-center text-xs font-bold transition-all border-2 border-[#F94F06] bg-orange-500/20 text-orange-200 scale-[1.03] cursor-pointer';
+          } else {
+            btn.className = 'py-2 px-1 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 cursor-pointer';
+          }
+        });
       }
     }
 
     function setPlan(planId) {
+      isTrialMode = false;
       currentPlanId = planId;
-      renderPlan();
+      renderUI();
+    }
+
+    function switchToTrial() {
+      isTrialMode = true;
+      currentPlanId = 'solo';
+      renderUI();
+    }
+
+    function switchToPurchase(planId) {
+      isTrialMode = false;
+      currentPlanId = planId || 'pro';
+      renderUI();
+    }
+
+    function toggleCycle() {
+      currentCycle = currentCycle === 'yearly' ? 'monthly' : 'yearly';
+      renderUI();
     }
 
     function setPaymentMethod(method) {
@@ -278,50 +442,68 @@
       const btnWave = document.getElementById('btn-pay-wave');
       const btnOm = document.getElementById('btn-pay-om');
       if (method === 'WAVE') {
-        btnWave.className = 'p-3 rounded-xl border-2 border-[#1E90FF] bg-blue-50/50 text-[#1E90FF] font-bold text-xs flex items-center justify-between cursor-pointer';
-        btnOm.className = 'p-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-xs flex items-center justify-between cursor-pointer';
+        btnWave.className = 'p-3 rounded-2xl border-2 border-[#1DC2EC] bg-cyan-50/60 text-slate-800 font-bold text-xs flex items-center gap-2.5 cursor-pointer transition-all';
+        btnOm.className = 'p-3 rounded-2xl border border-slate-200 bg-white text-slate-700 font-bold text-xs flex items-center gap-2.5 cursor-pointer transition-all hover:border-slate-300';
       } else {
-        btnOm.className = 'p-3 rounded-xl border-2 border-[#FF7900] bg-orange-50/50 text-[#FF7900] font-bold text-xs flex items-center justify-between cursor-pointer';
-        btnWave.className = 'p-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-xs flex items-center justify-between cursor-pointer';
+        btnOm.className = 'p-3 rounded-2xl border-2 border-[#FF7900] bg-orange-50/60 text-slate-800 font-bold text-xs flex items-center gap-2.5 cursor-pointer transition-all';
+        btnWave.className = 'p-3 rounded-2xl border border-slate-200 bg-white text-slate-700 font-bold text-xs flex items-center gap-2.5 cursor-pointer transition-all hover:border-slate-300';
       }
-      renderPlan();
+      renderUI();
     }
 
     async function handleRegistrationSubmit(e) {
       e.preventDefault();
       const submitBtn = document.getElementById('btn-reg-submit');
-      const plan = PLANS[currentPlanId];
+      const plan = PLANS[currentPlanId] || PLANS.solo;
       const isYearly = currentCycle === 'yearly';
       const price = isYearly ? plan.priceYearly : plan.priceMonthly;
 
       submitBtn.textContent = 'Création du compte en cours...';
       submitBtn.disabled = true;
 
+      const agencyName = document.getElementById('reg-agency').value.trim();
+      const fullName = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const agencyId = 'agency_' + Date.now();
+      const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+
       const profile = {
-        agencyId: 'agency_' + Date.now(),
-        agencyName: document.getElementById('reg-agency').value,
-        fullName: document.getElementById('reg-name').value,
-        email: document.getElementById('reg-email').value,
-        phone: document.getElementById('reg-phone').value,
-        plan: currentPlanId,
+        agencyId,
+        agencyName,
+        fullName,
+        email,
+        phone,
+        plan: isTrialMode ? 'solo' : currentPlanId,
         cycle: currentCycle,
+        amount: isTrialMode ? 0 : price,
+        workspacesMax: isTrialMode ? 3 : plan.workspacesMax,
+        workspacesUsed: 0,
+        paymentMethod: isTrialMode ? null : currentMethod,
+        paymentStatus: isTrialMode ? 'TRIAL' : 'PENDING_PAYMENT',
+        status: isTrialMode ? 'TRIAL' : 'pending',
+        trialEndsAt,
       };
 
+      // Sauvegarde session locale
       localStorage.setItem('cmflow_user_profile', JSON.stringify(profile));
-      localStorage.setItem('cmflow_active_plan', currentPlanId);
+      localStorage.setItem('cmflow_active_plan', profile.plan);
+      localStorage.setItem('cmflow_agency_id', agencyId);
 
-      if (plan.isFree || price === 0) {
+      // ── CAS 1 : MODE ESSAI GRATUIT ──
+      if (isTrialMode) {
         setTimeout(() => {
-          window.location.href = 'dashboard.html?plan=starter&welcome=true';
-        }, 800);
+          window.location.href = 'dashboard.html?status=trial_started&welcome=true';
+        }, 600);
         return;
       }
 
-      submitBtn.textContent = `Connexion à ${currentMethod === 'WAVE' ? 'Wave 🌊' : 'Orange Money 🍊'}...`;
+      // ── CAS 2 : MODE ACHAT DIRECT ──
+      submitBtn.textContent = `Redirection vers ${currentMethod === 'WAVE' ? 'Wave 🌊' : 'Orange Money 🍊'}...`;
 
       try {
         const endpoint = currentMethod === 'WAVE' ? '/api/billing/wave/checkout' : '/api/billing/om/checkout';
-        const planCode = currentPlanId === 'scale' ? 'SCALE' : 'PRO_AGENCY';
+        const planCode = currentPlanId.toUpperCase();
 
         const res = await fetch(endpoint, {
           method: 'POST',
@@ -333,7 +515,7 @@
             phone: profile.phone,
             planId: planCode,
             amount: price,
-            returnUrl: window.location.origin + '/billing.html?status=success&plan=' + planCode + '&method=' + currentMethod.toLowerCase(),
+            returnUrl: window.location.origin + '/billing.html?status=success&plan=' + currentPlanId + '&method=' + currentMethod.toLowerCase(),
             cancelUrl: window.location.origin + '/register.html?plan=' + currentPlanId,
           }),
         });
@@ -346,14 +528,24 @@
             return;
           }
         }
-        window.location.href = 'billing.html?status=success&plan=' + planCode + '&method=' + currentMethod.toLowerCase();
       } catch (err) {
-        window.location.href = 'billing.html?status=success&plan=' + currentPlanId + '&method=' + currentMethod.toLowerCase();
+        // Fallback
       }
+
+      // Fallback si pas d'API backend
+      const q = new URLSearchParams({
+        status: 'pending',
+        plan: currentPlanId,
+        method: currentMethod === 'WAVE' ? 'wave' : 'om',
+        agency: agencyName,
+        email: email,
+        amount: String(price),
+      });
+      window.location.href = `billing.html?${q.toString()}`;
     }
 
-    // Initial render
-    renderPlan();
+    // Initialisation
+    renderUI();
   </script>
 </body>
 </html>
