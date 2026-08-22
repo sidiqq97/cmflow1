@@ -29,63 +29,65 @@ interface PlanDetail {
 }
 
 const PLANS_CONFIG: Record<string, PlanDetail> = {
-  starter: {
-    id: 'starter',
-    name: 'Découverte',
-    badge: 'Essai 14j Gratuit 🌱',
-    tagline: 'Pour tester la plateforme avec vos 2 premiers clients sans carte bancaire.',
-    priceMonthly: 0,
-    priceYearly: 0,
-    isFree: true,
+  solo: {
+    id: 'solo',
+    name: 'Solo / Freelance',
+    badge: 'Essai 14j Inclus 🌱',
+    tagline: 'Idéal pour les freelances et CM indépendants gérant leurs premiers clients.',
+    priceMonthly: 3500,
+    priceYearly: 35000,
+    isFree: false,
     features: [
-      'Jusqu’à 2 Marques & Clients',
-      'Validation WhatsApp en 1 clic',
-      'Calendrier éditorial & Médias HD (50 Mo)',
-      'Assistant IA Illimité',
+      '2 Workspaces clients',
+      'Publications & médias illimités',
+      'Portail de validation WhatsApp interactif',
+      'Publication automatique Instagram & Facebook',
     ],
   },
   pro: {
     id: 'pro',
     name: 'Pro Agency',
-    badge: 'Le Plus Populaire 🔥',
-    tagline: 'L’arme ultime pour gérer jusqu’à 10 marques sereinement.',
+    badge: 'Recommandé 🔥',
+    tagline: 'La solution complète pour les agences et CM avec un portefeuille actif.',
     priceMonthly: 15000,
     priceYearly: 150000,
     isFree: false,
     features: [
-      'Jusqu’à 10 Marques & Clients actifs',
-      'Auto-Publish Meta (Instagram Pro & Facebook)',
-      'Validation WhatsApp & Liens Magiques',
-      'Export Bilans & Rapports PDF personnalisés',
+      'Jusqu’à 10 Workspaces clients',
+      'Publication Reels, Carrousels & Stories',
+      'Rapports analytiques PDF automatisés',
       'Support prioritaire WhatsApp 7j/7',
     ],
   },
   scale: {
     id: 'scale',
     name: 'Scale Agence',
-    badge: 'Grandes Équipes 🚀',
-    tagline: 'Pour les agences digitales et équipes de CMs en pleine expansion.',
+    badge: 'Grands Comptes 🚀',
+    tagline: 'Pour les agences en forte croissance gérant de multiples marques.',
     priceMonthly: 35000,
     priceYearly: 350000,
     isFree: false,
     features: [
-      'Marques & Clients illimités',
-      'Marque Blanche (White-label complet)',
-      'Multi-comptes CM & Rôles d’équipe',
-      'Accès API REST & Webhooks personnalisés',
+      'Workspaces clients illimités',
+      'Gestion d’équipe & rôles CM illimités',
+      'Marque blanche totale (votre logo sur le portail client)',
+      'Intégration API & Webhooks sur mesure',
     ],
   },
 };
+
+// Compatibilité pour anciens liens
+PLANS_CONFIG.starter = PLANS_CONFIG.solo;
 
 function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const planParam = searchParams.get('plan') || 'starter';
+  const planParam = searchParams.get('plan') || 'solo';
   const cycleParam = searchParams.get('cycle') || 'monthly';
 
   const [activePlanId, setActivePlanId] = useState<string>(
-    PLANS_CONFIG[planParam] ? planParam : 'starter'
+    PLANS_CONFIG[planParam] ? planParam : 'solo'
   );
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>(
     cycleParam === 'yearly' ? 'yearly' : 'monthly'

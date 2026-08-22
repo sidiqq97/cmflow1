@@ -46,7 +46,7 @@ export const PLANS = [
     description: 'Pour les agences en forte croissance gérant de multiples marques.',
     features: [
       'Workspaces clients illimités',
-      'Gestion d'équipe & rôles CM illimités',
+      'Gestion d\'équipe & rôles CM illimités',
       'Marque blanche totale (votre logo sur le portail client)',
       'Intégration API & Webhooks sur mesure'
     ],
