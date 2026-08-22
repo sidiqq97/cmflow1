@@ -534,18 +534,140 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('status') === 'success') {
-        const plan = urlParams.get('plan') || 'PRO_AGENCY';
-        const method = urlParams.get('method') === 'om' ? 'Orange Money 🍊' : 'Wave 🌊';
-        showToast('🎉 Félicitations ! Votre abonnement ' + plan + ' est désormais actif via ' + method + '.');
+      const status = urlParams.get('status');
+      const plan = urlParams.get('plan') || 'pro';
+      const method = urlParams.get('method') || 'wave';
+      const agency = urlParams.get('agency') || '';
+      const email = urlParams.get('email') || '';
+      const amount = parseInt(urlParams.get('amount') || '0');
+
+      if (status === 'success') {
+        const methodLabel = method === 'om' ? 'Orange Money 🍊' : 'Wave 🌊';
+        showToast('🎉 Félicitations ! Votre abonnement ' + plan + ' est désormais actif via ' + methodLabel + '.');
         if (typeof CMFlowRealtime !== 'undefined') {
           CMFlowRealtime.trigger({
-            workspaceName: 'Facturation ' + method,
+            workspaceName: 'Facturation ' + methodLabel,
             action: 'APPROVED',
-            postCaption: 'Abonnement ' + plan + ' validé avec succès sur ' + method + ' !'
+            postCaption: 'Abonnement ' + plan + ' validé avec succès sur ' + methodLabel + ' !'
           });
         }
-      } else if (urlParams.get('status') === 'error' || urlParams.get('status') === 'cancelled') {
+
+      } else if (status === 'pending') {
+        // Afficher bannière d'instructions de paiement
+        const isOm = method === 'om';
+        const methodLabel = isOm ? 'Orange Money 🍊' : 'Wave 🌊';
+        const amountFormatted = amount > 0 ? amount.toLocaleString('fr-FR') + ' FCFA' : '—';
+        const planLabel = plan === 'solo' ? 'Solo / Freelance' : plan === 'pro' ? 'Pro Agency' : 'Scale Agence';
+
+        const banner = document.createElement('div');
+        banner.id = 'payment-pending-banner';
+        banner.style.cssText = `
+          position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+          background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+          border-bottom: 2px solid ${isOm ? '#FF7900' : '#1E90FF'};
+          padding: 0; display: flex; align-items: center; justify-content: center;
+          min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif;
+        `;
+
+        banner.innerHTML = `
+          <div style="max-width: 520px; width: 100%; margin: 20px; background: #1E293B; border-radius: 24px; border: 1px solid ${isOm ? '#FF7900' : '#1E90FF'}33; overflow: hidden; box-shadow: 0 32px 64px rgba(0,0,0,0.5);">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, ${isOm ? '#FF7900' : '#1E90FF'}22, ${isOm ? '#FF7900' : '#1E90FF'}08); padding: 28px 28px 20px; border-bottom: 1px solid ${isOm ? '#FF7900' : '#1E90FF'}22;">
+              <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 12px;">
+                <div style="width:48px; height:48px; border-radius:16px; background: ${isOm ? '#FF7900' : '#1E90FF'}22; display:flex; align-items:center; justify-content:center; font-size:24px; border: 1px solid ${isOm ? '#FF7900' : '#1E90FF'}44;">
+                  ${isOm ? '🍊' : '🌊'}
+                </div>
+                <div>
+                  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:${isOm ? '#FF7900' : '#60B4FF'}; margin-bottom:2px;">Paiement en cours</div>
+                  <div style="font-size:20px; font-weight:900; color:#FFFFFF;">Payer via ${methodLabel}</div>
+                </div>
+              </div>
+              <!-- Récap forfait -->
+              <div style="background: rgba(255,255,255,0.05); border-radius:14px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(255,255,255,0.08);">
+                <div>
+                  <div style="font-size:10px; font-weight:700; color:#94A3B8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:2px;">Forfait CMFlow</div>
+                  <div style="font-size:14px; font-weight:800; color:#FFFFFF;">${planLabel}</div>
+                  ${agency ? `<div style="font-size:11px; color:#94A3B8; margin-top:2px;">${agency}</div>` : ''}
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:10px; font-weight:700; color:#94A3B8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:2px;">Montant</div>
+                  <div style="font-size:22px; font-weight:900; color:${isOm ? '#FF7900' : '#60B4FF'};">${amountFormatted}</div>
+                  <div style="font-size:10px; color:#64748B;">/ mois</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Instructions -->
+            <div style="padding: 24px 28px;">
+              ${isOm ? `
+                <!-- Instructions Orange Money -->
+                <div style="font-size:13px; font-weight:700; color:#F1F5F9; margin-bottom:14px;">Suivez ces étapes pour payer :</div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                  ${[
+                    ['1', '#FF7900', 'Composez le code USSD', 'Tapez <strong style="color:#FF7900; font-size:16px;">*144#</strong> sur votre téléphone Orange et appuyez sur Appel.'],
+                    ['2', '#FF7900', 'Sélectionnez "Paiement marchand"', 'Dans le menu, choisissez <strong>Paiement</strong> ou <strong>Transfert / Paiement</strong>.'],
+                    ['3', '#FF7900', 'Entrez le montant', `Saisissez <strong style="color:#FF7900;">${amountFormatted}</strong> comme montant à payer.`],
+                    ['4', '#FF7900', 'Référence de paiement', `Référence : <strong style="color:#FF7900;">CMFLOW-${plan.toUpperCase()}</strong> — Email : <strong>${email || 'votre email'}</strong>`],
+                    ['5', '#10B981', 'Confirmez avec votre code PIN', 'Validez avec votre code secret Orange Money. Vous recevrez un SMS de confirmation.'],
+                  ].map(([n, c, title, desc]) => `
+                    <div style="display:flex; gap:12px; align-items:flex-start; background:rgba(255,255,255,0.04); border-radius:14px; padding:12px 14px; border:1px solid rgba(255,255,255,0.06);">
+                      <div style="width:28px; height:28px; border-radius:10px; background:${c}22; color:${c}; font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; shrink:0; border:1px solid ${c}33; flex-shrink:0;">${n}</div>
+                      <div>
+                        <div style="font-size:12px; font-weight:700; color:#E2E8F0; margin-bottom:3px;">${title}</div>
+                        <div style="font-size:11px; color:#94A3B8; line-height:1.5;">${desc}</div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+                <!-- Bouton alternatif site OM -->
+                <a href="https://orangemoney.orange.sn/" target="_blank" rel="noopener noreferrer"
+                   style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; padding:12px 20px; background:#FF7900; color:#FFFFFF; font-size:12px; font-weight:800; border-radius:16px; text-decoration:none; transition:opacity .2s;"
+                   onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
+                  🍊 Payer en ligne sur orangemoney.orange.sn
+                </a>
+              ` : `
+                <!-- Instructions Wave -->
+                <div style="font-size:13px; font-weight:700; color:#F1F5F9; margin-bottom:14px;">Suivez ces étapes pour payer :</div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                  ${[
+                    ['1', '#1E90FF', 'Ouvrez l\'app Wave', 'Lancez <strong>Wave</strong> sur votre smartphone (SN / CI).'],
+                    ['2', '#1E90FF', 'Appuyez sur "Envoyer"', 'Sélectionnez <strong>Envoyer de l\'argent</strong>.'],
+                    ['3', '#1E90FF', 'Entrez le montant', `Montant : <strong style="color:#1E90FF;">${amountFormatted}</strong>.`],
+                    ['4', '#1E90FF', 'Note de paiement', `Note : <strong>CMFLOW-${plan.toUpperCase()}</strong> — ${email || 'votre email'}`],
+                    ['5', '#10B981', 'Confirmez le paiement', 'Validez avec votre empreinte ou code PIN Wave.'],
+                  ].map(([n, c, title, desc]) => `
+                    <div style="display:flex; gap:12px; align-items:flex-start; background:rgba(255,255,255,0.04); border-radius:14px; padding:12px 14px; border:1px solid rgba(255,255,255,0.06);">
+                      <div style="width:28px; height:28px; border-radius:10px; background:${c}22; color:${c}; font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; shrink:0; border:1px solid ${c}33; flex-shrink:0;">${n}</div>
+                      <div>
+                        <div style="font-size:12px; font-weight:700; color:#E2E8F0; margin-bottom:3px;">${title}</div>
+                        <div style="font-size:11px; color:#94A3B8; line-height:1.5;">${desc}</div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              `}
+
+              <!-- Boutons action -->
+              <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="document.getElementById('payment-pending-banner').remove();"
+                  style="flex:1; padding:12px; background:rgba(255,255,255,0.06); color:#94A3B8; font-size:11px; font-weight:700; border-radius:14px; border:1px solid rgba(255,255,255,0.08); cursor:pointer;">
+                  ← Retour au tableau de bord
+                </button>
+                <button onclick="document.getElementById('payment-pending-banner').remove(); showToast('✅ Paiement marqué comme effectué. Notre équipe vérifiera sous 24h.');"
+                  style="flex:2; padding:12px; background:linear-gradient(135deg, #10B981, #059669); color:#FFFFFF; font-size:11px; font-weight:800; border-radius:14px; border:none; cursor:pointer;">
+                  ✅ J'ai effectué le paiement
+                </button>
+              </div>
+              <div style="text-align:center; margin-top:12px; font-size:10px; color:#475569;">
+                🔒 Paiement 100% sécurisé • Activation sous 1h • Support WhatsApp disponible
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(banner);
+
+      } else if (status === 'error' || status === 'cancelled') {
         showToast('❌ Le paiement a été annulé ou interrompu.');
       }
     });

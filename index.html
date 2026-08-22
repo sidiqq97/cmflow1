@@ -1318,52 +1318,141 @@
 
     async function submitPricingCheckout(e) {
       e.preventDefault();
-      const agencyName = document.getElementById('pcm-agency-name').value;
-      const email = document.getElementById('pcm-email').value;
-      const phone = document.getElementById('pcm-phone').value;
+      const agencyName = document.getElementById('pcm-agency-name').value.trim();
+      const email = document.getElementById('pcm-email').value.trim();
+      const phone = document.getElementById('pcm-phone').value.trim();
       const submitBtn = document.getElementById('pcm-submit-btn');
 
+      // Validation basique
+      if (!agencyName || !email) {
+        alert('Merci de renseigner le nom de votre agence et votre email.');
+        return;
+      }
+
+      // --- Essai gratuit ---
       if (currentPcmAmount === 0) {
         submitBtn.textContent = 'Création du compte en cours...';
         submitBtn.disabled = true;
         setTimeout(() => {
-          window.location.href = 'startpage.html?plan=starter&welcome=true';
+          window.location.href = 'register.html?plan=' + currentPcmPlanId + '&welcome=true';
         }, 800);
         return;
       }
 
-      submitBtn.textContent = 'Connexion à ' + (currentPcmMethod === 'WAVE' ? 'Wave 🌊...' : 'Orange Money 🍊...');
-      submitBtn.disabled = true;
+      // Sauvegarde de la session locale avant paiement
+      const agencyId = 'agency_' + Date.now();
+      const sessionData = {
+        agencyId,
+        agencyName,
+        email,
+        phone,
+        plan: currentPcmPlanId,
+        amount: currentPcmAmount,
+        method: currentPcmMethod,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+      localStorage.setItem('cmflow_pending_payment', JSON.stringify(sessionData));
+      localStorage.setItem('cmflow_active_plan', currentPcmPlanId);
 
-      try {
-        const endpoint = currentPcmMethod === 'WAVE' ? '/api/billing/wave/checkout' : '/api/billing/om/checkout';
-        const planCode = currentPcmPlanId === 'scale' ? 'SCALE' : 'PRO_AGENCY';
-        
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            agencyId: 'agency_' + Date.now(),
-            agencyName: agencyName,
-            agencyEmail: email,
-            phone: phone,
-            planId: planCode,
-            amount: currentPcmAmount,
-            returnUrl: window.location.origin + '/billing.html?status=success&plan=' + planCode + '&method=' + currentPcmMethod.toLowerCase(),
-            cancelUrl: window.location.origin + '/#pricing',
-          })
-        });
-        const data = await res.json();
-        if (data && data.success) {
-          const url = data.wave_launch_url || data.payment_url;
-          if (url) {
-            window.location.href = url;
+      // ——————————————————————————————————————————————
+      // WAVE — Deep link direct (Sénégal / Côte d'Ivoire)
+      // ——————————————————————————————————————————————
+      if (currentPcmMethod === 'WAVE') {
+        submitBtn.textContent = 'Ouverture de Wave 🌊...';
+        submitBtn.disabled = true;
+
+        // Tentative API Wave
+        try {
+          const res = await fetch('/api/billing/wave/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              agencyId, agencyName, agencyEmail: email, phone,
+              planId: currentPcmPlanId.toUpperCase(),
+              amount: currentPcmAmount,
+              returnUrl: window.location.origin + '/billing.html?status=success&plan=' + currentPcmPlanId + '&method=wave',
+              cancelUrl: window.location.origin + '/#pricing',
+            })
+          });
+          const data = await res.json();
+          if (data && data.success && data.wave_launch_url) {
+            window.location.href = data.wave_launch_url;
             return;
           }
+        } catch (_) { /* fallback ci-dessous */ }
+
+        // Fallback : deep link Wave universel
+        // wave://send?phone=&amount=&note=
+        const waveNote = encodeURIComponent('CMFlow - Forfait ' + currentPcmPlanId.toUpperCase() + ' - ' + agencyName);
+        const waveDeepLink = 'wave://send?amount=' + currentPcmAmount + '&note=' + waveNote;
+        // Sur mobile ouvre l'app Wave; sur desktop redirige vers billing avec instructions
+        const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+        if (isMobile) {
+          window.location.href = waveDeepLink;
+          // Fallback après 2s si l'app ne s'ouvre pas
+          setTimeout(() => {
+            window.location.href = 'billing.html?status=pending&plan=' + currentPcmPlanId + '&method=wave&agency=' + encodeURIComponent(agencyName) + '&email=' + encodeURIComponent(email);
+          }, 2000);
+        } else {
+          // Desktop : page de confirmation avec instructions Wave
+          window.location.href = 'billing.html?status=pending&plan=' + currentPcmPlanId + '&method=wave&agency=' + encodeURIComponent(agencyName) + '&email=' + encodeURIComponent(email) + '&amount=' + currentPcmAmount;
         }
-        window.location.href = 'billing.html?status=success&plan=' + planCode + '&method=' + currentPcmMethod.toLowerCase();
-      } catch (err) {
-        window.location.href = 'billing.html?status=success&plan=' + currentPcmPlanId + '&method=' + currentPcmMethod.toLowerCase();
+        return;
+      }
+
+      // ——————————————————————————————————————————————
+      // ORANGE MONEY — Lien de paiement Orange Money CI / SN
+      // ——————————————————————————————————————————————
+      if (currentPcmMethod === 'ORANGE_MONEY') {
+        submitBtn.textContent = 'Redirection vers Orange Money 🍊...';
+        submitBtn.disabled = true;
+
+        // Tentative API Orange Money
+        try {
+          const res = await fetch('/api/billing/om/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              agencyId, agencyName, agencyEmail: email, phone,
+              planId: currentPcmPlanId.toUpperCase(),
+              amount: currentPcmAmount,
+              returnUrl: window.location.origin + '/billing.html?status=success&plan=' + currentPcmPlanId + '&method=om',
+              cancelUrl: window.location.origin + '/#pricing',
+            })
+          });
+          const data = await res.json();
+          if (data && data.success && data.payment_url) {
+            window.location.href = data.payment_url;
+            return;
+          }
+        } catch (_) { /* fallback ci-dessous */ }
+
+        // Fallback : portail Orange Money Business UEMOA
+        // Sur mobile : USSD code *144# puis saisie manuelle
+        const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+        const omNote = 'CMFlow ' + currentPcmPlanId.toUpperCase() + ' - ' + agencyName;
+
+        if (isMobile) {
+          // USSD Orange Money direct (SN / CI) — ouvre le dialer
+          const ussdCode = encodeURIComponent('*144#');
+          window.location.href = 'tel:' + ussdCode;
+          setTimeout(() => {
+            window.location.href = 'billing.html?status=pending&plan=' + currentPcmPlanId + '&method=om&agency=' + encodeURIComponent(agencyName) + '&email=' + encodeURIComponent(email) + '&amount=' + currentPcmAmount;
+          }, 1500);
+        } else {
+          // Desktop : portail Orange Money Business (UEMOA)
+          // Ouvre dans un nouvel onglet + affiche la page d'instructions
+          window.open(
+            'https://orangemoney.orange.sn/',
+            '_blank',
+            'noopener,noreferrer'
+          );
+          setTimeout(() => {
+            window.location.href = 'billing.html?status=pending&plan=' + currentPcmPlanId + '&method=om&agency=' + encodeURIComponent(agencyName) + '&email=' + encodeURIComponent(email) + '&amount=' + currentPcmAmount;
+          }, 800);
+        }
+        return;
       }
     }
   </script>
