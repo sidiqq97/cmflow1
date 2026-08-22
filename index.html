@@ -1254,7 +1254,10 @@
         if (submitBtn) submitBtn.textContent = "Créer mon compte & Démarrer l'essai →";
       } else {
         if (payContainer) payContainer.style.display = 'block';
-        if (submitBtn) submitBtn.textContent = 'Confirmer et Payer ' + amount.toLocaleString('fr-FR') + ' FCFA →';
+        // Texte initial calé sur Wave (sélectionné par défaut)
+        if (submitBtn) submitBtn.textContent = 'Payer ' + amount.toLocaleString('fr-FR') + ' FCFA via Wave 🌊 →';
+        // Réinitialiser la sélection visuelle de Wave
+        setPcmMethod('WAVE');
       }
 
       const modal = document.getElementById('pricing-checkout-modal');
@@ -1287,7 +1290,9 @@
       currentPcmMethod = method;
       const btnWave = document.getElementById('pcm-btn-wave');
       const btnOm = document.getElementById('pcm-btn-om');
+      const submitBtn = document.getElementById('pcm-submit-btn');
       if (!btnWave || !btnOm) return;
+
       if (method === 'WAVE') {
         btnWave.style.border = '2px solid #1E90FF';
         btnWave.style.background = '#EFF6FF';
@@ -1295,6 +1300,9 @@
         btnOm.style.border = '1px solid #CBD5E1';
         btnOm.style.background = '#FFFFFF';
         btnOm.style.color = '#64748B';
+        if (submitBtn && !submitBtn.disabled) {
+          submitBtn.textContent = 'Payer ' + (currentPcmAmount || 0).toLocaleString('fr-FR') + ' FCFA via Wave 🌊 →';
+        }
       } else {
         btnOm.style.border = '2px solid #FF7900';
         btnOm.style.background = '#FFF7ED';
@@ -1302,6 +1310,9 @@
         btnWave.style.border = '1px solid #CBD5E1';
         btnWave.style.background = '#FFFFFF';
         btnWave.style.color = '#64748B';
+        if (submitBtn && !submitBtn.disabled) {
+          submitBtn.textContent = 'Payer ' + (currentPcmAmount || 0).toLocaleString('fr-FR') + ' FCFA via Orange Money 🍊 →';
+        }
       }
     }
 
