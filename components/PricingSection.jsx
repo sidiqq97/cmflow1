@@ -179,7 +179,7 @@ export function PricingSection() {
           <div className="inline-flex items-center justify-center gap-2 text-xs md:text-sm font-semibold text-slate-500 bg-white/80 border border-slate-200/80 px-5 py-2.5 rounded-full shadow-xs">
             <ShieldCheck className="w-4 h-4 text-emerald-500" />
             <span>
-              Tous les forfaits incluent 14 jours d'essai • Paiement sécurisé par <strong>Wave 🌊</strong> & <strong>Orange Money 🍊</strong>
+              Tous les forfaits incluent 14 jours d&apos;essai • Paiement sécurisé par <strong>Wave 🌊</strong> &amp; <strong>Orange Money 🍊</strong>
             </span>
           </div>
         </div>
