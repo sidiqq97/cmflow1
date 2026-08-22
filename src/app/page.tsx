@@ -84,13 +84,13 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-            <a
-              href="#pricing"
+            <Link
+              href="/register?plan=starter"
               className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-[#F94F06] hover:bg-[#e04605] text-white text-sm font-black shadow-xl shadow-orange-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
               <span>Démarrer l'essai 14 jours (Sans CB)</span>
               <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
             <a
               href="#validation"
               className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 text-sm font-bold shadow-xs transition-all flex items-center justify-center gap-2"

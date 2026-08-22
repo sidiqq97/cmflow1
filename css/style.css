@@ -3879,6 +3879,34 @@ button {
 }
 
 /* ==========================================================================
+   MODALES POPUPS & BACKDROP (CHECKOUT TARIFAIRE, GAIN DE TEMPS, AUTH)
+   ========================================================================== */
+.auth-modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  background: rgba(15, 23, 42, 0.72) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.auth-modal-backdrop.active {
+  display: flex !important;
+  opacity: 1 !important;
+}
+
+.auth-modal-backdrop.active > div {
+  animation: modalScaleUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ==========================================================================
    ANIMATIONS & KEYFRAMES ADDITIONNELS
    ========================================================================== */
 @keyframes dropUp {
@@ -3895,7 +3923,7 @@ button {
 @keyframes modalScaleUp {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.94);
   }
   to {
     opacity: 1;
@@ -3911,5 +3939,6 @@ button {
     box-shadow: 0 15px 35px rgba(37, 99, 235, 0.12);
   }
 }
+
 
 

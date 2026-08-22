@@ -62,7 +62,7 @@ export function PricingSection() {
   const cycle = isYearly ? 'yearly' : 'monthly';
 
   return (
-    <section className="py-20 px-4 bg-[#F8FAFC] relative z-10" id="tarifs">
+    <section className="py-20 px-4 bg-[#F8FAFC] relative z-10" id="pricing">
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center space-y-4 max-w-2xl mx-auto">

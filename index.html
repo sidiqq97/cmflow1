@@ -1226,7 +1226,7 @@
 
       if (badgeEl) badgeEl.textContent = badge || 'Formule Choisie';
       if (nameEl) nameEl.textContent = planName || 'Pro Agency';
-      if (priceEl) priceEl.textContent = amount === 0 ? '0 FCFA' : (amount.toLocaleString() + ' FCFA');
+      if (priceEl) priceEl.textContent = amount === 0 ? '0 FCFA' : (amount.toLocaleString('fr-FR') + ' FCFA');
       if (periodEl) periodEl.textContent = amount === 0 ? ' / 14 jours' : ' / mois';
       
       if (amount === 0) {
@@ -1234,11 +1234,12 @@
         if (submitBtn) submitBtn.textContent = "Créer mon compte & Démarrer l'essai →";
       } else {
         if (payContainer) payContainer.style.display = 'block';
-        if (submitBtn) submitBtn.textContent = 'Confirmer et Payer ' + amount.toLocaleString() + ' FCFA →';
+        if (submitBtn) submitBtn.textContent = 'Confirmer et Payer ' + amount.toLocaleString('fr-FR') + ' FCFA →';
       }
 
       const modal = document.getElementById('pricing-checkout-modal');
       if (modal) {
+        modal.style.display = 'flex';
         modal.classList.add('active');
         modal.removeAttribute('aria-hidden');
         document.body.style.overflow = 'hidden';
@@ -1248,6 +1249,7 @@
     function closePricingCheckoutModal() {
       const modal = document.getElementById('pricing-checkout-modal');
       if (modal) {
+        modal.style.display = 'none';
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
