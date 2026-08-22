@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscription & Choix du Forfait — CMFlow</title>
+  <meta name="description" content="Créez votre compte agence CMFlow, choisissez votre forfait et démarrez sereinement.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-full bg-[#F8FAFC] flex items-center justify-center p-4 sm:p-6 lg:p-8 antialiased text-[#0F172A]">
+
+  <!-- Conteneur Carte SaaS -->
+  <div class="w-full max-w-5xl bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[660px]">
+    
+    <!-- =========================================================================
+        COLONNE 1 : ENCADRÉ RÉCAPITULATIF DYNAMIQUE
+        ========================================================================= -->
+    <div class="md:col-span-5 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 p-6 sm:p-8 text-white flex flex-col justify-between relative overflow-hidden">
+      
+      <!-- Halo décoratif -->
+      <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 space-y-6">
+        <!-- Logo -->
+        <a href="index.html" class="inline-flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-[#F94F06] flex items-center justify-center text-white font-black text-sm">
+            CM
+          </div>
+          <span class="text-xl font-black tracking-tight text-white">CM<span class="text-[#F94F06]">Flow</span></span>
+        </a>
+
+        <!-- Carte Forfait Dynamique -->
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-black uppercase tracking-wider text-orange-400">Votre Forfait</span>
+            <span id="recap-plan-badge" class="text-[10px] font-black bg-orange-500 text-white px-2.5 py-0.5 rounded-full">
+              Le Plus Populaire 🔥
+            </span>
+          </div>
+
+          <div>
+            <h2 id="recap-plan-name" class="text-2xl font-black text-white">Pro Agency</h2>
+            <p id="recap-plan-tagline" class="text-xs text-slate-300 mt-1">L'arme ultime pour gérer jusqu'à 10 marques sereinement.</p>
+          </div>
+
+          <div class="pt-2 border-t border-white/10 flex items-baseline gap-1.5">
+            <span id="recap-plan-price" class="text-3xl font-black text-white">15 000</span>
+            <span id="recap-plan-period" class="text-xs font-bold text-slate-400">FCFA / mois</span>
+          </div>
+        </div>
+
+        <!-- Boutons de Changement Rapide -->
+        <div class="space-y-1.5">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Changer d'offre :</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" onclick="setPlan('starter')" id="btn-switch-starter" class="p-2 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10">
+              Découverte
+            </button>
+            <button type="button" onclick="setPlan('pro')" id="btn-switch-pro" class="p-2 rounded-xl text-center text-xs font-bold transition-all border border-orange-500 bg-orange-500/20 text-orange-300">
+              Pro
+            </button>
+            <button type="button" onclick="setPlan('scale')" id="btn-switch-scale" class="p-2 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10">
+              Scale
+            </button>
+          </div>
+        </div>
+
+        <!-- Liste des Inclusions -->
+        <div class="space-y-2.5 pt-2">
+          <span class="text-xs font-bold text-white">Inclus dans votre offre :</span>
+          <ul id="recap-features-list" class="space-y-2 text-xs text-slate-300">
+            <!-- Injecté dynamiquement par JS -->
+          </ul>
+        </div>
+      </div>
+
+      <div class="relative z-10 pt-4 text-[11px] text-slate-400 flex items-center gap-2 border-t border-white/10">
+        <span>🔒 Paiement sécurisé Wave & Orange Money</span>
+      </div>
+
+    </div>
+
+    <!-- =========================================================================
+        COLONNE 2 : FORMULAIRE D'INSCRIPTION & PAIEMENT
+        ========================================================================= -->
+    <div class="md:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col justify-between">
+      <div>
+        
+        <div class="mb-6">
+          <h1 class="text-2xl font-black text-[#0F172A] tracking-tight">
+            Finalisez votre inscription
+          </h1>
+          <p class="text-xs text-slate-500 mt-1">
+            Créez votre espace en 30 secondes et connectez vos marques.
+          </p>
+        </div>
+
+        <form id="reg-form" class="space-y-3.5" onsubmit="handleRegistrationSubmit(event)">
+          
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Nom de votre Agence / Studio <span class="text-[#F94F06]">*</span></label>
+            <input type="text" id="reg-agency" required placeholder="Ex: Teranga Digital Studio" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Nom complet du CM <span class="text-[#F94F06]">*</span></label>
+            <input type="text" id="reg-name" required placeholder="Ex: Awa Diop" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Email Professionnel <span class="text-[#F94F06]">*</span></label>
+              <input type="email" id="reg-email" required placeholder="awa@teranga.sn" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Mot de passe <span class="text-[#F94F06]">*</span></label>
+              <input type="password" id="reg-password" required minlength="6" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Numéro WhatsApp (pour alertes & validations) <span class="text-[#F94F06]">*</span></label>
+            <input type="tel" id="reg-phone" required placeholder="+221 77 000 00 00" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-[#F94F06] transition-all">
+          </div>
+
+          <!-- Sélecteur Mobile Money -->
+          <div id="reg-payment-section" class="pt-2">
+            <label class="block text-xs font-bold text-slate-700 mb-2">Mode de Paiement Mobile Money 🇸🇳 🇨🇮</label>
+            <div class="grid grid-cols-2 gap-3">
+              <button type="button" id="btn-pay-wave" onclick="setPaymentMethod('WAVE')" class="p-3 rounded-xl border-2 border-[#1E90FF] bg-blue-50/50 text-[#1E90FF] font-bold text-xs flex items-center justify-between cursor-pointer">
+                <span>🌊 Wave</span>
+                <span class="text-[10px] font-normal text-slate-500">1-clic</span>
+              </button>
+              <button type="button" id="btn-pay-om" onclick="setPaymentMethod('ORANGE_MONEY')" class="p-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-xs flex items-center justify-between cursor-pointer">
+                <span>🍊 Orange Money</span>
+                <span class="text-[10px] font-normal text-slate-500">OTP</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bouton CTA -->
+          <div class="pt-3">
+            <button type="submit" id="btn-reg-submit" class="w-full py-3.5 px-4 bg-[#F94F06] hover:bg-[#e04605] text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-orange-500/25 active:scale-[0.98] transition-all cursor-pointer">
+              Créer mon compte & Payer 15 000 FCFA →
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+
+      <div class="text-center pt-4 border-t border-slate-100 text-xs text-slate-500">
+        Déjà inscrit ? <a href="login.html" class="font-bold text-[#F94F06] hover:underline">Se connecter</a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const PLANS = {
+      starter: {
+        name: 'Découverte (Starter Solo)',
+        badge: 'Essai 14j 🌱',
+        tagline: 'Pour tester la plateforme avec vos 2 premiers clients.',
+        priceMonthly: 0,
+        priceYearly: 0,
+        isFree: true,
+        features: [
+          '✓ Jusqu’à 2 Marques / Clients',
+          '✓ Validation WhatsApp en 1 clic',
+          '✓ Calendrier & Médias HD (50 Mo)',
+          '✓ Assistant IA Illimité',
+        ],
+      },
+      pro: {
+        name: 'Pro Agency',
+        badge: 'Le Plus Populaire 🔥',
+        tagline: 'L’arme ultime pour gérer jusqu’à 10 marques sereinement.',
+        priceMonthly: 15000,
+        priceYearly: 150000,
+        isFree: false,
+        features: [
+          '✓ Jusqu’à 10 Marques & Clients',
+          '✓ Auto-Publish Meta (Instagram & FB)',
+          '✓ Validation WhatsApp & Liens Magiques',
+          '✓ Export Bilans & Rapports PDF',
+          '✓ Support prioritaire WhatsApp 7j/7',
+        ],
+      },
+      scale: {
+        name: 'Scale Agence',
+        badge: 'Grandes Équipes 🚀',
+        tagline: 'Pour les agences digitales et équipes de CMs.',
+        priceMonthly: 35000,
+        priceYearly: 350000,
+        isFree: false,
+        features: [
+          '✓ Marques & Clients illimités',
+          '✓ Marque Blanche (White-label complet)',
+          '✓ Multi-comptes CM & Rôles',
+          '✓ Accès API REST & Webhooks',
+        ],
+      },
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentPlanId = urlParams.get('plan') || 'pro';
+    let currentCycle = urlParams.get('cycle') || 'monthly';
+    let currentMethod = 'WAVE';
+
+    if (!PLANS[currentPlanId]) currentPlanId = 'pro';
+
+    function renderPlan() {
+      const plan = PLANS[currentPlanId];
+      const isYearly = currentCycle === 'yearly';
+      const price = isYearly ? plan.priceYearly : plan.priceMonthly;
+
+      document.getElementById('recap-plan-badge').textContent = plan.badge;
+      document.getElementById('recap-plan-name').textContent = plan.name;
+      document.getElementById('recap-plan-tagline').textContent = plan.tagline;
+      document.getElementById('recap-plan-price').textContent = price === 0 ? '0' : price.toLocaleString('fr-FR');
+      document.getElementById('recap-plan-period').textContent = price === 0 ? 'FCFA / 14 jours' : (isYearly ? 'FCFA / an' : 'FCFA / mois');
+
+      // Update features list
+      const listEl = document.getElementById('recap-features-list');
+      listEl.innerHTML = plan.features.map(f => `<li>${f}</li>`).join('');
+
+      // Update Switch Buttons
+      ['starter', 'pro', 'scale'].forEach(p => {
+        const btn = document.getElementById('btn-switch-' + p);
+        if (!btn) return;
+        if (p === currentPlanId) {
+          btn.className = 'p-2 rounded-xl text-center text-xs font-bold transition-all border border-orange-500 bg-orange-500/20 text-orange-300';
+        } else {
+          btn.className = 'p-2 rounded-xl text-center text-xs font-bold transition-all border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10';
+        }
+      });
+
+      // Update payment section & submit button text
+      const paySec = document.getElementById('reg-payment-section');
+      const submitBtn = document.getElementById('btn-reg-submit');
+      if (plan.isFree || price === 0) {
+        if (paySec) paySec.style.display = 'none';
+        if (submitBtn) submitBtn.textContent = "Créer mon compte & Démarrer l'essai gratuit →";
+      } else {
+        if (paySec) paySec.style.display = 'block';
+        if (submitBtn) submitBtn.textContent = `Confirmer et Payer ${price.toLocaleString('fr-FR')} FCFA via ${currentMethod === 'WAVE' ? 'Wave 🌊' : 'Orange Money 🍊'} →`;
+      }
+    }
+
+    function setPlan(planId) {
+      currentPlanId = planId;
+      renderPlan();
+    }
+
+    function setPaymentMethod(method) {
+      currentMethod = method;
+      const btnWave = document.getElementById('btn-pay-wave');
+      const btnOm = document.getElementById('btn-pay-om');
+      if (method === 'WAVE') {
+        btnWave.className = 'p-3 rounded-xl border-2 border-[#1E90FF] bg-blue-50/50 text-[#1E90FF] font-bold text-xs flex items-center justify-between cursor-pointer';
+        btnOm.className = 'p-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-xs flex items-center justify-between cursor-pointer';
+      } else {
+        btnOm.className = 'p-3 rounded-xl border-2 border-[#FF7900] bg-orange-50/50 text-[#FF7900] font-bold text-xs flex items-center justify-between cursor-pointer';
+        btnWave.className = 'p-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-xs flex items-center justify-between cursor-pointer';
+      }
+      renderPlan();
+    }
+
+    async function handleRegistrationSubmit(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('btn-reg-submit');
+      const plan = PLANS[currentPlanId];
+      const isYearly = currentCycle === 'yearly';
+      const price = isYearly ? plan.priceYearly : plan.priceMonthly;
+
+      submitBtn.textContent = 'Création du compte en cours...';
+      submitBtn.disabled = true;
+
+      const profile = {
+        agencyId: 'agency_' + Date.now(),
+        agencyName: document.getElementById('reg-agency').value,
+        fullName: document.getElementById('reg-name').value,
+        email: document.getElementById('reg-email').value,
+        phone: document.getElementById('reg-phone').value,
+        plan: currentPlanId,
+        cycle: currentCycle,
+      };
+
+      localStorage.setItem('cmflow_user_profile', JSON.stringify(profile));
+      localStorage.setItem('cmflow_active_plan', currentPlanId);
+
+      if (plan.isFree || price === 0) {
+        setTimeout(() => {
+          window.location.href = 'dashboard.html?plan=starter&welcome=true';
+        }, 800);
+        return;
+      }
+
+      submitBtn.textContent = `Connexion à ${currentMethod === 'WAVE' ? 'Wave 🌊' : 'Orange Money 🍊'}...`;
+
+      try {
+        const endpoint = currentMethod === 'WAVE' ? '/api/billing/wave/checkout' : '/api/billing/om/checkout';
+        const planCode = currentPlanId === 'scale' ? 'SCALE' : 'PRO_AGENCY';
+
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agencyId: profile.agencyId,
+            agencyName: profile.agencyName,
+            agencyEmail: profile.email,
+            phone: profile.phone,
+            planId: planCode,
+            amount: price,
+            returnUrl: window.location.origin + '/billing.html?status=success&plan=' + planCode + '&method=' + currentMethod.toLowerCase(),
+            cancelUrl: window.location.origin + '/register.html?plan=' + currentPlanId,
+          }),
+        });
+
+        const data = await res.json();
+        if (data && data.success) {
+          const url = data.wave_launch_url || data.payment_url;
+          if (url) {
+            window.location.href = url;
+            return;
+          }
+        }
+        window.location.href = 'billing.html?status=success&plan=' + planCode + '&method=' + currentMethod.toLowerCase();
+      } catch (err) {
+        window.location.href = 'billing.html?status=success&plan=' + currentPlanId + '&method=' + currentMethod.toLowerCase();
+      }
+    }
+
+    // Initial render
+    renderPlan();
+  </script>
+</body>
+</html>

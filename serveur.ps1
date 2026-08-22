@@ -41,6 +41,24 @@ while ($listener.IsListening) {
         elseif ($rawUrl.StartsWith("v/") -or $rawUrl.StartsWith("approve/")) {
             $rawUrl = "client-review.html"
         }
+        elseif ($rawUrl -eq "register" -or $rawUrl -eq "register/") {
+            $rawUrl = "register.html"
+        }
+        elseif ($rawUrl -eq "login" -or $rawUrl -eq "login/") {
+            $rawUrl = "login.html"
+        }
+        elseif ($rawUrl -eq "dashboard" -or $rawUrl -eq "dashboard/") {
+            $rawUrl = "dashboard.html"
+        }
+        elseif ($rawUrl -eq "billing" -or $rawUrl -eq "billing/") {
+            $rawUrl = "billing.html"
+        }
+        elseif ($rawUrl -eq "planning" -or $rawUrl -eq "planning/") {
+            $rawUrl = "planning.html"
+        }
+        elseif ($rawUrl -eq "settings" -or $rawUrl -eq "settings/") {
+            $rawUrl = "settings.html"
+        }
         elseif ($rawUrl.StartsWith("api/")) {
             # Dispatcher API Local Mock pour tests immédiats sans Next.js
             $response.ContentType = "application/json; charset=utf-8"
