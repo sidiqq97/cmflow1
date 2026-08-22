@@ -549,10 +549,10 @@
 
         <div class="pricing-cards-grid">
           
-          <!-- Plan Découverte -->
+          <!-- Plan 1 : Starter Solo -->
           <div class="pricing-card-modern">
-            <h3 class="pricing-plan-title">Découverte</h3>
-            <p class="pricing-plan-desc">Pour tester la plateforme et débuter votre activité.</p>
+            <h3 class="pricing-plan-title">Starter Solo</h3>
+            <p class="pricing-plan-desc">Pour tester la plateforme et débuter avec vos premiers clients.</p>
             
             <div class="pricing-price-box">
               0 <span class="pricing-price-period">FCFA / 14 jours</span>
@@ -561,76 +561,39 @@
             <div class="pricing-features-list">
               <div class="pricing-feature-row">
                 <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span><strong>1 client & marque</strong></span>
+                <span><strong>Jusqu'à 2 clients & marques</strong></span>
               </div>
               <div class="pricing-feature-row">
                 <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span>Calendrier éditorial & File d'attente</span>
+                <span>Validation WhatsApp 1-clic</span>
               </div>
               <div class="pricing-feature-row">
                 <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span>Bouton Copier & Partage WhatsApp</span>
+                <span>Calendrier éditorial & Médias HD (Max 50 Mo)</span>
               </div>
               <div class="pricing-feature-row">
                 <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span>Assistant IA (5 générations/jour)</span>
+                <span>Assistant IA Illimité</span>
               </div>
             </div>
 
-            <button type="button" class="btn btn-secondary btn-block" data-auth-target="register">
-              Démarrer gratuitement
+            <button type="button" class="btn btn-secondary btn-block" onclick="openPricingCheckoutModal('starter', 'Starter Solo', 0, 'Essai 14j Gratuit 🌱')">
+              Démarrer l'essai gratuit
             </button>
           </div>
 
-          <!-- Plan Starter (Le plus populaire) -->
+          <!-- Plan 2 : Pro Agency (Le plus populaire) -->
           <div class="pricing-card-modern popular">
             <div class="pricing-popular-badge" style="display: inline-flex; align-items: center; gap: 6px;">
               <svg viewBox="0 0 20 20" width="13" height="13" fill="#FFFFFF"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-              Le plus populaire
+              Le plus populaire 🔥
             </div>
             
-            <h3 class="pricing-plan-title">Starter</h3>
-            <p class="pricing-plan-desc">Idéal pour les Community Managers freelances.</p>
+            <h3 class="pricing-plan-title">Pro Agency</h3>
+            <p class="pricing-plan-desc">L'arme ultime pour gérer jusqu'à 10 marques sereinement.</p>
             
             <div class="pricing-price-box" style="color: #F94F06;">
-              3 500 <span class="pricing-price-period">FCFA / mois</span>
-            </div>
-
-            <div class="pricing-features-list">
-              <div class="pricing-feature-row">
-                <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span><strong>Jusqu'à 4 clients & marques</strong></span>
-              </div>
-              <div class="pricing-feature-row">
-                <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span><strong>Espaces clients 100% cloisonnés</strong></span>
-              </div>
-              <div class="pricing-feature-row">
-                <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span>Multi-réseaux (Instagram, FB, TikTok, LinkedIn)</span>
-              </div>
-              <div class="pricing-feature-row">
-                <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span><strong>Assistant IA Illimité</strong> (textes & hashtags)</span>
-              </div>
-              <div class="pricing-feature-row">
-                <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span>Paiement direct <strong>Wave & Orange Money</strong></span>
-              </div>
-            </div>
-
-            <button type="button" class="btn btn-orange-glow btn-block" onclick="openCheckoutModal('Plan Starter', '3 500 FCFA', '/ mois')">
-              Démarrer sans engagement
-            </button>
-          </div>
-
-          <!-- Plan Pro -->
-          <div class="pricing-card-modern">
-            <h3 class="pricing-plan-title">Pro Illimité</h3>
-            <p class="pricing-plan-desc">Pour les agences et CMs avec un grand volume.</p>
-            
-            <div class="pricing-price-box">
-              7 500 <span class="pricing-price-period">FCFA / mois</span>
+              15 000 <span class="pricing-price-period">FCFA / mois</span>
             </div>
 
             <div class="pricing-features-list">
@@ -640,15 +603,15 @@
               </div>
               <div class="pricing-feature-row">
                 <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span>Tout le pack Starter en illimité</span>
+                <span><strong>Auto-Publish Meta (Instagram & FB)</strong></span>
               </div>
               <div class="pricing-feature-row">
                 <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span><strong>Export de Bilans & Rapports PDF</strong></span>
+                <span><strong>Export Bilans & Rapports PDF</strong></span>
               </div>
               <div class="pricing-feature-row">
                 <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
-                <span>Publication directe automatique Meta</span>
+                <span>Paiement direct <strong>Wave & Orange Money</strong></span>
               </div>
               <div class="pricing-feature-row">
                 <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
@@ -656,8 +619,41 @@
               </div>
             </div>
 
-            <button type="button" class="btn btn-primary btn-block" onclick="openCheckoutModal('Plan Pro Illimité', '7 500 FCFA', '/ mois')">
-              Passer au Plan Pro
+            <button type="button" class="btn btn-orange-glow btn-block" onclick="openPricingCheckoutModal('pro', 'Pro Agency', 15000, 'Le Plus Populaire 🔥')">
+              Choisir Pro Agency
+            </button>
+          </div>
+
+          <!-- Plan 3 : Scale & Franchise -->
+          <div class="pricing-card-modern">
+            <h3 class="pricing-plan-title">Scale & Franchise</h3>
+            <p class="pricing-plan-desc">Pour les agences digitales et équipes de CMs.</p>
+            
+            <div class="pricing-price-box">
+              35 000 <span class="pricing-price-period">FCFA / mois</span>
+            </div>
+
+            <div class="pricing-features-list">
+              <div class="pricing-feature-row">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
+                <span><strong>Marques & Workspaces illimités</strong></span>
+              </div>
+              <div class="pricing-feature-row">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
+                <span><strong>Marque Blanche (White-label)</strong></span>
+              </div>
+              <div class="pricing-feature-row">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
+                <span>Multi-comptes CM & Rôles</span>
+              </div>
+              <div class="pricing-feature-row">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="#10B981" class="pricing-feature-check"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>
+                <span>Accès API REST & Webhooks</span>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block" onclick="openPricingCheckoutModal('scale', 'Scale & Franchise', 35000, 'Grandes Équipes 🚀')">
+              Passer au Plan Scale
             </button>
           </div>
 
@@ -1127,6 +1123,73 @@
     </div>
   </div>
 
+  <!-- =========================================================================
+       MODALE DE CHECKOUT TARIFAIRE INTERACTIVE (WAVE & ORANGE MONEY)
+       ========================================================================= -->
+  <div id="pricing-checkout-modal" class="auth-modal-backdrop" style="display: none; align-items: center; justify-content: center; z-index: 10000;" aria-hidden="true" role="dialog" aria-modal="true">
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 28px; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25); max-width: 440px; width: 90%; padding: 24px; position: relative; font-family: inherit;">
+      
+      <button type="button" onclick="closePricingCheckoutModal()" style="position: absolute; top: 16px; right: 16px; background: #F1F5F9; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748B;">
+        ✕
+      </button>
+
+      <!-- En-tête du Forfait -->
+      <div style="border-bottom: 1px solid #F1F5F9; padding-bottom: 14px; margin-bottom: 16px;">
+        <span id="pcm-plan-badge" style="display: inline-block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; background: #FFF7ED; color: #F94F06; border: 1px solid #FFEDD5; padding: 2px 10px; border-radius: 999px; margin-bottom: 6px;">
+          Le Plus Populaire 🔥
+        </span>
+        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+          <h3 id="pcm-plan-name" style="font-size: 1.35rem; font-weight: 900; color: #0F172A; margin: 0;">Pro Agency</h3>
+          <div style="text-align: right;">
+            <span id="pcm-plan-price" style="font-size: 1.35rem; font-weight: 900; color: #0F172A;">15 000 FCFA</span>
+            <span style="font-size: 0.75rem; color: #94A3B8; font-weight: 600;"> / mois</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulaire Express -->
+      <form id="pcm-checkout-form" onsubmit="submitPricingCheckout(event)" style="display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #334155; margin-bottom: 4px;">Nom de votre Agence / Studio <span style="color: #F94F06;">*</span></label>
+          <input type="text" id="pcm-agency-name" required placeholder="Ex: Teranga Digital" style="width: 100%; box-sizing: border-box; padding: 10px 12px; font-size: 0.8rem; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; outline: none;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #334155; margin-bottom: 4px;">Email Professionnel <span style="color: #F94F06;">*</span></label>
+          <input type="email" id="pcm-email" required placeholder="contact@votre-agence.sn" style="width: 100%; box-sizing: border-box; padding: 10px 12px; font-size: 0.8rem; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; outline: none;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #334155; margin-bottom: 4px;">Numéro WhatsApp (pour alertes & liens)</label>
+          <input type="tel" id="pcm-phone" placeholder="+221 77 000 00 00" style="width: 100%; box-sizing: border-box; padding: 10px 12px; font-size: 0.8rem; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; outline: none;">
+        </div>
+
+        <!-- Sélecteur Mobile Money -->
+        <div id="pcm-payment-method-container" style="margin-top: 4px;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #334155; margin-bottom: 6px;">Moyen de Paiement Mobile Money 🇸🇳 🇨🇮</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button type="button" id="pcm-btn-wave" onclick="setPcmMethod('WAVE')" style="padding: 10px; border-radius: 12px; border: 2px solid #1E90FF; background: #EFF6FF; color: #1E90FF; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
+              🌊 Wave<br><span style="font-size: 0.65rem; color: #64748B; font-weight: 600;">1% frais • 1-clic</span>
+            </button>
+            <button type="button" id="pcm-btn-om" onclick="setPcmMethod('ORANGE_MONEY')" style="padding: 10px; border-radius: 12px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #64748B; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
+              🍊 Orange Money<br><span style="font-size: 0.65rem; color: #64748B; font-weight: 600;">UEMOA • Code OTP</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bouton CTA -->
+        <button type="submit" id="pcm-submit-btn" style="margin-top: 8px; width: 100%; padding: 13px; background: #F94F06; color: #FFFFFF; font-weight: 800; font-size: 0.85rem; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 10px 20px -5px rgba(249, 79, 6, 0.35);">
+          Confirmer et Payer 15 000 FCFA →
+        </button>
+
+        <div style="text-align: center; font-size: 0.68rem; color: #94A3B8; margin-top: 4px;">
+          🔒 Paiement 100% sécurisé • Sans engagement • Annulation en 1 clic
+        </div>
+      </form>
+
+    </div>
+  </div>
+
   <!-- Floating WhatsApp Quick Button on Mobile -->
   <a href="https://wa.me/221770000000?text=Bonjour%20CMFlow%2C%20j%27aimerais%20des%20informations%20sur%20la%20plateforme" target="_blank" class="mobile-floating-whatsapp-btn" aria-label="Contacter sur WhatsApp" title="Poser une question sur WhatsApp">
     <svg viewBox="0 0 24 24" width="28" height="28" fill="#FFFFFF"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm0 18.15c-1.5 0-2.97-.39-4.27-1.14l-.31-.18-3.17.83.85-3.09-.2-.32a8.188 8.188 0 0 1-1.25-4.34c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c.01 4.54-3.68 8.23-8.12 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.84-.86 2.06 0 1.21.89 2.39 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.18-.47-.3z"/></svg>
@@ -1145,5 +1208,118 @@
   <script src="js/app.js"></script>
   <script src="js/backend.js"></script>
   <script src="js/script.js"></script>
+  <script>
+    let currentPcmPlanId = 'pro';
+    let currentPcmAmount = 15000;
+    let currentPcmMethod = 'WAVE';
+
+    function openPricingCheckoutModal(planId, planName, amount, badge) {
+      currentPcmPlanId = planId || 'pro';
+      currentPcmAmount = amount || 0;
+      
+      const badgeEl = document.getElementById('pcm-plan-badge');
+      const nameEl = document.getElementById('pcm-plan-name');
+      const priceEl = document.getElementById('pcm-plan-price');
+      const payContainer = document.getElementById('pcm-payment-method-container');
+      const submitBtn = document.getElementById('pcm-submit-btn');
+
+      if (badgeEl) badgeEl.textContent = badge || 'Formule Choisie';
+      if (nameEl) nameEl.textContent = planName || 'Pro Agency';
+      if (priceEl) priceEl.textContent = amount === 0 ? '0 FCFA' : (amount.toLocaleString() + ' FCFA');
+      
+      if (amount === 0) {
+        if (payContainer) payContainer.style.display = 'none';
+        if (submitBtn) submitBtn.textContent = "Créer mon compte & Démarrer l'essai →";
+      } else {
+        if (payContainer) payContainer.style.display = 'block';
+        if (submitBtn) submitBtn.textContent = 'Confirmer et Payer ' + amount.toLocaleString() + ' FCFA →';
+      }
+
+      const modal = document.getElementById('pricing-checkout-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    }
+
+    function closePricingCheckoutModal() {
+      const modal = document.getElementById('pricing-checkout-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    function setPcmMethod(method) {
+      currentPcmMethod = method;
+      const btnWave = document.getElementById('pcm-btn-wave');
+      const btnOm = document.getElementById('pcm-btn-om');
+      if (!btnWave || !btnOm) return;
+      if (method === 'WAVE') {
+        btnWave.style.border = '2px solid #1E90FF';
+        btnWave.style.background = '#EFF6FF';
+        btnWave.style.color = '#1E90FF';
+        btnOm.style.border = '1px solid #CBD5E1';
+        btnOm.style.background = '#FFFFFF';
+        btnOm.style.color = '#64748B';
+      } else {
+        btnOm.style.border = '2px solid #FF7900';
+        btnOm.style.background = '#FFF7ED';
+        btnOm.style.color = '#FF7900';
+        btnWave.style.border = '1px solid #CBD5E1';
+        btnWave.style.background = '#FFFFFF';
+        btnWave.style.color = '#64748B';
+      }
+    }
+
+    async function submitPricingCheckout(e) {
+      e.preventDefault();
+      const agencyName = document.getElementById('pcm-agency-name').value;
+      const email = document.getElementById('pcm-email').value;
+      const phone = document.getElementById('pcm-phone').value;
+      const submitBtn = document.getElementById('pcm-submit-btn');
+
+      if (currentPcmAmount === 0) {
+        submitBtn.textContent = 'Création du compte en cours...';
+        submitBtn.disabled = true;
+        setTimeout(() => {
+          window.location.href = 'startpage.html?plan=starter&welcome=true';
+        }, 800);
+        return;
+      }
+
+      submitBtn.textContent = 'Connexion à ' + (currentPcmMethod === 'WAVE' ? 'Wave 🌊...' : 'Orange Money 🍊...');
+      submitBtn.disabled = true;
+
+      try {
+        const endpoint = currentPcmMethod === 'WAVE' ? '/api/billing/wave/checkout' : '/api/billing/om/checkout';
+        const planCode = currentPcmPlanId === 'scale' ? 'SCALE' : 'PRO_AGENCY';
+        
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agencyId: 'agency_' + Date.now(),
+            agencyName: agencyName,
+            agencyEmail: email,
+            phone: phone,
+            planId: planCode,
+            amount: currentPcmAmount,
+            returnUrl: window.location.origin + '/billing.html?status=success&plan=' + planCode + '&method=' + currentPcmMethod.toLowerCase(),
+            cancelUrl: window.location.origin + '/#pricing',
+          })
+        });
+        const data = await res.json();
+        if (data && data.success) {
+          const url = data.wave_launch_url || data.payment_url;
+          if (url) {
+            window.location.href = url;
+            return;
+          }
+        }
+        window.location.href = 'billing.html?status=success&plan=' + planCode + '&method=' + currentPcmMethod.toLowerCase();
+      } catch (err) {
+        window.location.href = 'billing.html?status=success&plan=' + currentPcmPlanId + '&method=' + currentPcmMethod.toLowerCase();
+      }
+    }
+  </script>
 </body>
 </html>
