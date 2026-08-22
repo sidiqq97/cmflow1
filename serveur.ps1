@@ -41,6 +41,43 @@ while ($listener.IsListening) {
         elseif ($rawUrl.StartsWith("v/") -or $rawUrl.StartsWith("approve/")) {
             $rawUrl = "client-review.html"
         }
+        elseif ($rawUrl.StartsWith("api/")) {
+            # Dispatcher API Local Mock pour tests immédiats sans Next.js
+            $response.ContentType = "application/json; charset=utf-8"
+            $response.AddHeader("Access-Control-Allow-Origin", "*")
+            $response.AddHeader("Access-Control-Allow-Headers", "*")
+            $response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+
+            if ($request.HttpMethod -eq "OPTIONS") {
+                $response.StatusCode = 200
+                $response.OutputStream.Close()
+                continue
+            }
+
+            $jsonResponse = "{}"
+            if ($rawUrl -like "api/billing/wave/checkout*") {
+                $jsonResponse = '{"success":true,"wave_launch_url":"https://pay.wave.com/m/mock_checkout_cmflow","amount":15000,"currency":"XOF"}'
+            }
+            elseif ($rawUrl -like "api/billing/om/checkout*") {
+                $jsonResponse = '{"success":true,"payment_url":"https://webpayment.orange-money.com/pay?token=om_ptk_mock_123","pay_token":"om_ptk_mock_123","currency":"OUV"}'
+            }
+            elseif ($rawUrl -like "api/cron/publish*") {
+                $jsonResponse = '{"success":true,"message":"Publication automatique exécutée.","publishedCount":2}'
+            }
+            elseif ($rawUrl -like "api/health/env*") {
+                $jsonResponse = '{"isValid":true,"status":"OK","configuredCount":15,"totalCount":15}'
+            }
+            else {
+                $jsonResponse = '{"success":true,"status":"OK"}'
+            }
+
+            $bytes = [System.Text.Encoding]::UTF8.GetBytes($jsonResponse)
+            $response.ContentLength64 = $bytes.Length
+            $response.StatusCode = 200
+            $response.OutputStream.Write($bytes, 0, $bytes.Length)
+            $response.OutputStream.Close()
+            continue
+        }
 
         $localFile = Join-Path $path $rawUrl
         $fullPath = [System.IO.Path]::GetFullPath($localFile)
