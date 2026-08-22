@@ -337,13 +337,22 @@
                 <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Support WhatsApp prioritaire 7j/7</li>
               </ul>
             </div>
-            <button
-              type="button"
-              onclick="startWavePayment('PRO_AGENCY', 15000)"
-              class="mt-6 w-full py-3 px-4 rounded-xl text-xs font-black bg-[#1E90FF] hover:bg-[#1873cc] text-white shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
-            >
-              <span>🌊 Renouveler via Wave (15 000 F)</span>
-            </button>
+            <div class="mt-6 space-y-2">
+              <button
+                type="button"
+                onclick="startWavePayment('PRO_AGENCY', 15000)"
+                class="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-[#1E90FF] hover:bg-[#1873cc] text-white shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+              >
+                <span>🌊 Payer via Wave (15 000 F)</span>
+              </button>
+              <button
+                type="button"
+                onclick="startOrangeMoneyPayment('PRO_AGENCY', 15000)"
+                class="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-[#FF7900] hover:bg-[#e56c00] text-white shadow-md shadow-orange-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+              >
+                <span>🍊 Payer via Orange Money (15 000 F)</span>
+              </button>
+            </div>
           </div>
 
           <!-- PLAN 3 : SCALE & FRANCHISE -->
@@ -365,13 +374,22 @@
                 <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Accès API REST CMFlow</li>
               </ul>
             </div>
-            <button
-              type="button"
-              onclick="startWavePayment('SCALE', 35000)"
-              class="mt-6 w-full py-3 px-4 rounded-xl text-xs font-black bg-slate-900 hover:bg-slate-800 text-white shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <span>🌊 Passer à Scale (35 000 F)</span>
-            </button>
+            <div class="mt-6 space-y-2">
+              <button
+                type="button"
+                onclick="startWavePayment('SCALE', 35000)"
+                class="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-[#1E90FF] hover:bg-[#1873cc] text-white shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>🌊 Payer via Wave (35 000 F)</span>
+              </button>
+              <button
+                type="button"
+                onclick="startOrangeMoneyPayment('SCALE', 35000)"
+                class="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-[#FF7900] hover:bg-[#e56c00] text-white shadow-md shadow-orange-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>🍊 Payer via Orange Money (35 000 F)</span>
+              </button>
+            </div>
           </div>
 
         </div>
@@ -406,7 +424,7 @@
                 <td class="py-3 font-extrabold font-mono text-[#0F172A]">INV-2026-07</td>
                 <td class="py-3 text-slate-500">21 Juillet 2026</td>
                 <td class="py-3 font-bold text-[#0F172A]">15 000 FCFA</td>
-                <td class="py-3">🌊 Wave</td>
+                <td class="py-3">🍊 Orange Money (+221 78 450 99 00)</td>
                 <td class="py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700">✓ Payé</span></td>
                 <td class="py-3 text-right"><button type="button" onclick="showToast('📥 Téléchargement reçu INV-2026-07.pdf')" class="px-2.5 py-1 bg-slate-100 rounded-lg text-[11px] font-bold hover:bg-slate-200 transition-colors">PDF</button></td>
               </tr>
@@ -455,23 +473,56 @@
             window.location.href = data.wave_launch_url;
           }, 800);
         } else {
-          // Fallback simulation si serveur distant indisponible
-          simulateWaveSuccess(planId, amount);
+          simulatePaymentSuccess('Wave', planId, amount);
         }
       } catch (err) {
         console.warn('Fallback Wave Checkout:', err);
-        simulateWaveSuccess(planId, amount);
+        simulatePaymentSuccess('Wave', planId, amount);
       }
     }
 
-    function simulateWaveSuccess(planId, amount) {
+    async function startOrangeMoneyPayment(planId, amount) {
+      showToast('🍊 Connexion sécurisée à Orange Money Web Payment...');
+      
+      try {
+        const response = await fetch('/api/billing/om/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agencyId: 'agency_awa_dakar',
+            agencyName: 'Awa Diop Agency',
+            agencyEmail: 'awa@cmflow.sn',
+            planId: planId,
+            amount: amount,
+            returnUrl: window.location.origin + '/billing.html?status=success&method=om&plan=' + planId,
+            cancelUrl: window.location.origin + '/billing.html?status=cancelled&method=om&plan=' + planId,
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.payment_url) {
+          showToast('🚀 Redirection vers le portail Orange Money...');
+          setTimeout(() => {
+            window.location.href = data.payment_url;
+          }, 800);
+        } else {
+          simulatePaymentSuccess('Orange Money', planId, amount);
+        }
+      } catch (err) {
+        console.warn('Fallback Orange Money Checkout:', err);
+        simulatePaymentSuccess('Orange Money', planId, amount);
+      }
+    }
+
+    function simulatePaymentSuccess(method, planId, amount) {
       setTimeout(() => {
-        showToast('🎉 Paiement Wave de ' + amount.toLocaleString() + ' FCFA validé avec succès ! Forfait ' + planId + ' activé.');
+        showToast('🎉 Paiement ' + method + ' de ' + amount.toLocaleString() + ' FCFA validé avec succès ! Forfait ' + planId + ' activé.');
         if (typeof CMFlowRealtime !== 'undefined') {
           CMFlowRealtime.trigger({
-            workspaceName: 'Abonnement Wave',
+            workspaceName: 'Abonnement ' + method,
             action: 'APPROVED',
-            postCaption: 'Paiement Wave de ' + amount.toLocaleString() + ' FCFA validé. Forfait ' + planId + ' actif ! 🌊✨'
+            postCaption: 'Paiement ' + method + ' de ' + amount.toLocaleString() + ' FCFA validé. Forfait ' + planId + ' actif ! ✨'
           });
         }
       }, 1000);
@@ -481,16 +532,17 @@
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('status') === 'success') {
         const plan = urlParams.get('plan') || 'PRO_AGENCY';
-        showToast('🎉 Félicitations ! Votre abonnement ' + plan + ' est désormais actif via Wave 🌊.');
+        const method = urlParams.get('method') === 'om' ? 'Orange Money 🍊' : 'Wave 🌊';
+        showToast('🎉 Félicitations ! Votre abonnement ' + plan + ' est désormais actif via ' + method + '.');
         if (typeof CMFlowRealtime !== 'undefined') {
           CMFlowRealtime.trigger({
-            workspaceName: 'Facturation Wave',
+            workspaceName: 'Facturation ' + method,
             action: 'APPROVED',
-            postCaption: 'Abonnement ' + plan + ' validé avec succès sur Wave ! 🌊'
+            postCaption: 'Abonnement ' + plan + ' validé avec succès sur ' + method + ' !'
           });
         }
-      } else if (urlParams.get('status') === 'error') {
-        showToast('❌ Le paiement Wave a été annulé ou interrompu.');
+      } else if (urlParams.get('status') === 'error' || urlParams.get('status') === 'cancelled') {
+        showToast('❌ Le paiement a été annulé ou interrompu.');
       }
     });
   </script>

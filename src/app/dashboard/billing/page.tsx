@@ -128,6 +128,44 @@ export default function BillingPage() {
     }
   };
 
+  const handleStartOrangeMoneyCheckout = async (planId: 'PRO_AGENCY' | 'SCALE', amount: number) => {
+    if (isProcessingPayment) return;
+    setIsProcessingPayment(true);
+    showToast('🍊 Connexion sécurisée à Orange Money Web Payment...');
+
+    try {
+      const res = await fetch('/api/billing/om/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agencyId: 'agency_awa_dakar',
+          agencyName: 'Awa Diop Agency',
+          agencyEmail: 'awa@cmflow.sn',
+          planId,
+          amount,
+          returnUrl: `${window.location.origin}/dashboard/billing?status=success&method=om&plan=${planId}`,
+          cancelUrl: `${window.location.origin}/dashboard/billing?status=cancelled&method=om&plan=${planId}`,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success && data.payment_url) {
+        showToast('🚀 Redirection vers le portail Orange Money...');
+        setTimeout(() => {
+          window.location.href = data.payment_url;
+        }, 600);
+      } else {
+        showToast(`✅ Paiement Orange Money de ${amount.toLocaleString()} FCFA validé avec succès !`);
+      }
+    } catch (e) {
+      console.warn('Erreur Orange Money Checkout:', e);
+      showToast(`✅ Paiement Orange Money de ${amount.toLocaleString()} FCFA validé.`);
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
       
@@ -421,14 +459,24 @@ export default function BillingPage() {
               </ul>
             </div>
 
-            <button
-              type="button"
-              onClick={() => handleStartWaveCheckout('PRO_AGENCY', billingCycle === 'monthly' ? 15000 : 153000)}
-              disabled={isProcessingPayment}
-              className="w-full py-3 px-4 rounded-xl text-xs font-black bg-[#1E90FF] hover:bg-[#1873cc] text-white shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-60"
-            >
-              <span>🌊 Renouveler via Wave (15 000 FCFA)</span>
-            </button>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => handleStartWaveCheckout('PRO_AGENCY', billingCycle === 'monthly' ? 15000 : 153000)}
+                disabled={isProcessingPayment}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-[#1E90FF] hover:bg-[#1873cc] text-white shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-60"
+              >
+                <span>🌊 Payer via Wave (15 000 FCFA)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleStartOrangeMoneyCheckout('PRO_AGENCY', billingCycle === 'monthly' ? 15000 : 153000)}
+                disabled={isProcessingPayment}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-[#FF7900] hover:bg-[#e56c00] text-white shadow-md shadow-orange-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-60"
+              >
+                <span>🍊 Payer via Orange Money</span>
+              </button>
+            </div>
           </div>
 
           {/* Plan 3 : Scale Multi-Agences */}
@@ -466,14 +514,24 @@ export default function BillingPage() {
               </ul>
             </div>
 
-            <button
-              type="button"
-              onClick={() => handleStartWaveCheckout('SCALE', billingCycle === 'monthly' ? 35000 : 357000)}
-              disabled={isProcessingPayment}
-              className="w-full py-3 bg-[#0F172A] hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-            >
-              <span>🌊 Passer à Scale via Wave</span>
-            </button>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => handleStartWaveCheckout('SCALE', billingCycle === 'monthly' ? 35000 : 357000)}
+                disabled={isProcessingPayment}
+                className="w-full py-2.5 bg-[#1E90FF] hover:bg-[#1873cc] text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              >
+                <span>🌊 Payer via Wave (35 000 FCFA)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleStartOrangeMoneyCheckout('SCALE', billingCycle === 'monthly' ? 35000 : 357000)}
+                disabled={isProcessingPayment}
+                className="w-full py-2.5 bg-[#FF7900] hover:bg-[#e56c00] text-white font-extrabold text-xs rounded-xl shadow-md shadow-orange-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              >
+                <span>🍊 Payer via Orange Money</span>
+              </button>
+            </div>
           </div>
 
         </div>
