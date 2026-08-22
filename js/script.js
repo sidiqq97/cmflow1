@@ -1021,9 +1021,9 @@ function initFooterLinks() {
 }
 
 /* ==========================================================================
-   11. BENTO GRID BRAND SIMULATION & FAQ ACCORDION
+   11. BENTO GRID BRAND SIMULATION & HERO AI CAPTION GENERATOR
    ========================================================================== */
-function simulateBentoBrand(brandKey) {
+function simulateBentoBrand(brandKey, clickedBtn) {
   const brandData = {
     shop: {
       title: 'Vision Large Shop • Boutique Mode',
@@ -1053,18 +1053,95 @@ function simulateBentoBrand(brandKey) {
   if (imgEl) imgEl.src = selected.img;
 
   if (simBox) {
-    simBox.style.transform = 'scale(0.98)';
+    simBox.style.transform = 'scale(0.96)';
+    simBox.style.opacity = '0.7';
+    simBox.style.transition = 'all 0.18s ease';
     setTimeout(() => {
       simBox.style.transform = 'scale(1)';
-    }, 150);
+      simBox.style.opacity = '1';
+    }, 120);
   }
 
   // Active tab styling
-  document.querySelectorAll('.bento-client-tab-btn').forEach(btn => {
+  const buttons = document.querySelectorAll('.bento-client-tab-btn');
+  buttons.forEach(btn => {
     btn.classList.remove('active');
   });
-  if (window.event && window.event.currentTarget) {
-    window.event.currentTarget.classList.add('active');
+
+  if (clickedBtn && clickedBtn.classList) {
+    clickedBtn.classList.add('active');
+  } else {
+    // Fallback: match by brandKey in onclick attribute
+    buttons.forEach(btn => {
+      if (btn.getAttribute('onclick')?.includes(brandKey)) {
+        btn.classList.add('active');
+      }
+    });
+  }
+}
+
+// Hero AI Suggestion Generator Interactive Demo
+let heroAiIndex = 0;
+const heroAiSuggestions = [
+  {
+    caption: "Nouvelle collection sneakers Dakar ! DM ou WhatsApp pour réserver...",
+    tags: "#VisionLarge #DakarMode #Sneakers",
+    img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=120&auto=format&fit=crop&q=80"
+  },
+  {
+    caption: "🔥 Arrivage exclusif : Tailles 38 à 45 disponibles au showroom ! Livraison express Dakar en 2h ⚡",
+    tags: "#ModeDakar #SneakersAddict #LivraisonExpress",
+    img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=120&auto=format&fit=crop&q=80"
+  },
+  {
+    caption: "Quel modèle préférez-vous pour ce week-end ? Votez en commentaire 👇 Promo spéciale -15% sur la 2e paire !",
+    tags: "#TerangaStyle #LookDuJour #DakarFashion",
+    img: "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=120&auto=format&fit=crop&q=80"
+  }
+];
+
+function cycleHeroAiSuggestion() {
+  heroAiIndex = (heroAiIndex + 1) % heroAiSuggestions.length;
+  const current = heroAiSuggestions[heroAiIndex];
+
+  const captionEl = document.getElementById('hero-mock-caption');
+  const tagsEl = document.getElementById('hero-mock-tags');
+  const imgEl = document.getElementById('hero-mock-img');
+  const statusEl = document.getElementById('hero-ai-status-text');
+  const btnEl = document.getElementById('hero-ai-generate-btn');
+
+  if (btnEl) {
+    btnEl.style.transform = 'scale(0.92)';
+    setTimeout(() => { btnEl.style.transform = 'scale(1)'; }, 150);
+  }
+
+  if (statusEl) {
+    statusEl.innerHTML = `<span style="color: #10B981; font-weight: 800;">✨ Génération IA en cours...</span>`;
+    setTimeout(() => {
+      statusEl.textContent = `Assistant IA : Idée ${heroAiIndex + 1}/3 appliquée ✨`;
+    }, 400);
+  }
+
+  if (captionEl) {
+    captionEl.style.opacity = '0.2';
+    captionEl.style.transition = 'opacity 0.2s ease';
+    setTimeout(() => {
+      captionEl.textContent = current.caption;
+      captionEl.style.opacity = '1';
+    }, 250);
+  }
+
+  if (tagsEl) {
+    tagsEl.style.opacity = '0.2';
+    tagsEl.style.transition = 'opacity 0.2s ease';
+    setTimeout(() => {
+      tagsEl.textContent = current.tags;
+      tagsEl.style.opacity = '1';
+    }, 250);
+  }
+
+  if (imgEl && current.img) {
+    imgEl.src = current.img;
   }
 }
 
@@ -1120,6 +1197,7 @@ function updateSavingsCalculation(count) {
 
 // Expose globally for inline onclick
 window.simulateBentoBrand = simulateBentoBrand;
+window.cycleHeroAiSuggestion = cycleHeroAiSuggestion;
 window.toggleFaqItem = toggleFaqItem;
 window.openTimeSavingsCalculator = openTimeSavingsCalculator;
 window.closeTimeSavingsCalculator = closeTimeSavingsCalculator;

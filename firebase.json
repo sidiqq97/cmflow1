@@ -15,6 +15,30 @@
       {
         "source": "/approve/**",
         "destination": "/client-review.html"
+      },
+      {
+        "source": "/register",
+        "destination": "/register.html"
+      },
+      {
+        "source": "/login",
+        "destination": "/login.html"
+      },
+      {
+        "source": "/dashboard",
+        "destination": "/dashboard.html"
+      },
+      {
+        "source": "/billing",
+        "destination": "/billing.html"
+      },
+      {
+        "source": "/planning",
+        "destination": "/planning.html"
+      },
+      {
+        "source": "/settings",
+        "destination": "/settings.html"
       }
     ],
     "headers": [
