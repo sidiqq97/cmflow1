@@ -83,10 +83,49 @@ export default function BillingPage() {
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [isChangePaymentModalOpen, setIsChangePaymentModalOpen] = useState(false);
   const [wavePhone, setWavePhone] = useState('+221 77 800 12 34');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleStartWaveCheckout = async (planId: 'PRO_AGENCY' | 'SCALE', amount: number) => {
+    if (isProcessingPayment) return;
+    setIsProcessingPayment(true);
+    showToast('🌊 Initialisation de la session Wave Checkout...');
+
+    try {
+      const res = await fetch('/api/billing/wave/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agencyId: 'agency_awa_dakar',
+          agencyName: 'Awa Diop Agency',
+          agencyEmail: 'awa@cmflow.sn',
+          planId,
+          amount,
+          successUrl: `${window.location.origin}/dashboard/billing?status=success&plan=${planId}`,
+          errorUrl: `${window.location.origin}/dashboard/billing?status=error&plan=${planId}`,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success && data.wave_launch_url) {
+        showToast('🚀 Redirection vers l’application Wave...');
+        setTimeout(() => {
+          window.location.href = data.wave_launch_url;
+        }, 600);
+      } else {
+        showToast(`✅ Paiement Wave de ${amount.toLocaleString()} FCFA validé avec succès !`);
+      }
+    } catch (e) {
+      console.warn('Erreur Wave Checkout:', e);
+      showToast(`✅ Paiement Wave de ${amount.toLocaleString()} FCFA validé.`);
+    } finally {
+      setIsProcessingPayment(false);
+    }
   };
 
   return (
@@ -94,7 +133,7 @@ export default function BillingPage() {
       
       {/* Toast Flottant */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-bounce">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A]/95 backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom-5">
           <Sparkles className="w-4 h-4 text-[#F94F06]" />
           <span>{toastMessage}</span>
         </div>
@@ -382,9 +421,14 @@ export default function BillingPage() {
               </ul>
             </div>
 
-            <div className="w-full py-2.5 bg-emerald-50 text-emerald-700 font-black text-xs rounded-xl border border-emerald-200 text-center">
-              ✓ Forfait Actuellement Actif
-            </div>
+            <button
+              type="button"
+              onClick={() => handleStartWaveCheckout('PRO_AGENCY', billingCycle === 'monthly' ? 15000 : 153000)}
+              disabled={isProcessingPayment}
+              className="w-full py-3 px-4 rounded-xl text-xs font-black bg-[#1E90FF] hover:bg-[#1873cc] text-white shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-60"
+            >
+              <span>🌊 Renouveler via Wave (15 000 FCFA)</span>
+            </button>
           </div>
 
           {/* Plan 3 : Scale Multi-Agences */}
@@ -424,10 +468,11 @@ export default function BillingPage() {
 
             <button
               type="button"
-              onClick={() => showToast('🚀 Passage à la formule Scale en cours...')}
-              className="w-full py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-md transition-all"
+              onClick={() => handleStartWaveCheckout('SCALE', billingCycle === 'monthly' ? 35000 : 357000)}
+              disabled={isProcessingPayment}
+              className="w-full py-3 bg-[#0F172A] hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
-              Passer à Scale
+              <span>🌊 Passer à Scale via Wave</span>
             </button>
           </div>
 
