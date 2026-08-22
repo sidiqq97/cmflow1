@@ -3,6 +3,7 @@
 import React from 'react';
 import Sidebar from '../../components/Sidebar';
 import WorkspaceSelector from '../../components/WorkspaceSelector';
+import { RealtimeListener } from '../../components/RealtimeListener';
 import { WorkspaceProvider } from '../../context/WorkspaceContext';
 
 export default function DashboardLayout({
@@ -13,6 +14,9 @@ export default function DashboardLayout({
   return (
     <WorkspaceProvider>
       <div className="flex min-h-screen bg-[#F8FAFC] font-sans antialiased text-[#0F172A]">
+        {/* Écouteur de notifications et de webhooks en temps réel */}
+        <RealtimeListener />
+
         {/* Barre Latérale Unique Partagée */}
         <Sidebar />
 

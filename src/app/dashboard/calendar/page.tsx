@@ -254,6 +254,32 @@ export default function CalendarPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  // Écouteur en temps réel des décisions clients (Webhooks & Activités)
+  useEffect(() => {
+    const handleRealtimeActivity = (e: any) => {
+      const notif = e.detail;
+      if (!notif) return;
+
+      if (notif.postId) {
+        setPosts((prevPosts) =>
+          prevPosts.map((p) => {
+            if (p.id === notif.postId || notif.postId.includes(p.id)) {
+              const newStatus: PostStatus =
+                notif.action === 'APPROVED' ? 'validated' : 'pending_validation';
+              return { ...p, status: newStatus };
+            }
+            return p;
+          })
+        );
+      }
+    };
+
+    window.addEventListener('cmflow:activity', handleRealtimeActivity);
+    return () => {
+      window.removeEventListener('cmflow:activity', handleRealtimeActivity);
+    };
+  }, []);
+
   // Traitement d'importation de fichiers (Drag & Drop ou File Dialog)
   const handleFilesSelected = (files: FileList | File[]) => {
     const fileArray = Array.from(files);

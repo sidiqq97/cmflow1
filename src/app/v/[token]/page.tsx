@@ -223,7 +223,19 @@ export default function ClientValidationPage({ params }: { params?: { token?: st
     const targetId = currentPost.id;
 
     try {
-      // Appel API d'approbation
+      // 1. Appel API d'approbation et Webhook temps réel
+      fetch('/api/webhooks/approvals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          postId: targetId,
+          workspaceId: workspace.id,
+          action: 'APPROVED',
+          comment: '',
+        }),
+      }).catch((e) => console.warn('Webhook dispatch warning:', e));
+
       fetch(`/api/approvals/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -269,6 +281,19 @@ export default function ClientValidationPage({ params }: { params?: { token?: st
     const comment = revisionComment.trim();
 
     try {
+      // 1. Appel API de webhook temps réel
+      fetch('/api/webhooks/approvals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          postId: targetId,
+          workspaceId: workspace.id,
+          action: 'CHANGES_REQUESTED',
+          comment,
+        }),
+      }).catch((e) => console.warn('Webhook dispatch warning:', e));
+
       fetch(`/api/approvals/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
