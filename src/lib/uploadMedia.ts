@@ -30,6 +30,19 @@ export async function uploadPostMedia(
     throw new Error('Aucun fichier média fourni pour le téléversement.');
   }
 
+  // 1. Validation de la taille (Règle Firebase Storage : Max 50 Mo)
+  const MAX_SIZE_BYTES = 50 * 1024 * 1024; // 50 Mo
+  if (file.size && file.size > MAX_SIZE_BYTES) {
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+    throw new Error(`Fichier trop volumineux (${sizeMb} Mo). La taille maximale autorisée par Firebase Storage est de 50 Mo.`);
+  }
+
+  // 2. Validation des types MIME autorisés (Images & Vidéos HD)
+  const allowedMimePrefixes = ['image/', 'video/'];
+  if (file.type && !allowedMimePrefixes.some((prefix) => file.type.startsWith(prefix))) {
+    throw new Error(`Format de fichier non supporté (${file.type}). Seuls les formats images (JPG, PNG, WebP) et vidéos (MP4, MOV) sont acceptés.`);
+  }
+
   // Nettoyage et sécurisation du nom de fichier
   const rawName = file.name || `media_${Date.now()}.${file.type?.split('/')[1] || 'jpg'}`;
   const sanitizedFilename = rawName.replace(/[^a-zA-Z0-9.-]/g, '_');
