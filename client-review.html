@@ -312,18 +312,71 @@
     function submitRevision() {
       const text = document.getElementById('revision-input').value.trim();
       if (!text) return;
-      postsData[currentIndex].status = 'CHANGES_REQUESTED';
-      postsData[currentIndex].comment = text;
+      const current = postsData[currentIndex];
+      current.status = 'CHANGES_REQUESTED';
+      current.comment = text;
       document.getElementById('revision-input').value = '';
       toggleRevisionDrawer();
       showToast('✏️ Remarque envoyée au Community Manager !');
       renderUI();
+
+      // Déclenchement temps réel pour le cockpit CM
+      if (typeof CMFlowRealtime !== 'undefined') {
+        CMFlowRealtime.trigger({
+          workspaceId: 'teranga-gourmet',
+          workspaceName: 'Teranga Gourmet 🇸🇳',
+          action: 'CHANGES_REQUESTED',
+          comment: text,
+          postId: current.id,
+          postCaption: current.caption,
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      // Appel Webhook API
+      fetch('/api/webhooks/approvals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: 'v_demo8a1d',
+          postId: current.id,
+          workspaceId: 'teranga-gourmet',
+          action: 'CHANGES_REQUESTED',
+          comment: text,
+        }),
+      }).catch((e) => console.warn('API webhook offline:', e));
     }
 
     function approveCurrentPost() {
-      postsData[currentIndex].status = 'APPROVED';
+      const current = postsData[currentIndex];
+      current.status = 'APPROVED';
       showToast('✨ Publication validée avec succès !');
       renderUI();
+
+      // Déclenchement temps réel pour le cockpit CM
+      if (typeof CMFlowRealtime !== 'undefined') {
+        CMFlowRealtime.trigger({
+          workspaceId: 'teranga-gourmet',
+          workspaceName: 'Teranga Gourmet 🇸🇳',
+          action: 'APPROVED',
+          postId: current.id,
+          postCaption: current.caption,
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      // Appel Webhook API
+      fetch('/api/webhooks/approvals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: 'v_demo8a1d',
+          postId: current.id,
+          workspaceId: 'teranga-gourmet',
+          action: 'APPROVED',
+          comment: '',
+        }),
+      }).catch((e) => console.warn('API webhook offline:', e));
 
       const allApproved = postsData.every(p => p.status === 'APPROVED');
       if (allApproved) {
@@ -343,5 +396,6 @@
 
     document.addEventListener('DOMContentLoaded', renderUI);
   </script>
+  <script src="js/realtime-listener.js"></script>
 </body>
 </html>
