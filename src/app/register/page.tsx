@@ -1,99 +1,204 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  Sparkles,
-  ShieldCheck,
-  CheckCircle2,
-  Lock,
-  Mail,
-  User,
-  Building2,
-  Phone,
-  ArrowRight,
-  Loader2,
-  AlertCircle,
-  Eye,
-  EyeOff,
-  Check
+  Mail, Lock, User, Building2, Phone, ArrowRight,
+  Loader2, AlertCircle, Eye, EyeOff, Check, CheckCircle2,
+  Sparkles, ShieldCheck, ChevronRight,
 } from 'lucide-react';
-import { PLANS_CONFIG, PLANS_MAP, PlanConfig } from '@/constants/plans';
+import { PLANS_CONFIG, PLANS_MAP, PlanConfig, formatPrice, getUpgradePlan } from '@/constants/plans';
+import { WaveLogo } from '@/components/icons/WaveLogo';
+import { OrangeMoneyLogo } from '@/components/icons/OrangeMoneyLogo';
 import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+
+// ============================================================
+// Sous-composant : Carte Récapitulative (colonne droite)
+// ============================================================
+
+function PlanSummaryCard({
+  plan,
+  isYearly,
+  onChangePlan,
+  onToggleCycle,
+}: {
+  plan: PlanConfig;
+  isYearly: boolean;
+  onChangePlan: (id: string) => void;
+  onToggleCycle: () => void;
+}) {
+  const price = isYearly ? plan.priceYearly : plan.priceMonthly;
+
+  return (
+    <div className="bg-gradient-to-br from-[#0F172A] via-slate-900 to-[#0F172A] rounded-3xl p-7 h-full flex flex-col gap-6 relative overflow-hidden">
+      {/* Halo décoratif */}
+      <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-[#F94F06]/15 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Logo CMFlow */}
+      <Link href="/" className="inline-flex items-center gap-2">
+        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#F94F06] to-orange-400 flex items-center justify-center text-white font-black text-sm shadow-md shadow-orange-500/30">
+          CM
+        </div>
+        <span className="text-lg font-black tracking-tight text-white">
+          CM<span className="text-[#F94F06]">Flow</span>
+        </span>
+      </Link>
+
+      {/* Sélecteur rapide des offres */}
+      <div className="space-y-1.5">
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          Votre formule :
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {PLANS_CONFIG.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => onChangePlan(p.id)}
+              className={`py-2 px-1 rounded-2xl text-center text-[11px] font-bold transition-all cursor-pointer ${
+                p.id === plan.id
+                  ? 'border-2 border-[#F94F06] bg-orange-500/20 text-orange-200 scale-[1.03]'
+                  : 'border border-white/10 bg-white/5 text-slate-400 hover:bg-white/10'
+              }`}
+            >
+              {p.id === 'pro' ? '🔥 Pro' : p.id === 'solo' ? '⚡ Solo' : '👑 Scale'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Carte forfait actif */}
+      <div className="bg-white/10 border border-white/10 rounded-2xl p-5 space-y-4 relative z-10">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-black uppercase tracking-widest text-orange-400">
+            Forfait Choisi
+          </span>
+          <span className="text-[10px] font-black bg-[#F94F06] text-white px-2.5 py-0.5 rounded-full">
+            {plan.badge}
+          </span>
+        </div>
+        <div>
+          <h3 className="text-xl font-black text-white">{plan.name}</h3>
+          <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">{plan.description}</p>
+        </div>
+
+        {/* Prix + Toggle */}
+        <div className="flex items-end justify-between border-t border-white/10 pt-3">
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-black text-white">{formatPrice(price)}</span>
+            <span className="text-xs text-slate-400">{isYearly ? '/ an' : '/ mois'}</span>
+          </div>
+          <button
+            type="button"
+            onClick={onToggleCycle}
+            className="text-[10px] font-black bg-white/10 hover:bg-white/20 text-slate-300 px-3 py-1.5 rounded-xl border border-white/10 transition-all cursor-pointer"
+          >
+            {isYearly ? 'Passer mensuel' : 'Annuel (-2 mois)'}
+          </button>
+        </div>
+      </div>
+
+      {/* Features incluses */}
+      <div className="space-y-2.5 flex-1">
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          Inclus :
+        </p>
+        {plan.features.map((f, i) => (
+          <div key={i} className="flex items-start gap-2 text-xs text-slate-300">
+            <div className="w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
+              <Check className="w-2.5 h-2.5 text-emerald-400 stroke-[3]" />
+            </div>
+            <span>{f}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Réassurance */}
+      <div className="border-t border-white/10 pt-4 text-[11px] text-slate-500 flex items-center gap-2">
+        <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+        <span>14 jours d&apos;essai inclus • Wave 🌊 & Orange Money 🍊</span>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// Composant principal du formulaire
+// ============================================================
 
 function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const planParam = searchParams.get('plan') || 'solo';
-  const cycleParam = searchParams.get('cycle') || 'monthly';
+  // Paramètres URL
+  const planParam = searchParams.get('plan') ?? 'pro';
+  const cycleParam = searchParams.get('cycle') ?? 'monthly';
 
   const [activePlanId, setActivePlanId] = useState<string>(
-    PLANS_MAP[planParam] ? planParam : 'solo'
+    PLANS_MAP[planParam] ? planParam : 'pro'
   );
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>(
-    cycleParam === 'yearly' ? 'yearly' : 'monthly'
-  );
+  const [isYearly, setIsYearly] = useState(cycleParam === 'yearly');
 
-  // États du formulaire
+  // Champs formulaire
   const [agencyName, setAgencyName] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [phone, setPhone] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'WAVE' | 'ORANGE_MONEY'>('WAVE');
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [payMethod, setPayMethod] = useState<'WAVE' | 'ORANGE_MONEY'>('WAVE');
 
-  const currentPlan: PlanConfig = PLANS_MAP[activePlanId] || PLANS_CONFIG[0];
-  const isYearly = billingCycle === 'yearly';
+  // États UI
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const currentPlan: PlanConfig = PLANS_MAP[activePlanId] ?? PLANS_CONFIG[1];
   const currentPrice = isYearly ? currentPlan.priceYearly : currentPlan.priceMonthly;
 
+  const handleChangePlan = useCallback((id: string) => setActivePlanId(id), []);
+  const handleToggleCycle = useCallback(() => setIsYearly((v) => !v), []);
+
+  // ── Soumission ──────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null);
+    setErrorMsg(null);
 
     if (!agencyName.trim() || !fullName.trim() || !email.trim() || !password.trim() || !phone.trim()) {
-      setErrorMessage('Veuillez remplir tous les champs obligatoires.');
+      setErrorMsg('Merci de renseigner tous les champs obligatoires.');
       return;
     }
-
     if (password.length < 6) {
-      setErrorMessage('Le mot de passe doit comporter au moins 6 caractères.');
+      setErrorMsg('Le mot de passe doit comporter au moins 6 caractères.');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      let userUid = 'usr_' + Date.now();
       const agencyId = 'agency_' + Date.now();
+      let userUid = 'usr_' + Date.now();
 
-      // Inscription via Firebase Auth Client
+      // 1. Firebase Auth
       if (auth) {
         try {
-          const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-          userUid = userCredential.user.uid;
-          await updateProfile(userCredential.user, {
-            displayName: fullName.trim(),
-          });
+          const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
+          userUid = cred.user.uid;
+          await updateProfile(cred.user, { displayName: fullName.trim() });
         } catch (authErr: any) {
-          if (authErr.code === 'auth/email-already-in-use') {
-            throw new Error('Cette adresse email est déjà associée à un compte. Veuillez vous connecter.');
-          } else if (authErr.code === 'auth/invalid-email') {
-            throw new Error('L’adresse email saisie est invalide.');
-          } else if (authErr.code === 'auth/weak-password') {
-            throw new Error('Le mot de passe est trop faible.');
-          }
-          console.warn('Firebase Auth standard fallback:', authErr.message);
+          const msgs: Record<string, string> = {
+            'auth/email-already-in-use': 'Cette adresse email est déjà utilisée. Connectez-vous à la place.',
+            'auth/invalid-email': 'Adresse email invalide.',
+            'auth/weak-password': 'Mot de passe trop faible (6 caractères minimum).',
+          };
+          throw new Error(msgs[authErr.code] ?? authErr.message);
         }
       }
 
-      // Données de l'agence et de l'utilisateur
+      // 2. Écriture Firestore
+      const now = serverTimestamp ? serverTimestamp() : new Date().toISOString();
       const agencyData = {
         id: agencyId,
         name: agencyName.trim(),
@@ -103,303 +208,158 @@ function RegisterForm() {
         ownerPhone: phone.trim(),
         planId: currentPlan.id,
         planName: currentPlan.name,
-        billingCycle: billingCycle,
+        billingCycle: isYearly ? 'yearly' : 'monthly',
         amount: currentPrice,
-        workspacesLimit: currentPlan.workspaces,
-        paymentMethod: paymentMethod,
+        workspacesMax: currentPlan.workspacesMax,
+        workspacesUsed: 0,
+        paymentMethod: payMethod,
+        paymentStatus: 'pending',
         trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'active',
-        createdAt: serverTimestamp ? serverTimestamp() : new Date().toISOString(),
+        status: 'trialing',
+        createdAt: now,
       };
-
       const userData = {
         uid: userUid,
         email: email.trim(),
         displayName: fullName.trim(),
-        agencyId: agencyId,
+        agencyId,
         role: 'owner',
-        createdAt: serverTimestamp ? serverTimestamp() : new Date().toISOString(),
+        createdAt: now,
       };
 
-      // Sauvegarde Firestore
       if (db) {
         try {
           await setDoc(doc(db, 'agencies', agencyId), agencyData);
           await setDoc(doc(db, 'users', userUid), userData);
         } catch (dbErr) {
-          console.warn('Firestore fallback local storage:', dbErr);
+          console.warn('Firestore write failed (offline?):', dbErr);
         }
       }
 
-      // Persistance de session locale
-      const sessionProfile = {
-        agencyId,
-        agencyName: agencyName.trim(),
-        fullName: fullName.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        plan: currentPlan.id,
-        cycle: billingCycle,
-        amount: currentPrice,
-        workspacesLimit: currentPlan.workspaces,
-        paymentMethod: paymentMethod,
-      };
+      // 3. LocalStorage session
+      localStorage.setItem('cmflow_user_profile', JSON.stringify({
+        agencyId, agencyName: agencyName.trim(), fullName: fullName.trim(),
+        email: email.trim(), phone: phone.trim(),
+        plan: currentPlan.id, cycle: isYearly ? 'yearly' : 'monthly',
+        amount: currentPrice, workspacesMax: currentPlan.workspacesMax,
+        workspacesUsed: 0, paymentMethod: payMethod,
+      }));
+      localStorage.setItem('cmflow_active_plan', currentPlan.id);
+      localStorage.setItem('cmflow_agency_id', agencyId);
 
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('cmflow_user_profile', JSON.stringify(sessionProfile));
-        localStorage.setItem('cmflow_active_plan', currentPlan.id);
-        localStorage.setItem('cmflow_agency_id', agencyId);
-      }
+      // 4. Redirection paiement
+      const returnBase = window.location.origin;
+      const params = new URLSearchParams({
+        agencyId, agencyName: agencyName.trim(), agencyEmail: email.trim(),
+        phone: phone.trim(), planId: currentPlan.id.toUpperCase(),
+        amount: String(currentPrice),
+        returnUrl: `${returnBase}/billing.html?status=success&plan=${currentPlan.id}&method=${payMethod === 'WAVE' ? 'wave' : 'om'}`,
+        cancelUrl: `${returnBase}/register?plan=${currentPlan.id}`,
+      });
 
-      // Tentative de déclenchement de la passerelle Wave / Orange Money
+      const endpoint = payMethod === 'WAVE'
+        ? '/api/billing/wave/checkout'
+        : '/api/billing/om/checkout';
+
       try {
-        const endpoint = paymentMethod === 'WAVE' ? '/api/billing/wave/checkout' : '/api/billing/om/checkout';
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            agencyId,
-            agencyName: agencyName.trim(),
-            agencyEmail: email.trim(),
-            phone: phone.trim(),
-            planId: currentPlan.id.toUpperCase(),
-            amount: currentPrice,
-            returnUrl: `${window.location.origin}/dashboard?welcome=true&plan=${currentPlan.id}`,
-            cancelUrl: `${window.location.origin}/register?plan=${currentPlan.id}`,
-          }),
+          body: JSON.stringify(Object.fromEntries(params.entries())),
         });
-
         const data = await res.json();
-        if (data && data.success) {
-          const redirectUrl = data.wave_launch_url || data.payment_url;
-          if (redirectUrl) {
-            window.location.href = redirectUrl;
-            return;
-          }
+        if (data?.success) {
+          const url = data.wave_launch_url || data.payment_url;
+          if (url) { window.location.href = url; return; }
         }
-      } catch (payErr) {
-        console.warn('Payment redirect fallback to direct dashboard:', payErr);
-      }
+      } catch { /* fallback */ }
 
-      // Redirection Dashboard directe si l'essai gratuit de 14 jours s'active
-      router.push('/dashboard?welcome=true&plan=' + currentPlan.id);
+      // Fallback : page instructions paiement
+      window.location.href = `/billing.html?status=pending&plan=${currentPlan.id}&method=${payMethod === 'WAVE' ? 'wave' : 'om'}&agency=${encodeURIComponent(agencyName.trim())}&email=${encodeURIComponent(email.trim())}&amount=${currentPrice}`;
+
     } catch (err: any) {
-      setErrorMessage(err.message || 'Une erreur inattendue est survenue lors de l’inscription.');
+      setErrorMsg(err.message ?? 'Une erreur inattendue est survenue. Réessayez.');
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[720px]">
-      
-      {/* =========================================================================
-          COLONNE GAUCHE : RÉCAPITULATIF DU FORFAIT DYNAMIQUE
-          ========================================================================= */}
-      <div className="lg:col-span-5 bg-gradient-to-br from-[#0F172A] via-slate-900 to-slate-950 p-6 sm:p-10 text-white flex flex-col justify-between relative overflow-hidden">
-        {/* Halo décoratif orange */}
-        <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-orange-500/20 rounded-full blur-3xl pointer-events-none" />
+    <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[680px]">
 
-        <div className="relative z-10 space-y-6">
-          {/* Logo Brand */}
-          <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#F94F06] to-orange-400 flex items-center justify-center text-white font-black text-base shadow-md shadow-orange-500/30">
-              CM
-            </div>
-            <span className="text-xl font-black tracking-tight text-white">
-              CM<span className="text-[#F94F06]">Flow</span>
-            </span>
-          </Link>
-
-          {/* Switch Mensuel / Annuel */}
-          <div className="bg-white/5 border border-white/10 p-1.5 rounded-2xl flex items-center justify-between gap-1">
-            <button
-              type="button"
-              onClick={() => setBillingCycle('monthly')}
-              className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
-                !isYearly
-                  ? 'bg-[#F94F06] text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Facturation Mensuelle
-            </button>
-            <button
-              type="button"
-              onClick={() => setBillingCycle('yearly')}
-              className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                isYearly
-                  ? 'bg-[#F94F06] text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>Annuelle</span>
-              <span className="bg-emerald-400/20 text-emerald-300 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold">
-                -2 mois
-              </span>
-            </button>
-          </div>
-
-          {/* Sélecteur Rapide des 3 Offres */}
-          <div className="space-y-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Sélectionnez votre formule :
-            </span>
-            <div className="grid grid-cols-3 gap-2">
-              {PLANS_CONFIG.map((plan) => {
-                const isSelected = plan.id === currentPlan.id;
-                return (
-                  <button
-                    key={plan.id}
-                    type="button"
-                    onClick={() => setActivePlanId(plan.id)}
-                    className={`py-2.5 px-2 rounded-2xl text-center text-xs font-bold transition-all cursor-pointer ${
-                      isSelected
-                        ? 'border-2 border-[#F94F06] bg-orange-500/20 text-orange-200 shadow-md scale-[1.02]'
-                        : 'border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
-                    }`}
-                  >
-                    {plan.id === 'pro' ? 'Pro 🔥' : plan.id === 'solo' ? 'Solo ⚡' : 'Scale'}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Carte Forfait Active */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-black uppercase tracking-wider text-orange-400">
-                Forfait Choisi
-              </span>
-              <span className="text-[10px] font-black bg-[#F94F06] text-white px-2.5 py-0.5 rounded-full shadow-xs">
-                {currentPlan.badge}
-              </span>
-            </div>
-
-            <div>
-              <h2 className="text-2xl font-black text-white">{currentPlan.name}</h2>
-              <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                {currentPlan.description}
-              </p>
-            </div>
-
-            <div className="pt-2 border-t border-white/10 flex items-baseline gap-1.5">
-              <span className="text-3xl lg:text-4xl font-black text-white tracking-tight">
-                {currentPrice.toLocaleString('fr-FR')} FCFA
-              </span>
-              <span className="text-xs font-bold text-slate-400">
-                {isYearly ? '/ an' : '/ mois'}
-              </span>
-            </div>
-
-            <div className="text-[11px] font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl flex items-center gap-2">
-              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-              <span>
-                {currentPlan.workspaces >= 999
-                  ? 'Workspaces clients illimités'
-                  : `${currentPlan.workspaces} Workspaces clients inclus`}
-              </span>
-            </div>
-          </div>
-
-          {/* Liste des Inclusions */}
-          <div className="space-y-2.5 pt-1">
-            <span className="text-xs font-bold text-white">Inclus dans votre formule :</span>
-            <ul className="space-y-2 text-xs text-slate-300">
-              {currentPlan.features.map((feature, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-2.5 h-2.5 stroke-[3]" />
-                  </div>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Footer Réassurance */}
-        <div className="relative z-10 pt-4 text-[11px] text-slate-400 flex items-center gap-2 border-t border-white/10 mt-6">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>Essai 14 jours inclus • Paiement sécurisé Wave 🌊 & Orange Money 🍊</span>
-        </div>
-      </div>
-
-      {/* =========================================================================
-          COLONNE DROITE : FORMULAIRE D'INSCRIPTION & VALIDATION
-          ========================================================================= */}
-      <div className="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between space-y-6">
+      {/* ── Colonne Gauche : Formulaire ─────────────────── */}
+      <div className="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between">
         <div>
-          <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          {/* En-tête */}
+          <div className="pb-5 border-b border-slate-100 flex items-center justify-between">
             <div>
               <h1 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
-                Créez votre compte agence
+                Créer mon espace agence
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Démarrez votre espace de travail CMFlow en 2 minutes.
+              <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                Opérationnel en 2 minutes — 14 jours d&apos;essai offerts.
               </p>
             </div>
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-50 text-[#F94F06] border border-orange-200">
-              <Sparkles className="w-3.5 h-3.5" />
-              14 jours offerts
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-orange-50 text-[#F94F06] border border-orange-200">
+              <Sparkles className="w-3 h-3" />
+              Essai gratuit
             </span>
           </div>
 
-          {/* Message d'erreur */}
-          {errorMessage && (
-            <div className="mt-4 p-3.5 rounded-2xl bg-rose-50 border border-rose-200/80 text-rose-700 text-xs font-semibold flex items-start gap-2.5">
+          {/* Erreur */}
+          {errorMsg && (
+            <div className="mt-4 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{errorMessage}</span>
+              {errorMsg}
             </div>
           )}
 
-          {/* Formulaire Principal */}
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            {/* Nom de l'Agence & Nom Complet */}
+          {/* Formulaire */}
+          <form id="register-form" onSubmit={handleSubmit} className="mt-6 space-y-4">
+            {/* Agence & Nom */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Nom de l'Agence / Freelance *
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Building2 className="w-4 h-4" />
+              {[
+                {
+                  label: "Nom de l'Agence / Studio *",
+                  icon: <Building2 className="w-4 h-4" />,
+                  placeholder: 'Ex: Kitsune Digital',
+                  value: agencyName,
+                  setter: setAgencyName,
+                  type: 'text',
+                },
+                {
+                  label: 'Votre Nom Complet *',
+                  icon: <User className="w-4 h-4" />,
+                  placeholder: 'Ex: Fatoumata Diallo',
+                  value: fullName,
+                  setter: setFullName,
+                  type: 'text',
+                },
+              ].map((field) => (
+                <div key={field.label}>
+                  <label className="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-1.5">
+                    {field.label}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      {field.icon}
+                    </div>
+                    <input
+                      type={field.type}
+                      required
+                      placeholder={field.placeholder}
+                      value={field.value}
+                      onChange={(e) => field.setter(e.target.value)}
+                      className="w-full pl-10 pr-3.5 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all placeholder:text-slate-400"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ex: Kitsune Studio"
-                    value={agencyName}
-                    onChange={(e) => setAgencyName(e.target.value)}
-                    className="w-full pl-10 pr-3.5 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
-                  />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Nom Complet du Responsable *
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ex: Sidiqq Ndiaye"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full pl-10 pr-3.5 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
-                  />
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/* Email & Mot de Passe */}
+            {/* Email & Phone */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-1.5">
                   Email Professionnel *
                 </label>
                 <div className="relative">
@@ -412,100 +372,107 @@ function RegisterForm() {
                     placeholder="contact@agence.sn"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-3.5 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
+                    className="w-full pl-10 pr-3.5 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all placeholder:text-slate-400"
                   />
                 </div>
               </div>
-
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Mot de Passe (6+ car.) *
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-1.5">
+                  Numéro WhatsApp *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Lock className="w-4 h-4" />
+                    <Phone className="w-4 h-4" />
                   </div>
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type="tel"
                     required
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-10 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
+                    placeholder="+221 77 800 12 34"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full pl-10 pr-3.5 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all placeholder:text-slate-400"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Téléphone WhatsApp */}
+            {/* Mot de passe */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Numéro WhatsApp pour Notifications Client *
+              <label className="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-1.5">
+                Mot de Passe (6+ caractères) *
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Phone className="w-4 h-4" />
+                  <Lock className="w-4 h-4" />
                 </div>
                 <input
-                  type="tel"
+                  type={showPassword ? 'text' : 'password'}
                   required
-                  placeholder="+221 77 800 12 34"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full pl-10 pr-3.5 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-10 pr-10 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#F94F06]/20 focus:border-[#F94F06] transition-all placeholder:text-slate-400"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
-            {/* Passerelle de Paiement Wave / OM */}
-            <div className="pt-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+            {/* Sélecteur de paiement */}
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-wider text-slate-600 mb-2">
                 Passerelle de Paiement Sécurisée :
               </label>
               <div className="grid grid-cols-2 gap-3">
+                {/* Wave */}
                 <button
                   type="button"
-                  onClick={() => setPaymentMethod('WAVE')}
-                  className={`p-3.5 rounded-2xl border-2 text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
-                    paymentMethod === 'WAVE'
-                      ? 'border-[#1E90FF] bg-blue-50/50 text-[#1E90FF] shadow-xs'
-                      : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                  onClick={() => setPayMethod('WAVE')}
+                  className={`p-3.5 rounded-2xl border-2 flex items-center gap-2.5 transition-all cursor-pointer ${
+                    payMethod === 'WAVE'
+                      ? 'border-[#1DC2EC] bg-cyan-50/60'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">🌊</span>
-                    <span>Wave Sénégal / CI</span>
+                  <WaveLogo size={28} />
+                  <div className="text-left">
+                    <div className="text-xs font-black text-slate-800">Wave</div>
+                    <div className="text-[10px] text-slate-500">1% frais • 1-clic</div>
                   </div>
-                  {paymentMethod === 'WAVE' && <CheckCircle2 className="w-4 h-4 text-[#1E90FF]" />}
+                  {payMethod === 'WAVE' && (
+                    <CheckCircle2 className="w-4 h-4 text-[#1DC2EC] ml-auto shrink-0" />
+                  )}
                 </button>
 
+                {/* Orange Money */}
                 <button
                   type="button"
-                  onClick={() => setPaymentMethod('ORANGE_MONEY')}
-                  className={`p-3.5 rounded-2xl border-2 text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
-                    paymentMethod === 'ORANGE_MONEY'
-                      ? 'border-[#FF7900] bg-orange-50/50 text-[#FF7900] shadow-xs'
-                      : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                  onClick={() => setPayMethod('ORANGE_MONEY')}
+                  className={`p-3.5 rounded-2xl border-2 flex items-center gap-2.5 transition-all cursor-pointer ${
+                    payMethod === 'ORANGE_MONEY'
+                      ? 'border-[#FF7900] bg-orange-50/60'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">🍊</span>
-                    <span>Orange Money</span>
+                  <OrangeMoneyLogo size={28} />
+                  <div className="text-left">
+                    <div className="text-xs font-black text-slate-800">Orange Money</div>
+                    <div className="text-[10px] text-slate-500">UEMOA • Code OTP</div>
                   </div>
-                  {paymentMethod === 'ORANGE_MONEY' && <CheckCircle2 className="w-4 h-4 text-[#FF7900]" />}
+                  {payMethod === 'ORANGE_MONEY' && (
+                    <CheckCircle2 className="w-4 h-4 text-[#FF7900] ml-auto shrink-0" />
+                  )}
                 </button>
               </div>
             </div>
 
-            {/* Bouton de Soumission */}
-            <div className="pt-4">
+            {/* CTA principal */}
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={isLoading}
@@ -514,13 +481,12 @@ function RegisterForm() {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Création du compte en cours...</span>
+                    Création de votre espace...
                   </>
                 ) : (
                   <>
-                    <span>
-                      Démarrer mon Essai 14 Jours ({currentPrice.toLocaleString('fr-FR')} FCFA)
-                    </span>
+                    Démarrer — {formatPrice(currentPrice)}{' '}
+                    via {payMethod === 'WAVE' ? 'Wave 🌊' : 'Orange Money 🍊'}
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -529,21 +495,35 @@ function RegisterForm() {
           </form>
         </div>
 
-        {/* Pied de page & Connexion */}
-        <div className="text-center pt-4 border-t border-slate-100 text-xs text-slate-500">
+        {/* Pied de formulaire */}
+        <div className="mt-6 text-center text-xs text-slate-500 border-t border-slate-100 pt-5">
           Vous avez déjà un compte ?{' '}
-          <Link href="/login" className="font-bold text-[#F94F06] hover:underline">
-            Se connecter à mon agence
+          <Link href="/login" className="font-black text-[#F94F06] hover:underline">
+            Se connecter →
           </Link>
         </div>
+      </div>
+
+      {/* ── Colonne Droite : Récapitulatif ──────────────── */}
+      <div className="lg:col-span-5 p-5">
+        <PlanSummaryCard
+          plan={currentPlan}
+          isYearly={isYearly}
+          onChangePlan={handleChangePlan}
+          onToggleCycle={handleToggleCycle}
+        />
       </div>
     </div>
   );
 }
 
+// ============================================================
+// Page (avec Suspense pour useSearchParams)
+// ============================================================
+
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4 sm:p-6 lg:p-8 antialiased text-[#0F172A]">
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4 sm:p-6 lg:p-8 antialiased">
       <Suspense
         fallback={
           <div className="flex items-center justify-center min-h-[400px]">
