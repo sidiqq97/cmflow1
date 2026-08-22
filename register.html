@@ -336,7 +336,7 @@
 
         document.getElementById('recap-plan-badge').textContent = '14 Jours Offerts 🎁';
         document.getElementById('recap-plan-name').textContent = 'Essai Gratuit 14 Jours';
-        document.getElementById('recap-plan-tagline').textContent = 'Accès complet sans engagement, sans carte bancaire.';
+        document.getElementById('recap-plan-tagline').textContent = 'Sans engagement et sans carte bancaire requise.';
         document.getElementById('recap-plan-price').textContent = '0';
         document.getElementById('recap-plan-period').textContent = 'FCFA';
         if (recapHeader) recapHeader.textContent = 'Formule d\'essai';
@@ -346,10 +346,10 @@
           modePill.innerHTML = '🎁 14 jours gratuits';
         }
         if (mainTitle) mainTitle.textContent = 'Démarrer votre essai gratuit';
-        if (subTitle) subTitle.textContent = '14 jours offerts · Aucune carte bancaire · Annulation libre';
+        if (subTitle) subTitle.textContent = '14 jours offerts · Sans engagement · Sans carte bancaire requise';
 
         submitBtn.className = 'w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-2xl shadow-xl shadow-emerald-500/25 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2';
-        submitBtn.innerHTML = '🎁 Créer mon compte & Démarrer l\'essai →';
+        submitBtn.innerHTML = 'Créer mon compte & Démarrer l\'essai →';
 
         if (modeToggleLink) {
           modeToggleLink.innerHTML = 'Vous souhaitez démarrer directement avec un forfait ? <a href="javascript:void(0)" onclick="switchToPurchase(\'pro\')" class="font-black text-[#F94F06] hover:underline">Voir les forfaits payants →</a>';
@@ -358,12 +358,13 @@
         // Features en mode essai
         const listEl = document.getElementById('recap-features-list');
         listEl.innerHTML = [
-          '✓ 3 Workspaces clients (Forfait Solo inclus)',
-          '✓ Publications illimitées (Carrousels, Reels, Posts)',
-          '✓ Portail de validation WhatsApp interactif',
-          '✓ Publication automatique Instagram & Facebook',
-          '✓ Rapports PDF mensuels inclus',
-        ].map(f => `<li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> <span>${f.replace('✓ ', '')}</span></li>`).join('');
+          '3 Workspaces clients inclus (Forfait Solo)',
+          'Publications illimitées (Carrousels, Reels, Posts)',
+          'Portail de validation WhatsApp interactif',
+          'Publication automatique Instagram & Facebook',
+          'Rapports PDF mensuels automatiques',
+          'Support réactif par WhatsApp',
+        ].map(f => `<li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> <span>${f}</span></li>`).join('');
 
       } else {
         // ── MODE ACHAT DIRECT ──

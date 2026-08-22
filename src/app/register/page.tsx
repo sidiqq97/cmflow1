@@ -69,42 +69,43 @@ function PlanSummaryCard({
             <Gift className="w-5 h-5 text-emerald-400" />
           </div>
           <div>
-            <div className="text-xs font-black text-emerald-400 uppercase tracking-wider">Essai Gratuit</div>
-            <div className="text-[11px] text-emerald-300/70 font-semibold">Sans carte bancaire requise</div>
+            <div className="text-xs font-black text-emerald-400 uppercase tracking-wider">Essai Gratuit 14 Jours</div>
+            <div className="text-[11px] text-emerald-300/80 font-semibold">Sans engagement & sans carte bancaire requise</div>
           </div>
         </div>
 
         {/* Prix */}
         <div className="bg-white/8 border border-white/10 rounded-2xl p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total dû aujourd'hui</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total à payer aujourd&apos;hui</span>
             <span className="text-[10px] font-black bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
-              GRATUIT
+              0 FCFA
             </span>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-black text-white">0</span>
             <span className="text-lg font-bold text-slate-400">FCFA</span>
           </div>
-          <div className="flex items-center gap-2 text-[11px] text-slate-400">
+          <div className="flex items-center gap-2 text-[11px] text-slate-300">
             <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span>Accès complet pendant <strong className="text-emerald-400">14 jours</strong> — sans engagement</span>
+            <span>Essai Gratuit 14 Jours — Sans engagement et sans carte bancaire requise</span>
           </div>
         </div>
 
         {/* Ce qui est inclus */}
         <div className="space-y-2.5 flex-1">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-            Pendant votre essai :
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            Inclus dans votre essai gratuit :
           </p>
           {[
-            '3 Workspaces clients (forfait Solo)',
+            '3 Workspaces clients inclus (Forfait Solo)',
             'Publications illimitées (Carrousels, Reels, Posts)',
             'Portail de validation WhatsApp interactif',
             'Publication automatique Instagram & Facebook',
-            'Rapports PDF mensuels inclus',
+            'Rapports d\'analyse PDF mensuels',
+            'Support réactif par WhatsApp',
           ].map((f, i) => (
-            <div key={i} className="flex items-start gap-2 text-xs text-slate-300">
+            <div key={i} className="flex items-start gap-2 text-xs text-slate-200">
               <div className="w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
                 <Check className="w-2.5 h-2.5 text-emerald-400 stroke-[3]" />
               </div>
