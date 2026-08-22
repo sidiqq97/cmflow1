@@ -1104,7 +1104,20 @@
         document.getElementById('modal-create-post').classList.remove('flex');
         document.getElementById('post-caption-input').value = '';
         renderCalendar();
-        showToast('✨ Publication ajoutée et programmée avec succès !');
+        showToast('✨ Publication enregistrée ! Lien de validation prêt.');
+
+        // Ouvrir immédiatement la modale de partage WhatsApp
+        const token = `v_${Math.random().toString(36).substring(2, 10)}`;
+        const magicUrl = `https://cmflow.sn/v/${token}`;
+        document.getElementById('magic-link-display').textContent = magicUrl;
+        const text = `Bonjour ${currentClient.name} ! 🌟 Voici les nouveaux visuels prêts pour validation : ${magicUrl} (Lien actif pendant 48h sans mot de passe).`;
+        document.getElementById('whatsapp-message-text').textContent = text;
+        document.getElementById('btn-open-whatsapp-direct').href = `https://wa.me/${currentClient.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
+        
+        setTimeout(() => {
+          document.getElementById('modal-validation').classList.remove('hidden');
+          document.getElementById('modal-validation').classList.add('flex');
+        }, 300);
       };
 
       document.querySelectorAll('.btn-close-modal').forEach(btn => {

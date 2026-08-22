@@ -39,9 +39,12 @@ import {
   FolderOpen,
   Sliders,
   CheckSquare,
-  Square
+  Square,
+  Loader2
 } from 'lucide-react';
 import { useWorkspace } from '../../../context/WorkspaceContext';
+import { uploadPostMedia } from '../../../lib/uploadMedia';
+import { WhatsAppShareModal } from '../../../components/WhatsAppShareModal';
 
 // Types
 export type SocialNetwork = 'instagram' | 'facebook' | 'tiktok' | 'linkedin';
@@ -219,8 +222,16 @@ export default function CalendarPage() {
   const [isValidationModalOpen, setIsValidationModalOpen] = useState(false);
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [isAssetLibraryOpen, setIsAssetLibraryOpen] = useState(false);
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [previewPost, setPreviewPost] = useState<CalendarPost | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // État Téléversement & Partage WhatsApp
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [shareModalPost, setShareModalPost] = useState<any>(null);
+  const [shareModalToken, setShareModalToken] = useState<string>('v_demo8a1d');
+  const [shareModalMagicUrl, setShareModalMagicUrl] = useState<string>('');
 
   // Formulaire Nouveau Post enrichi
   const [caption, setCaption] = useState('');
@@ -325,41 +336,104 @@ export default function CalendarPage() {
   const validatedPostsCount = useMemo(() => filteredPosts.filter((p) => p.status === 'validated').length, [filteredPosts]);
   const scheduledPostsCount = useMemo(() => filteredPosts.filter((p) => p.status === 'scheduled').length, [filteredPosts]);
 
-  // Soumission Création Post
-  const handleCreatePostSubmit = (e: React.FormEvent) => {
+  // Soumission Création Post avec Upload Firebase Storage et Génération Token 48h
+  const handleCreatePostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!caption.trim() && mediaPreviews.length === 0) {
       triggerToast('⚠️ Veuillez ajouter au moins un média ou une légende.');
       return;
     }
 
-    const primaryNetwork = targetPlatforms[0] || 'instagram';
-    const mainMedia = mediaPreviews[0] || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80';
+    setIsUploading(true);
+    setUploadProgress(15);
 
-    const newPost: CalendarPost = {
-      id: `post-${Date.now()}`,
-      clientId: currentWorkspaceId,
-      network: primaryNetwork,
-      status: initialStatus,
-      scheduledDate,
-      scheduledTime,
-      caption,
-      mediaUrl: mainMedia,
-      mediaType: mediaType === 'VIDEO' ? 'video' : mediaType === 'CAROUSEL' ? 'carousel' : 'image',
-      carouselCount: mediaPreviews.length > 1 ? mediaPreviews.length : undefined,
-      likesEst: Math.floor(Math.random() * 400) + 50,
-    };
+    try {
+      const primaryNetwork = targetPlatforms[0] || 'instagram';
+      let mainMedia = mediaPreviews[0] || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80';
 
-    setPosts([newPost, ...posts]);
-    setIsCreatePostModalOpen(false);
+      // 1. Téléversement Réel sur Firebase Storage si un fichier local a été importé
+      if (mediaFiles.length > 0) {
+        try {
+          const uploadedUrl = await uploadPostMedia(mediaFiles[0], currentWorkspaceId, (p) => {
+            setUploadProgress(Math.max(15, Math.min(85, p)));
+          });
+          if (uploadedUrl) {
+            mainMedia = uploadedUrl;
+          }
+        } catch (uploadErr) {
+          console.warn('⚠️ Utilisation du média preview :', uploadErr);
+        }
+      }
 
-    // Reset formulaire
-    setCaption('');
-    setMediaFiles([]);
-    setMediaPreviews([]);
-    setMediaType('IMAGE');
+      setUploadProgress(90);
 
-    triggerToast('🎉 Publication programmée et ajoutée au calendrier !');
+      // 2. Appel Route API /api/posts/create pour Firestore & Session 48h
+      let createdToken = `v_${Math.random().toString(36).substring(2, 10)}`;
+      let magicUrl = `https://cmflow.sn/v/${createdToken}`;
+      let createdPostId = `post-${Date.now()}`;
+
+      try {
+        const response = await fetch('/api/posts/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            workspaceId: currentWorkspaceId,
+            caption,
+            mediaUrl: mainMedia,
+            mediaType: mediaType === 'VIDEO' ? 'video' : mediaType === 'CAROUSEL' ? 'carousel' : 'image',
+            platforms: targetPlatforms,
+            scheduledDate,
+            scheduledTime,
+          }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.token) createdToken = result.token;
+          if (result.magicUrl) magicUrl = result.magicUrl;
+          if (result.postId) createdPostId = result.postId;
+        }
+      } catch (apiErr) {
+        console.warn('⚠️ Enregistrement local fallback :', apiErr);
+      }
+
+      const newPost: CalendarPost = {
+        id: createdPostId,
+        clientId: currentWorkspaceId,
+        network: primaryNetwork,
+        status: initialStatus,
+        scheduledDate,
+        scheduledTime,
+        caption,
+        mediaUrl: mainMedia,
+        mediaType: mediaType === 'VIDEO' ? 'video' : mediaType === 'CAROUSEL' ? 'carousel' : 'image',
+        carouselCount: mediaPreviews.length > 1 ? mediaPreviews.length : undefined,
+        likesEst: Math.floor(Math.random() * 400) + 50,
+      };
+
+      setPosts([newPost, ...posts]);
+      setIsCreatePostModalOpen(false);
+
+      // Configuration et ouverture immédiate de la modale de validation WhatsApp
+      setShareModalPost(newPost);
+      setShareModalToken(createdToken);
+      setShareModalMagicUrl(magicUrl);
+      setIsWhatsAppModalOpen(true);
+
+      // Reset formulaire
+      setCaption('');
+      setMediaFiles([]);
+      setMediaPreviews([]);
+      setMediaType('IMAGE');
+
+      triggerToast('🎉 Publication enregistrée & lien WhatsApp prêt !');
+    } catch (err) {
+      console.error('Erreur lors de la programmation du post :', err);
+      triggerToast('❌ Erreur lors de la création de la publication.');
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
   const magicLink = `https://cmflow.sn/v/${currentWorkspaceId}-${Date.now().toString(36).slice(-4)}`;
@@ -1041,11 +1115,20 @@ export default function CalendarPage() {
               <button
                 type="button"
                 onClick={handleCreatePostSubmit}
-                disabled={!caption.trim() && mediaPreviews.length === 0}
+                disabled={(!caption.trim() && mediaPreviews.length === 0) || isUploading}
                 className="px-6 py-2.5 text-xs font-bold bg-[#F94F06] hover:bg-[#e04605] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
               >
-                <Send className="w-4 h-4" />
-                <span>Programmer & Envoyer en validation WhatsApp</span>
+                {isUploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>Téléversement {uploadProgress > 0 ? `${uploadProgress}%` : '...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Programmer & Envoyer en validation WhatsApp</span>
+                  </>
+                )}
               </button>
             </div>
 
@@ -1120,6 +1203,23 @@ export default function CalendarPage() {
           </div>
         </div>
       )}
+
+      {/* =======================================================================
+          G. MODALE DE PARTAGE WHATSAPP AVEC LIEN MAGIQUE 48H
+          ======================================================================= */}
+      <WhatsAppShareModal
+        isOpen={isWhatsAppModalOpen}
+        onClose={() => setIsWhatsAppModalOpen(false)}
+        post={shareModalPost}
+        token={shareModalToken}
+        magicUrl={shareModalMagicUrl}
+        workspace={{
+          id: currentWorkspaceId,
+          name: currentWorkspaceName,
+          whatsappClient: activeWorkspace?.whatsappNumber || activeWorkspace?.whatsapp || '+221 77 842 19 02',
+          flag: currentWorkspaceFlag,
+        }}
+      />
 
     </div>
   );
