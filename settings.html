@@ -697,6 +697,42 @@
         label.textContent = `${ws.name} ${ws.flag}`;
       }
     };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const side = document.getElementById('sidebar');
+      const sideBack = document.getElementById('sidebar-backdrop');
+      const openSide = document.getElementById('open-sidebar-btn');
+      const closeSide = document.getElementById('close-sidebar-btn');
+
+      if (openSide && side && sideBack) {
+        openSide.addEventListener('click', () => {
+          side.classList.remove('-translate-x-full');
+          sideBack.classList.remove('hidden');
+        });
+      }
+      if (closeSide && side && sideBack) {
+        closeSide.addEventListener('click', () => {
+          side.classList.add('-translate-x-full');
+          sideBack.classList.add('hidden');
+        });
+      }
+      if (sideBack && side) {
+        sideBack.addEventListener('click', () => {
+          side.classList.add('-translate-x-full');
+          sideBack.classList.add('hidden');
+        });
+      }
+
+      const logoutBtn = document.getElementById('btn-logout');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          if (confirm('Se déconnecter de CMFlow ?')) {
+            if (typeof CMFlowStore !== 'undefined') CMFlowStore.logout();
+            window.location.href = 'login.html';
+          }
+        });
+      }
+    });
   </script>
   <script src="js/workspace-state.js"></script>
 </body>
