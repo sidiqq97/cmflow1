@@ -38,6 +38,9 @@ while ($listener.IsListening) {
         if ([string]::IsNullOrEmpty($rawUrl) -or $rawUrl -eq "/") {
             $rawUrl = "index.html"
         }
+        elseif ($rawUrl.StartsWith("v/") -or $rawUrl.StartsWith("approve/")) {
+            $rawUrl = "client-review.html"
+        }
 
         $localFile = Join-Path $path $rawUrl
         $fullPath = [System.IO.Path]::GetFullPath($localFile)
