@@ -250,6 +250,19 @@
           <button type="button" class="view-tab-btn px-3 py-1.5 rounded-lg hover:text-slate-900 transition-all" data-view="list">Liste</button>
         </div>
 
+        <!-- Bouton Auto-Publish Worker (#0066FF) -->
+        <button
+          type="button"
+          id="btn-trigger-autopublish"
+          onclick="if(window.CMFlowAutoPublish) window.CMFlowAutoPublish.run()"
+          title="Exécuter la publication automatique maintenant"
+          class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#0066FF]/10 hover:bg-[#0066FF]/20 text-[#0066FF] border border-[#0066FF]/30 transition-all duration-200 active:scale-[0.98] cursor-pointer"
+        >
+          <svg class="w-3.5 h-3.5 text-[#0066FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span class="hidden md:inline">Auto-Publish</span>
+          <span class="md:hidden">⚡</span>
+        </button>
+
         <!-- Bouton WhatsApp Validation (#10B981) -->
         <button
           type="button"
@@ -1186,5 +1199,6 @@
   </script>
   <script src="js/workspace-state.js"></script>
   <script src="js/realtime-listener.js"></script>
+  <script src="js/auto-publish-worker.js"></script>
 </body>
 </html>
