@@ -168,7 +168,18 @@ function initAuthModal() {
   const formLogin = document.getElementById('form-login');
   const formRegister = document.getElementById('form-register');
 
-  if (!modal) return;
+  if (!modal) {
+    // Si pas de modal intégrée sur la page, rediriger directement vers register.html / login.html
+    document.querySelectorAll('[data-auth-target]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        if (btn.tagName === 'A' && btn.getAttribute('href')) return;
+        e.preventDefault();
+        const target = btn.getAttribute('data-auth-target') || 'login';
+        window.location.href = target === 'register' ? 'register.html?plan=starter' : 'login.html';
+      });
+    });
+    return;
+  }
 
   /**
    * Ouvre la modal sur un onglet donné
