@@ -3,57 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Check, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
-
-export const PLANS = [
-  {
-    id: 'solo',
-    name: 'Solo / Freelance',
-    badge: 'Démarrage',
-    priceMonthly: 3500,
-    priceYearly: 35000,
-    description: 'Idéal pour les freelances et CM indépendants gérant leurs premiers clients.',
-    features: [
-      '2 Workspaces clients',
-      'Publications & médias illimités',
-      'Portail de validation WhatsApp interactif',
-      'Publication automatique Instagram & Facebook'
-    ],
-    ctaText: 'Choisir le forfait Solo',
-    highlight: false
-  },
-  {
-    id: 'pro',
-    name: 'Pro Agency',
-    badge: 'Recommandé 🔥',
-    priceMonthly: 15000,
-    priceYearly: 150000,
-    description: 'La solution complète pour les agences et CM avec un portefeuille actif.',
-    features: [
-      'Jusqu\'à 10 Workspaces clients',
-      'Publication Reels, Carrousels & Stories',
-      'Rapports analytiques PDF automatisés',
-      'Support prioritaire WhatsApp 7j/7'
-    ],
-    ctaText: 'Choisir la Formule Pro',
-    highlight: true
-  },
-  {
-    id: 'scale',
-    name: 'Scale Agence',
-    badge: 'Grands Comptes',
-    priceMonthly: 35000,
-    priceYearly: 350000,
-    description: 'Pour les agences en forte croissance gérant de multiples marques.',
-    features: [
-      'Workspaces clients illimités',
-      'Gestion d\'équipe & rôles CM illimités',
-      'Marque blanche totale (votre logo sur le portail client)',
-      'Intégration API & Webhooks sur mesure'
-    ],
-    ctaText: 'Passer à Scale',
-    highlight: false
-  }
-];
+import { PLANS_CONFIG, PlanConfig } from '@/constants/plans';
 
 export function PricingSection() {
   const [isYearly, setIsYearly] = useState(false);
@@ -66,10 +16,10 @@ export function PricingSection() {
         <div className="text-center space-y-4 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-50 border border-orange-200/80 text-[#F94F06] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
-            Tarification Accessible
+            Tarification Accessible & Transparente
           </div>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-[#0F172A]">
-            Des tarifs pensés pour les créateurs locaux
+            Des forfaits calibrés pour vos ambitions
           </h2>
           <p className="text-sm md:text-base text-slate-600 font-medium">
             Paiement direct Wave et Orange Money en FCFA. Sans engagement.
@@ -103,7 +53,7 @@ export function PricingSection() {
 
         {/* Grille des 3 Forfaits Payants */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch relative z-20">
-          {PLANS.map((plan) => {
+          {PLANS_CONFIG.map((plan: PlanConfig) => {
             const price = isYearly ? plan.priceYearly : plan.priceMonthly;
             const targetUrl = `/register?plan=${plan.id}&cycle=${cycle}`;
 
@@ -144,7 +94,7 @@ export function PricingSection() {
                   </div>
 
                   <div className="border-t border-slate-100 pt-6 space-y-3">
-                    {plan.features.map((feature, idx) => (
+                    {plan.features.map((feature: string, idx: number) => (
                       <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-600">
                         <div className="w-4 h-4 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
                           <Check className="w-3 h-3 stroke-[3]" />
@@ -155,7 +105,7 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                {/* Bouton d'action avec Link Next.js */}
+                {/* Bouton d'action direct avec Next.js Link */}
                 <div className="pt-8">
                   <Link
                     href={targetUrl}
